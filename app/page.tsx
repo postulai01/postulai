@@ -120,6 +120,21 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ATS awareness */}
+        <section className="py-16 px-6 bg-slate-100">
+          <div className="max-w-3xl mx-auto">
+            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-4">
+              Dato que pocos conocen
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-black leading-snug mb-5">
+              ¿Sabías que el 75% de los currículums nunca llegan a un reclutador?
+            </h2>
+            <p className="text-slate-700 text-base sm:text-lg leading-relaxed">
+              Las empresas grandes usan software automático llamado ATS para filtrar candidatos antes de que un humano vea tu CV. Si tu currículum no está optimizado, queda descartado sin que nadie lo lea. Postulai genera CVs diseñados para pasar ese filtro: estructura limpia, palabras clave exactas de la oferta, y formato compatible. Tu currículum llega.
+            </p>
+          </div>
+        </section>
+
         {/* How it works */}
         <section className="py-20 px-6 bg-white">
           <div className="max-w-3xl mx-auto">
