@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(curl -s -X POST http://localhost:3000/api/waitlist -H 'Content-Type: application/json' -d '{\"email\": \"test@postul.ai\"}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/waitlist -H 'Content-Type: application/json' -d '{\"email\": \"noesvalido\"}')",
+      "Bash(npx tsc *)",
+      "Bash(curl *)"
+    ]
+  }
+}
