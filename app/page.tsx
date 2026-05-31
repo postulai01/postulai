@@ -191,6 +191,13 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Tagline — NEGRO */}
+        <section className="bg-[#0A0A0A] px-6 py-28 text-center">
+          <p className="text-white font-black leading-none tracking-tight" style={{ fontSize: 'clamp(3rem, 10vw, 8rem)' }}>
+            Postulai y listo.
+          </p>
+        </section>
+
         {/* Second CTA — BLANCO */}
         <section id="unirse" className="bg-white px-6 py-24 border-t border-slate-100">
           <div className="max-w-6xl mx-auto flex flex-col items-center gap-8 text-center">
