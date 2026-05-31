@@ -112,7 +112,7 @@ export default function Home() {
         </section>
 
         {/* How it works + ATS — BLANCO */}
-        <section id="como-funciona" className="bg-white px-6 py-20 scroll-mt-20">
+        <section id="como-funciona" className="bg-white px-6 py-20 scroll-mt-[72px]">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl sm:text-4xl font-black text-black text-center mb-4">
               Así funciona Postulai
@@ -199,7 +199,7 @@ export default function Home() {
         </section>
 
         {/* Benefits + Tagline — NEGRO */}
-        <section id="beneficios" className="bg-[#0A0A0A] px-6 py-20 scroll-mt-20">
+        <section id="beneficios" className="bg-[#0A0A0A] px-6 py-20 scroll-mt-[72px]">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl sm:text-4xl font-black text-white text-center mb-4">
               ¿Por qué Postulai?
@@ -232,7 +232,7 @@ export default function Home() {
         </section>
 
         {/* Second CTA — BLANCO */}
-        <section id="unirse" className="bg-white px-6 py-20 border-t border-slate-100 scroll-mt-20">
+        <section id="unirse" className="bg-white px-6 py-20 border-t border-slate-100 scroll-mt-[72px]">
           <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-black max-w-2xl leading-tight mb-4">
               ¿Listo para postular mejor?
