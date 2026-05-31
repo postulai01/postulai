@@ -131,7 +131,7 @@ export default function Home() {
             {/* Derecha: CTA */}
             <div className="flex flex-col items-center justify-center gap-5 text-center">
               <h3 className="text-3xl sm:text-4xl font-black text-black leading-tight">
-                Así se verá Postulai
+                Entra y Postulai
               </h3>
               <a
                 href="/app"
