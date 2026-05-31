@@ -4,9 +4,10 @@ import { useState } from "react";
 
 interface Props {
   variant?: "dark" | "light";
+  centered?: boolean;
 }
 
-export default function WaitlistForm({ variant = "light" }: Props) {
+export default function WaitlistForm({ variant = "light", centered = false }: Props) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -56,7 +57,7 @@ export default function WaitlistForm({ variant = "light" }: Props) {
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className={`w-full max-w-md ${centered ? "mx-auto" : ""}`}>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
         <input
           type="email"
@@ -80,7 +81,7 @@ export default function WaitlistForm({ variant = "light" }: Props) {
               : "bg-black text-white hover:bg-slate-800 active:bg-slate-700"
           }`}
         >
-          {status === "loading" ? "Guardando…" : "Anotarme en la lista de espera"}
+          {status === "loading" ? "Guardando…" : "Lista de espera"}
         </button>
       </form>
       {status === "error" && (

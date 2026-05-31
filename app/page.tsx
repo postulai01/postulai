@@ -61,9 +61,8 @@ export default function Home() {
         {/* Hero — NEGRO */}
         <section className="bg-[#0A0A0A] px-6 py-20">
           <div className="max-w-6xl mx-auto flex flex-col gap-10">
-            <div className="inline-flex items-center gap-2 border border-white/20 text-white/70 text-xs font-medium px-4 py-1.5 rounded-full w-fit">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-              En construcción — Lista de espera abierta
+            <div className="inline-flex items-center border border-black bg-white text-black text-[10px] font-semibold uppercase tracking-[0.2em] px-4 py-1.5 w-fit">
+              Acceso anticipado disponible
             </div>
 
             <h1 className="text-white leading-none tracking-tight max-w-5xl" style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', fontWeight: 900 }}>
@@ -162,7 +161,7 @@ export default function Home() {
                   El 75% de los currículums nunca llegan a un reclutador
                 </h2>
                 <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-                  Las empresas grandes filtran candidatos automáticamente antes de que un humano vea tu CV. Postulai genera currículums con la estructura correcta, las palabras clave exactas de la oferta, y el formato que exigen los sistemas de selección más usados en Chile. Tu currículum llega donde otros no llegan.
+                  Las empresas grandes filtran candidatos automáticamente antes de que un humano vea tu CV. Postulai crea y adapta tu currículum con la estructura correcta, las palabras clave exactas de la oferta, y el formato que exigen los sistemas de selección más usados en Chile. Tu currículum llega donde otros no llegan.
                 </p>
               </div>
 
@@ -210,9 +209,9 @@ export default function Home() {
               ¿Listo para postular mejor?
             </h2>
             <p className="text-slate-500 max-w-md text-lg mb-12">
-              Anótate y sé de los primeros en probarlo cuando lancemos.
+              Los primeros en entrar tendrán acceso anticipado. No te quedes fuera.
             </p>
-            <WaitlistForm variant="light" />
+            <WaitlistForm variant="light" centered />
           </div>
         </section>
 
@@ -220,12 +219,12 @@ export default function Home() {
 
       {/* Footer — NEGRO */}
       <footer className="bg-[#0A0A0A] border-t border-white/10 py-8 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-white/40 text-sm">
-          <span className="font-black text-white tracking-tight">Postulai</span>
-          <span>Hecho en Chile 🇨🇱</span>
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-white/50">
+          <span className="text-lg font-bold text-white tracking-tight">Postulai</span>
+          <span className="text-base">Hecho en Chile 🇨🇱</span>
           <a
             href="mailto:contacto@postulai.cl"
-            className="hover:text-white transition-colors duration-150"
+            className="text-base hover:text-white transition-colors duration-150"
           >
             contacto@postulai.cl
           </a>
