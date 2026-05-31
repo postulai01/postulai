@@ -59,7 +59,7 @@ export default function Home() {
       <main className="flex-1">
 
         {/* Hero — NEGRO */}
-        <section className="bg-[#0A0A0A] px-6 pt-24 pb-32">
+        <section className="bg-[#0A0A0A] px-6 py-20">
           <div className="max-w-6xl mx-auto flex flex-col gap-10">
             <div className="inline-flex items-center gap-2 border border-white/20 text-white/70 text-xs font-medium px-4 py-1.5 rounded-full w-fit">
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
@@ -84,8 +84,14 @@ export default function Home() {
         </section>
 
         {/* How it works + ATS — BLANCO */}
-        <section id="como-funciona" className="bg-white px-6 py-24">
+        <section id="como-funciona" className="bg-white px-6 py-20">
           <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-black text-black text-center mb-4">
+              Así funciona Postulai
+            </h2>
+            <p className="text-slate-500 text-center mb-12 max-w-xl mx-auto">
+              Sube tu currículum, pega la oferta, y recibe el resultado en segundos.
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
 
               {/* Left: Tool mockup */}
@@ -164,13 +170,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Benefits — NEGRO */}
-        <section id="beneficios" className="bg-[#0A0A0A] px-6 py-24">
+        {/* Benefits + Tagline — NEGRO */}
+        <section id="beneficios" className="bg-[#0A0A0A] px-6 py-20">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl sm:text-4xl font-black text-white text-center mb-4">
               ¿Por qué Postulai?
             </h2>
-            <p className="text-[#A0A0A0] text-center mb-14 max-w-xl mx-auto">
+            <p className="text-[#A0A0A0] text-center mb-12 max-w-xl mx-auto">
               Cada postulación exige tiempo, energía y precisión. Postulai se encarga de eso por ti.
             </p>
 
@@ -188,23 +194,22 @@ export default function Home() {
                 </div>
               ))}
             </div>
+
+            <div className="mt-20 text-center">
+              <p className="text-white font-black leading-none tracking-tight" style={{ fontSize: 'clamp(3rem, 10vw, 8rem)' }}>
+                Postulai y listo.
+              </p>
+            </div>
           </div>
         </section>
 
-        {/* Tagline — NEGRO */}
-        <section className="bg-[#0A0A0A] px-6 py-28 text-center">
-          <p className="text-white font-black leading-none tracking-tight" style={{ fontSize: 'clamp(3rem, 10vw, 8rem)' }}>
-            Postulai y listo.
-          </p>
-        </section>
-
         {/* Second CTA — BLANCO */}
-        <section id="unirse" className="bg-white px-6 py-24 border-t border-slate-100">
-          <div className="max-w-6xl mx-auto flex flex-col items-center gap-8 text-center">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-black max-w-2xl leading-tight">
+        <section id="unirse" className="bg-white px-6 py-20 border-t border-slate-100">
+          <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-black max-w-2xl leading-tight mb-4">
               ¿Listo para postular mejor?
             </h2>
-            <p className="text-slate-500 max-w-md text-lg">
+            <p className="text-slate-500 max-w-md text-lg mb-12">
               Anótate y sé de los primeros en probarlo cuando lancemos.
             </p>
             <WaitlistForm variant="light" />
