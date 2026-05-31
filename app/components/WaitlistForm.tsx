@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 
-export default function WaitlistForm() {
+interface Props {
+  variant?: "dark" | "light";
+}
+
+export default function WaitlistForm({ variant = "light" }: Props) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -38,8 +42,12 @@ export default function WaitlistForm() {
 
   if (status === "success") {
     return (
-      <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-6 py-4 text-slate-800 font-medium text-base">
-        <svg className="w-5 h-5 text-slate-700 shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+      <div className={`flex items-center gap-3 rounded-xl px-6 py-4 font-medium text-base border ${
+        variant === "dark"
+          ? "bg-white/10 border-white/20 text-white"
+          : "bg-gray-50 border-slate-200 text-black"
+      }`}>
+        <svg className={`w-5 h-5 shrink-0 ${variant === "dark" ? "text-white" : "text-black"}`} fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         ¡Te avisamos cuando esté listo. Gracias por tu interés!
@@ -56,19 +64,27 @@ export default function WaitlistForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="tu@email.com"
-          className="flex-1 px-4 py-3 rounded-xl border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent text-base shadow-sm"
+          className={`flex-1 px-4 py-3 rounded-xl border text-base shadow-sm focus:outline-none focus:ring-2 focus:border-transparent ${
+            variant === "dark"
+              ? "bg-white/10 border-white/20 text-white placeholder-white/40 focus:ring-white"
+              : "bg-white border-slate-200 text-black placeholder-slate-400 focus:ring-black"
+          }`}
           disabled={status === "loading"}
         />
         <button
           type="submit"
           disabled={status === "loading"}
-          className="px-6 py-3 bg-black hover:bg-slate-800 active:bg-slate-700 text-white font-semibold rounded-xl transition-colors duration-150 text-base shadow-sm whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+          className={`px-6 py-3 font-semibold rounded-xl transition-colors duration-150 text-base shadow-sm whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${
+            variant === "dark"
+              ? "bg-white text-black hover:bg-gray-100 active:bg-gray-200"
+              : "bg-black text-white hover:bg-slate-800 active:bg-slate-700"
+          }`}
         >
           {status === "loading" ? "Guardando…" : "Anotarme en la lista de espera"}
         </button>
       </form>
       {status === "error" && (
-        <p className="text-red-500 text-sm mt-2">{errorMsg}</p>
+        <p className="text-red-400 text-sm mt-2">{errorMsg}</p>
       )}
     </div>
   );
