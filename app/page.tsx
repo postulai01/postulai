@@ -54,7 +54,7 @@ export default function Home() {
           <nav className="hidden sm:flex items-center gap-6 text-sm font-medium text-white/60">
             <a href="#como-funciona" className="hover:text-white transition-colors duration-150">¿Cómo funciona?</a>
             <a href="#beneficios" className="hover:text-white transition-colors duration-150">¿Por qué Postulai?</a>
-            <a href="#unirse" className="bg-white text-black px-4 py-1.5 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-150">Quiero probarlo</a>
+            <a href="/app" className="bg-white text-black px-4 py-1.5 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-150">Probar ahora</a>
           </nav>
 
           {/* Mobile hamburger */}
@@ -80,7 +80,7 @@ export default function Home() {
           <div className="sm:hidden border-t border-white/10 bg-[#0A0A0A] px-6 py-5 flex flex-col gap-5">
             <a href="#como-funciona" onClick={() => setMenuOpen(false)} className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-150">¿Cómo funciona?</a>
             <a href="#beneficios" onClick={() => setMenuOpen(false)} className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-150">¿Por qué Postulai?</a>
-            <a href="#unirse" onClick={() => setMenuOpen(false)} className="inline-flex w-fit bg-white text-black text-sm px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-150">Quiero probarlo</a>
+            <a href="/app" className="inline-flex w-fit bg-white text-black text-sm px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-150">Probar ahora</a>
           </div>
         )}
       </header>
@@ -94,7 +94,7 @@ export default function Home() {
               Acceso anticipado disponible
             </div>
 
-            <h1 className="text-white leading-none tracking-tight max-w-5xl" style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', fontWeight: 900 }}>
+            <h1 className="text-white leading-none tracking-tight max-w-4xl" style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', fontWeight: 900 }}>
               Tu currículum, listo para cada trabajo que quieras.
             </h1>
 
@@ -111,90 +111,36 @@ export default function Home() {
           </div>
         </section>
 
-        {/* How it works + ATS — BLANCO */}
+        {/* ATS — BLANCO */}
         <section id="como-funciona" className="bg-white px-6 py-20 scroll-mt-[72px]">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl font-black text-black text-center mb-4">
-              Así funciona Postulai
-            </h2>
-            <p className="text-slate-500 text-center mb-12 max-w-xl mx-auto">
-              Sube tu currículum, pega la oferta, y recibe el resultado en segundos.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
 
-              {/* Left: Tool mockup */}
-              <div>
-                <div className="border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                  <div className="bg-gray-50 border-b border-slate-200 px-5 py-3 flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-slate-300" />
-                    <span className="w-3 h-3 rounded-full bg-slate-300" />
-                    <span className="w-3 h-3 rounded-full bg-slate-300" />
-                    <span className="ml-3 text-xs text-slate-400 font-mono">postulai.cl/app</span>
-                  </div>
-
-                  <div className="p-6 flex flex-col gap-5 bg-white">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-center cursor-default min-h-[120px]">
-                        <svg className="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                        </svg>
-                        <div>
-                          <p className="text-xs font-semibold text-slate-700">Tu CV</p>
-                          <p className="text-xs text-slate-400 mt-0.5">Pega el texto o sube el archivo</p>
-                        </div>
-                        <div className="px-3 py-1 bg-slate-100 rounded-lg text-xs text-slate-600 font-medium">
-                          Subir CV
-                        </div>
-                      </div>
-
-                      <div className="border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-center cursor-default min-h-[120px]">
-                        <svg className="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0" />
-                        </svg>
-                        <div>
-                          <p className="text-xs font-semibold text-slate-700">La oferta de trabajo</p>
-                          <p className="text-xs text-slate-400 mt-0.5">Pega el texto o la URL de la oferta</p>
-                        </div>
-                        <div className="px-3 py-1 bg-slate-100 rounded-lg text-xs text-slate-600 font-medium">
-                          Pegar oferta
-                        </div>
-                      </div>
-                    </div>
-
-                    <textarea
-                      disabled
-                      rows={2}
-                      placeholder="¿Algo que quieras agregar o cambiar? Cuéntanos aquí..."
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-400 placeholder-slate-300 bg-gray-50 text-xs resize-none cursor-default"
-                    />
-
-                    <button
-                      disabled
-                      className="w-full py-3 bg-black text-white font-bold rounded-xl text-sm tracking-wide cursor-default opacity-90"
-                    >
-                      Adaptar mi CV
-                    </button>
-                  </div>
-                </div>
-                <p className="text-center text-xs text-slate-400 mt-4">
-                  Vista previa — la herramienta estará disponible pronto
-                </p>
-              </div>
-
-              {/* Right: ATS content */}
-              <div className="flex flex-col gap-6">
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-                  Dato que pocos conocen
-                </p>
-                <h2 className="text-3xl sm:text-4xl font-black text-black leading-tight">
-                  El 75% de los currículums nunca llegan a un reclutador
-                </h2>
-                <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-                  Las empresas grandes filtran candidatos automáticamente antes de que un humano vea tu CV. Postulai crea y adapta tu currículum con la estructura correcta, las palabras clave exactas de la oferta, y el formato que exigen los sistemas de selección más usados en Chile. Tu currículum llega donde otros no llegan.
-                </p>
-              </div>
-
+            {/* Izquierda: texto ATS */}
+            <div className="flex flex-col gap-6">
+              <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
+                Dato que pocos conocen
+              </p>
+              <h2 className="text-3xl sm:text-4xl font-black text-black leading-tight">
+                El 75% de los currículums nunca llegan a un reclutador
+              </h2>
+              <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
+                Las empresas grandes filtran candidatos automáticamente antes de que un humano vea tu CV. Postulai crea y adapta tu currículum con la estructura correcta, las palabras clave exactas de la oferta, y el formato que exigen los sistemas de selección más usados en Chile. Tu currículum llega donde otros no llegan.
+              </p>
             </div>
+
+            {/* Derecha: CTA */}
+            <div className="flex flex-col items-center justify-center gap-5 text-center">
+              <h3 className="text-3xl sm:text-4xl font-black text-black leading-tight">
+                Así se verá Postulai
+              </h3>
+              <a
+                href="/app"
+                className="inline-flex items-center justify-center bg-black text-white font-bold text-base px-8 py-3.5 rounded-full hover:bg-slate-800 active:bg-slate-700 transition-colors duration-150"
+              >
+                Ver vista previa →
+              </a>
+            </div>
+
           </div>
         </section>
 
