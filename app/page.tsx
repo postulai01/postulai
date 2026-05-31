@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import WaitlistForm from "./components/WaitlistForm";
 
 const benefits = [
@@ -38,6 +38,7 @@ const benefits = [
 
 export default function Home() {
   useEffect(() => { window.scrollTo(0, 0); }, []);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col">
@@ -48,12 +49,40 @@ export default function Home() {
           <span className="text-xl font-black tracking-tight text-white">
             Postulai
           </span>
+
+          {/* Desktop nav */}
           <nav className="hidden sm:flex items-center gap-6 text-sm font-medium text-white/60">
-            <a href="#como-funciona" className="hover:text-white transition-colors duration-150">Ver cómo funciona</a>
-            <a href="#beneficios" className="hover:text-white transition-colors duration-150">Por qué Postulai</a>
+            <a href="#como-funciona" className="hover:text-white transition-colors duration-150">¿Cómo funciona?</a>
+            <a href="#beneficios" className="hover:text-white transition-colors duration-150">¿Por qué Postulai?</a>
             <a href="#unirse" className="bg-white text-black px-4 py-1.5 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-150">Quiero probarlo</a>
           </nav>
+
+          {/* Mobile hamburger */}
+          <button
+            className="sm:hidden text-white/70 hover:text-white transition-colors duration-150 p-1"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Menú"
+          >
+            {menuOpen ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
         </div>
+
+        {/* Mobile menu dropdown */}
+        {menuOpen && (
+          <div className="sm:hidden border-t border-white/10 bg-[#0A0A0A] px-6 py-5 flex flex-col gap-5">
+            <a href="#como-funciona" onClick={() => setMenuOpen(false)} className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-150">¿Cómo funciona?</a>
+            <a href="#beneficios" onClick={() => setMenuOpen(false)} className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-150">¿Por qué Postulai?</a>
+            <a href="#unirse" onClick={() => setMenuOpen(false)} className="inline-flex w-fit bg-white text-black text-sm px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-150">Quiero probarlo</a>
+          </div>
+        )}
       </header>
 
       <main className="flex-1">
@@ -83,7 +112,7 @@ export default function Home() {
         </section>
 
         {/* How it works + ATS — BLANCO */}
-        <section id="como-funciona" className="bg-white px-6 py-20">
+        <section id="como-funciona" className="bg-white px-6 py-20 scroll-mt-20">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl sm:text-4xl font-black text-black text-center mb-4">
               Así funciona Postulai
@@ -170,7 +199,7 @@ export default function Home() {
         </section>
 
         {/* Benefits + Tagline — NEGRO */}
-        <section id="beneficios" className="bg-[#0A0A0A] px-6 py-20">
+        <section id="beneficios" className="bg-[#0A0A0A] px-6 py-20 scroll-mt-20">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl sm:text-4xl font-black text-white text-center mb-4">
               ¿Por qué Postulai?
@@ -203,7 +232,7 @@ export default function Home() {
         </section>
 
         {/* Second CTA — BLANCO */}
-        <section id="unirse" className="bg-white px-6 py-20 border-t border-slate-100">
+        <section id="unirse" className="bg-white px-6 py-20 border-t border-slate-100 scroll-mt-20">
           <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-black max-w-2xl leading-tight mb-4">
               ¿Listo para postular mejor?
