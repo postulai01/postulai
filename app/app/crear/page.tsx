@@ -64,7 +64,7 @@ export default function CrearPage() {
       <header className="w-full border-b border-white/10 bg-[#0A0A0A]/95 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <a href="/" className="text-xl font-black tracking-tight text-white hover:opacity-80 transition-opacity duration-150">
-            Postulai
+            Postul<span className="text-[#9CA3AF]">ai</span>
           </a>
           <button className="text-sm font-medium text-white/60 hover:text-white transition-colors duration-150">
             Mi cuenta

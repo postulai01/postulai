@@ -47,7 +47,7 @@ export default function Home() {
       <header className="w-full border-b border-white/10 bg-[#0A0A0A]/95 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <a href="#" className="text-xl font-black tracking-tight text-white hover:opacity-80 transition-opacity duration-150">
-            Postulai
+            Postul<span className="text-[#9CA3AF]">ai</span>
           </a>
 
           {/* Desktop nav */}
@@ -171,7 +171,7 @@ export default function Home() {
 
             <div className="mt-20 text-center">
               <p className="text-white font-black leading-none tracking-tight" style={{ fontSize: 'clamp(3rem, 10vw, 8rem)' }}>
-                Postulai y listo.
+                Postul<span className="text-[#9CA3AF]">ai</span> y listo.
               </p>
             </div>
           </div>
@@ -195,7 +195,7 @@ export default function Home() {
       {/* Footer — NEGRO */}
       <footer className="bg-[#0A0A0A] border-t border-white/10 py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-white/50">
-          <span className="text-lg font-bold text-white tracking-tight">Postulai</span>
+          <span className="text-lg font-bold text-white tracking-tight">Postul<span className="text-[#9CA3AF]">ai</span></span>
           <span className="text-base">Hecho en Chile 🇨🇱</span>
           <a
             href="mailto:contacto@postulai.cl"
