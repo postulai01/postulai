@@ -37,7 +37,7 @@ export default function AppPage() {
           {/* Logo */}
           <div className="px-6 py-5 border-b border-[#1a1a1a]">
             <a href="/" className="text-xl font-black tracking-tight text-white hover:opacity-70 transition-opacity duration-150">
-              Postul<span className="text-[#9CA3AF]">ai</span>
+              Postulai
             </a>
           </div>
 
