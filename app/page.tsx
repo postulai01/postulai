@@ -54,7 +54,6 @@ export default function Home() {
           <nav className="hidden sm:flex items-center gap-6 text-sm font-medium text-white/60">
             <a href="#como-funciona" className="hover:text-white transition-colors duration-150">¿Cómo funciona?</a>
             <a href="#beneficios" className="hover:text-white transition-colors duration-150">¿Por qué Postulai?</a>
-            <a href="/app" className="bg-white text-black px-4 py-1.5 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-150">Vista previa</a>
           </nav>
 
           {/* Mobile hamburger */}
@@ -80,7 +79,6 @@ export default function Home() {
           <div className="sm:hidden border-t border-white/10 bg-[#0A0A0A] px-6 py-5 flex flex-col gap-5">
             <a href="#como-funciona" onClick={() => setMenuOpen(false)} className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-150">¿Cómo funciona?</a>
             <a href="#beneficios" onClick={() => setMenuOpen(false)} className="text-sm font-medium text-white/70 hover:text-white transition-colors duration-150">¿Por qué Postulai?</a>
-            <a href="/app" className="inline-flex w-fit bg-white text-black text-sm px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-150">Vista previa</a>
           </div>
         )}
       </header>
@@ -194,15 +192,13 @@ export default function Home() {
 
       {/* Footer — NEGRO */}
       <footer className="bg-[#0A0A0A] border-t border-white/10 py-8 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-white/50">
-          <span className="text-lg font-bold text-white tracking-tight">Postulai</span>
-          <span className="text-base">Hecho en Chile 🇨🇱</span>
-          <a
-            href="mailto:contacto@postulai.cl"
-            className="text-base hover:text-white transition-colors duration-150"
-          >
-            contacto@postulai.cl
-          </a>
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-white/50">
+          <span className="text-base font-bold text-white tracking-tight">Postulai · Hecho en Chile 🇨🇱</span>
+          <div className="flex items-center gap-5 text-sm">
+            <a href="mailto:contacto@postulai.cl" className="hover:text-white transition-colors duration-150">contacto@postulai.cl</a>
+            <a href="/terminos" className="hover:text-white transition-colors duration-150">Términos y condiciones</a>
+            <a href="/privacidad" className="hover:text-white transition-colors duration-150">Privacidad</a>
+          </div>
         </div>
       </footer>
     </div>

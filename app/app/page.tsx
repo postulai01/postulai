@@ -4,9 +4,63 @@ import { useState } from "react";
 
 export default function AppPage() {
   const [bannerVisible, setBannerVisible] = useState(true);
+  const [modalVisible, setModalVisible] = useState(true);
 
   return (
     <div className="h-screen overflow-hidden bg-[#0A0A0A] text-white flex flex-col">
+
+      {/* Modal de autenticación */}
+      {modalVisible && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+
+          {/* Panel */}
+          <div className="relative z-10 w-full max-w-[400px] mx-6 bg-[#0A0A0A] border border-[#222] rounded-2xl p-8 flex flex-col gap-7">
+
+            {/* Logo */}
+            <div className="flex justify-center">
+              <a href="/" className="text-2xl font-black tracking-tight text-white hover:opacity-70 transition-opacity duration-150">
+                Postulai
+              </a>
+            </div>
+
+            {/* Encabezado */}
+            <div className="flex flex-col gap-1 text-center">
+              <h2 className="text-xl font-black tracking-tight">Bienvenido</h2>
+              <p className="text-sm text-[#A0A0A0]">Inicia sesión o crea tu cuenta para continuar</p>
+            </div>
+
+            {/* Botones */}
+            <div className="flex flex-col gap-3">
+              <a
+                href="/registro"
+                className="w-full py-3 bg-white text-black font-bold text-sm rounded-xl text-center hover:bg-gray-100 active:bg-gray-200 transition-colors duration-150"
+              >
+                Crear cuenta
+              </a>
+              <a
+                href="/login"
+                className="w-full py-3 border border-white/25 text-white font-semibold text-sm rounded-xl text-center hover:border-white/50 hover:bg-white/5 transition-colors duration-150"
+              >
+                Iniciar sesión
+              </a>
+            </div>
+
+            {/* Continuar sin cuenta */}
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={() => setModalVisible(false)}
+                className="text-xs text-[#555] hover:text-[#A0A0A0] transition-colors duration-150"
+              >
+                Continuar sin cuenta →
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* Banner vista previa */}
       {bannerVisible && (
@@ -53,11 +107,11 @@ export default function AppPage() {
             </div>
           </div>
 
-          {/* Mi cuenta */}
-          <div className="px-6 py-4 border-t border-[#1a1a1a]">
-            <p className="text-sm text-white/30 hover:text-white/60 transition-colors duration-150 cursor-pointer">
-              Mi cuenta
-            </p>
+          {/* Sin sesión */}
+          <div className="px-6 py-5 border-t border-[#1a1a1a] flex items-center justify-center">
+            <a href="/login" className="text-sm font-medium text-white/40 hover:text-white/70 transition-colors duration-150 text-center">
+              Inicia sesión o regístrate
+            </a>
           </div>
 
         </aside>
@@ -66,8 +120,7 @@ export default function AppPage() {
         <main
           className="flex-1 flex flex-col items-center justify-center px-10 overflow-hidden"
           style={{
-            backgroundImage: "radial-gradient(circle, #161616 1.5px, transparent 1.5px)",
-            backgroundSize: "24px 24px",
+            backgroundImage: "repeating-linear-gradient(45deg, #111 0px, #111 1px, transparent 1px, transparent 18px)",
           }}
         >
           <div className="w-full max-w-[680px] flex flex-col gap-8">
