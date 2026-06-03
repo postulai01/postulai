@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
   // Enviar correo de bienvenida
   try {
     const resendRes = await resend.emails.send({
-      from: "Postulai <onboarding@resend.dev>",
+      from: "Postulai <onboarding@postulai.cl>",
       to: email,
       subject: "Ya eres parte de Postulai 🇨🇱",
       html: welcomeHtml(),
