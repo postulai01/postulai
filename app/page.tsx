@@ -111,34 +111,16 @@ export default function Home() {
 
         {/* ATS — BLANCO */}
         <section id="como-funciona" className="bg-white px-6 py-20 scroll-mt-[72px]">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-
-            {/* Izquierda: texto ATS */}
-            <div className="flex flex-col gap-6">
-              <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-                Dato que pocos conocen
-              </p>
-              <h2 className="text-3xl sm:text-4xl font-black text-black leading-tight">
-                El 75% de los currículums nunca llegan a un reclutador
-              </h2>
-              <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-                Las empresas grandes filtran candidatos automáticamente antes de que un humano vea tu CV. Postulai crea y adapta tu currículum con la estructura correcta, las palabras clave exactas de la oferta, y el formato que exigen los sistemas de selección más usados en Chile. Tu currículum llega donde otros no llegan.
-              </p>
-            </div>
-
-            {/* Derecha: CTA */}
-            <div className="flex flex-col items-center justify-center gap-5 text-center">
-              <h3 className="text-3xl sm:text-4xl font-black text-black leading-tight">
-                Entra y Postulai
-              </h3>
-              <a
-                href="/app"
-                className="inline-flex items-center justify-center bg-black text-white font-bold text-base px-8 py-3.5 rounded-full hover:bg-slate-800 active:bg-slate-700 transition-colors duration-150"
-              >
-                Ver vista previa →
-              </a>
-            </div>
-
+          <div className="max-w-2xl mx-auto flex flex-col items-center text-center gap-6">
+            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
+              Dato que pocos conocen
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-black text-black leading-tight">
+              El 75% de los currículums nunca llegan a un reclutador
+            </h2>
+            <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
+              Las empresas grandes filtran candidatos automáticamente antes de que un humano vea tu CV. Postulai crea y adapta tu currículum con la estructura correcta, las palabras clave exactas de la oferta, y el formato que exigen los sistemas de selección más usados en Chile. Tu currículum llega donde otros no llegan.
+            </p>
           </div>
         </section>
 
@@ -192,13 +174,12 @@ export default function Home() {
 
       {/* Footer — NEGRO */}
       <footer className="bg-[#0A0A0A] border-t border-white/10 py-8 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-white/50">
-          <span className="text-base font-bold text-white tracking-tight">Postulai · Hecho en Chile 🇨🇱</span>
-          <div className="flex items-center gap-5 text-sm">
-            <a href="mailto:contacto@postulai.cl" className="hover:text-white transition-colors duration-150">contacto@postulai.cl</a>
-            <a href="/terminos" className="hover:text-white transition-colors duration-150">Términos y condiciones</a>
-            <a href="/privacidad" className="hover:text-white transition-colors duration-150">Privacidad</a>
-          </div>
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-white/50">
+          <span className="text-lg font-bold text-white tracking-tight">Postulai</span>
+          <span className="text-base">Hecho en Chile 🇨🇱</span>
+          <a href="mailto:contacto@postulai.cl" className="text-base hover:text-white transition-colors duration-150">
+            contacto@postulai.cl
+          </a>
         </div>
       </footer>
     </div>
