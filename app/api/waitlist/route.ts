@@ -72,20 +72,32 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Email inválido." }, { status: 400 });
   }
 
-  // Guardar en Google Sheets (no bloqueante si falla)
-  fetch(SHEETS_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  }).catch(() => {});
+  // Guardar en Google Sheets
+  try {
+    const sheetsRes = await fetch(SHEETS_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    console.log("[waitlist] Sheets status:", sheetsRes.status);
+    const sheetsBody = await sheetsRes.text();
+    console.log("[waitlist] Sheets response:", sheetsBody);
+  } catch (err) {
+    console.error("[waitlist] Sheets error:", err);
+  }
 
-  // Enviar correo de bienvenida (no bloqueante si falla)
-  resend.emails.send({
-    from: "Postulai <onboarding@postulai.cl>",
-    to: email,
-    subject: "Ya eres parte de Postulai 🇨🇱",
-    html: welcomeHtml(),
-  }).catch(() => {});
+  // Enviar correo de bienvenida
+  try {
+    const resendRes = await resend.emails.send({
+      from: "Postulai <onboarding@resend.dev>",
+      to: email,
+      subject: "Ya eres parte de Postulai 🇨🇱",
+      html: welcomeHtml(),
+    });
+    console.log("[waitlist] Resend result:", JSON.stringify(resendRes));
+  } catch (err) {
+    console.error("[waitlist] Resend error:", err);
+  }
 
   return NextResponse.json({ ok: true });
 }
