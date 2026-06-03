@@ -68,6 +68,8 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const email = (body.email ?? "").trim().toLowerCase();
 
+  console.log("RESEND KEY EXISTS:", !!process.env.RESEND_API_KEY);
+
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Email inválido." }, { status: 400 });
   }
@@ -97,6 +99,7 @@ export async function POST(req: NextRequest) {
     console.log("[waitlist] Resend result:", JSON.stringify(resendRes));
   } catch (err) {
     console.error("[waitlist] Resend error:", err);
+    console.error("[waitlist] Resend error detail:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
   }
 
   return NextResponse.json({ ok: true });
