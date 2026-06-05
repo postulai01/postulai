@@ -1,179 +1,135 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import Sidebar from "@/app/components/Sidebar";
+
+const ALLOWED_EMAIL = "pedro.ignacio.heresi@gmail.com";
 
 export default function AppPage() {
-  const [bannerVisible, setBannerVisible] = useState(true);
-  const [modalVisible, setModalVisible] = useState(true);
+  const router = useRouter();
+  const [modalVisible, setModalVisible] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.replace("/login"); return; }
+      if (session.user.email !== ALLOWED_EMAIL) { router.replace("/"); return; }
+      setModalVisible(false);
+    });
+  }, [router]);
 
   return (
     <div className="h-screen overflow-hidden bg-[#0A0A0A] text-white flex flex-col">
 
-      {/* Modal de autenticación */}
-      {modalVisible && (
+      {modalVisible === true && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* Overlay */}
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-
-          {/* Panel */}
           <div className="relative z-10 w-full max-w-[400px] mx-6 bg-[#0A0A0A] border border-[#222] rounded-2xl p-8 flex flex-col gap-7">
-
-            {/* Logo */}
             <div className="flex justify-center">
-              <a href="/" className="text-2xl font-black tracking-tight text-white hover:opacity-70 transition-opacity duration-150">
+              <a href="/" className="text-2xl font-medium text-white hover:opacity-70 transition-opacity duration-150">
                 Postulai
               </a>
             </div>
-
-            {/* Encabezado */}
             <div className="flex flex-col gap-1 text-center">
-              <h2 className="text-xl font-black tracking-tight">Bienvenido</h2>
-              <p className="text-sm text-[#A0A0A0]">Inicia sesión o crea tu cuenta para continuar</p>
+              <h2 className="text-xl font-bold tracking-tight">Bienvenido</h2>
+              <p className="text-sm text-[#aaa]">Inicia sesión o crea tu cuenta para continuar</p>
             </div>
-
-            {/* Botones */}
             <div className="flex flex-col gap-3">
-              <a
-                href="/registro"
-                className="w-full py-3 bg-white text-black font-bold text-sm rounded-xl text-center hover:bg-gray-100 active:bg-gray-200 transition-colors duration-150"
-              >
+              <a href="/registro" className="w-full py-3 bg-white text-black font-bold text-sm rounded-xl text-center hover:bg-gray-100 active:bg-gray-200 transition-colors duration-150">
                 Crear cuenta
               </a>
-              <a
-                href="/login"
-                className="w-full py-3 border border-white/25 text-white font-semibold text-sm rounded-xl text-center hover:border-white/50 hover:bg-white/5 transition-colors duration-150"
-              >
+              <a href="/login" className="w-full py-3 border border-white/25 text-white font-semibold text-sm rounded-xl text-center hover:border-white/50 hover:bg-white/5 transition-colors duration-150">
                 Iniciar sesión
               </a>
             </div>
-
-            {/* Continuar sin cuenta */}
             <div className="flex justify-center">
-              <button
-                type="button"
-                onClick={() => setModalVisible(false)}
-                className="text-xs text-[#555] hover:text-[#A0A0A0] transition-colors duration-150"
-              >
+              <button type="button" onClick={() => setModalVisible(false)} className="text-xs text-[#555] hover:text-[#888] transition-colors duration-150">
                 Continuar sin cuenta →
               </button>
             </div>
-
           </div>
         </div>
       )}
 
-      {/* Banner vista previa */}
-      {bannerVisible && (
-        <div className="relative w-full bg-white border-b border-gray-200 px-6 py-3 text-center text-sm text-black shrink-0">
-          Estás viendo una vista previa. El producto completo estará disponible pronto —{" "}
-          <a href="/" className="underline underline-offset-2 hover:text-gray-600 transition-colors duration-150">
-            inscríbete en la lista de espera
-          </a>{" "}
-          para ser el primero.
-          <button
-            onClick={() => setBannerVisible(false)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-black/40 hover:text-black transition-colors duration-150 p-1"
-            aria-label="Cerrar banner"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      )}
-
-      {/* Layout principal */}
-      <div className="flex flex-1 min-h-0">
-
-        {/* Barra lateral */}
-        <aside className="w-[280px] shrink-0 bg-[#0D0D0D] border-r border-[#1a1a1a] flex flex-col">
-
-          {/* Logo */}
-          <div className="px-6 py-5 border-b border-[#1a1a1a]">
-            <a href="/" className="text-xl font-black tracking-tight text-white hover:opacity-70 transition-opacity duration-150">
-              Postulai
-            </a>
-          </div>
-
-          {/* Postulaciones */}
-          <div className="flex-1 flex flex-col gap-4 px-6 py-5 overflow-y-auto">
-            <p className="text-[10px] font-semibold tracking-[0.2em] text-white/25 uppercase">
-              Últimas postulaciones
-            </p>
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-xs text-white/20 text-center leading-relaxed">
-                Aún no tienes postulaciones.
-              </p>
-            </div>
-          </div>
-
-          {/* Sin sesión */}
-          <div className="px-6 py-5 border-t border-[#1a1a1a] flex items-center justify-center">
-            <a href="/login" className="text-sm font-medium text-white/40 hover:text-white/70 transition-colors duration-150 text-center">
-              Inicia sesión o regístrate
-            </a>
-          </div>
-
-        </aside>
+      <div className="flex flex-col md:flex-row flex-1 min-h-0">
+        <Sidebar />
 
         {/* Contenido principal */}
-        <main
-          className="flex-1 flex flex-col items-center justify-center px-10 overflow-hidden"
-          style={{
-            backgroundImage: "repeating-linear-gradient(45deg, #111 0px, #111 1px, transparent 1px, transparent 18px)",
-          }}
-        >
-          <div className="w-full max-w-[680px] flex flex-col gap-8">
+        <main className="flex-1 flex flex-col items-center justify-center px-8 sm:px-14 overflow-hidden relative">
+
+          {/* Figuras decorativas */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+            <div className="absolute -top-40 -right-40 w-[480px] h-[480px] rounded-full border border-[#1e1e1e]" />
+            <div className="absolute top-[50%] -right-20 w-52 h-52 rounded-full border border-[#1e1e1e]" />
+            <div className="absolute -bottom-10 right-28 w-36 h-36 border border-[#1e1e1e] rotate-45" />
+          </div>
+
+          {/* Contenido */}
+          <div className="w-full max-w-[640px] flex flex-col gap-10 relative">
 
             {/* Encabezado */}
             <div className="flex flex-col gap-3">
-              <h1 className="text-4xl font-black text-white tracking-tight leading-tight" style={{ fontWeight: 900 }}>
-                Tu próxima entrevista empieza aquí.
+              <h1 className="text-[30px] sm:text-[38px] font-bold text-white tracking-tight leading-tight">
+                Tu próxima entrevista<br className="hidden sm:block" /> empieza aquí.
               </h1>
-              <p className="text-[#A0A0A0] text-base leading-relaxed mb-2">
+              <p className="text-[#888] text-[15px] leading-relaxed">
                 Tú nos das la información. Nosotros te conseguimos la entrevista.
               </p>
             </div>
 
-            {/* Tarjetas */}
+            {/* Cards */}
             <div className="flex flex-col gap-3">
 
               <a
                 href="/app/crear"
-                className="group flex items-center gap-5 bg-[#111] border border-[#1e1e1e] rounded-xl p-7 hover:border-white/15 transition-colors duration-200"
+                className="group relative bg-[#141414] border border-[#222] rounded-xl p-6 flex items-start gap-5 hover:border-[#2a2a2a] hover:bg-[#161616] transition-colors duration-200 overflow-hidden"
               >
-                <div className="w-11 h-11 bg-[#1a1a1a] rounded-lg flex items-center justify-center shrink-0">
-                  <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                {/* Triángulo decorativo */}
+                <div
+                  className="absolute top-0 right-0 pointer-events-none"
+                  style={{ width: 0, height: 0, borderTop: "40px solid #1e1e1e", borderLeft: "40px solid transparent" }}
+                />
+                {/* Ícono */}
+                <div className="w-10 h-10 bg-[#1e1e1e] rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                  <svg className="w-5 h-5 text-[#888]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
                   </svg>
                 </div>
-                <div className="flex-1 flex flex-col gap-0.5 min-w-0">
-                  <p className="text-lg font-bold text-white leading-snug">Cuéntanos tu historia, nosotros el CV</p>
-                  <p className="text-[14px] text-[#A0A0A0] leading-relaxed">Completa tu perfil en minutos y creamos tu currículum profesional desde cero.</p>
+                {/* Texto */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-semibold text-[16px] leading-snug">Cuéntanos tu historia, nosotros el CV</p>
+                  <p className="text-[#aaa] text-[13px] mt-1.5 leading-relaxed">Completa tu perfil en minutos y creamos tu currículum profesional desde cero.</p>
+                  <p className="text-[#ccc] text-[11px] mt-4 font-semibold tracking-[0.08em]">EMPEZAR →</p>
                 </div>
-                <span className="text-white/20 group-hover:text-white/60 transition-colors duration-150 shrink-0 text-base">→</span>
               </a>
 
               <a
                 href="/app/adaptar"
-                className="group flex items-center gap-5 bg-[#111] border border-[#1e1e1e] rounded-xl p-7 hover:border-white/15 transition-colors duration-200"
+                className="group relative bg-[#141414] border border-[#222] rounded-xl p-6 flex items-start gap-5 hover:border-[#2a2a2a] hover:bg-[#161616] transition-colors duration-200 overflow-hidden"
               >
-                <div className="w-11 h-11 bg-[#1a1a1a] rounded-lg flex items-center justify-center shrink-0">
-                  <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                {/* Triángulo decorativo */}
+                <div
+                  className="absolute top-0 right-0 pointer-events-none"
+                  style={{ width: 0, height: 0, borderTop: "40px solid #1e1e1e", borderLeft: "40px solid transparent" }}
+                />
+                {/* Ícono */}
+                <div className="w-10 h-10 bg-[#1e1e1e] rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                  <svg className="w-5 h-5 text-[#888]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                   </svg>
                 </div>
-                <div className="flex-1 flex flex-col gap-0.5 min-w-0">
-                  <p className="text-lg font-bold text-white leading-snug">Tu CV, a medida de cada oferta</p>
-                  <p className="text-[14px] text-[#A0A0A0] leading-relaxed">Sube tu currículum y pega la oferta. Postulai lo adapta para que llegues primero.</p>
+                {/* Texto */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-semibold text-[16px] leading-snug">Tu CV, a medida de cada oferta</p>
+                  <p className="text-[#aaa] text-[13px] mt-1.5 leading-relaxed">Sube tu currículum y pega la oferta. Postulai lo adapta para que llegues primero.</p>
+                  <p className="text-[#ccc] text-[11px] mt-4 font-semibold tracking-[0.08em]">EMPEZAR →</p>
                 </div>
-                <span className="text-white/20 group-hover:text-white/60 transition-colors duration-150 shrink-0 text-base">→</span>
               </a>
 
             </div>
           </div>
         </main>
-
       </div>
     </div>
   );

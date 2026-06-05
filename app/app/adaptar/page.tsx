@@ -1,15 +1,26 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Sidebar, { saveHistorialEntry } from "@/app/components/Sidebar";
+import { supabase } from "@/lib/supabase";
 
 const inputClass =
   "w-full bg-[#111] border border-[#222] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/20 transition-colors duration-150";
 
 type CvStatus = "idle" | "loading" | "success" | "error";
 
+const ALLOWED_EMAIL = "pedro.ignacio.heresi@gmail.com";
+
 export default function AdaptarPage() {
   const router = useRouter();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.replace("/login"); return; }
+      if (session.user.email !== ALLOWED_EMAIL) { router.replace("/"); }
+    });
+  }, [router]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [cvText, setCvText] = useState("");
@@ -53,13 +64,30 @@ export default function AdaptarPage() {
     setError(null);
     setLoading(true);
     try {
+      let oferta = ofertaText;
+
+      if (ofertaMode === "link") {
+        const fetchRes = await fetch("/api/fetch-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: ofertaText }),
+        });
+        const fetchData = await fetchRes.json();
+        if (!fetchRes.ok || fetchData.error) {
+          setError("No pudimos leer esa página. Intenta pegar el texto directamente.");
+          setLoading(false);
+          return;
+        }
+        oferta = fetchData.texto;
+      }
+
       const res = await fetch("/api/process-cv", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           modo: "adaptar",
           cv: cvText,
-          oferta: ofertaText,
+          oferta,
           instrucciones: instrucciones || undefined,
         }),
       });
@@ -68,8 +96,12 @@ export default function AdaptarPage() {
 
       sessionStorage.setItem(
         "postulai_resultado",
-        JSON.stringify({ ...data, generadoEn: new Date().toISOString() })
+        JSON.stringify({ ...data, generadoEn: new Date().toISOString(), modo: "adaptar" })
       );
+      const titulo = data.titulo_postulacion ??
+        oferta.split("\n").find((l) => l.trim().length > 3)?.trim().slice(0, 60) ??
+        "Oferta de trabajo";
+      saveHistorialEntry({ titulo, fecha: new Date().toISOString(), tipo: "adaptado" });
       router.push("/app/resultado");
     } catch {
       setError("Algo salió mal, intenta de nuevo");
@@ -78,40 +110,33 @@ export default function AdaptarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col">
+    <div className="h-screen overflow-hidden bg-[#0A0A0A] text-white flex flex-col md:flex-row">
+      <Sidebar />
+      <div className="flex-1 flex flex-col min-h-0 overflow-y-auto relative">
 
-      {/* Navbar */}
-      <header className="w-full border-b border-white/10 bg-[#0A0A0A]/95 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <a href="/" className="text-xl font-black tracking-tight text-white hover:opacity-80 transition-opacity duration-150">
-            Postulai
-          </a>
-          <button className="text-sm font-medium text-white/60 hover:text-white transition-colors duration-150">
-            Mi cuenta
-          </button>
+        {/* Figuras decorativas */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+          <div className="absolute -top-32 -right-32 w-[400px] h-[400px] rounded-full border border-[#1e1e1e]" />
+          <div className="absolute top-[55%] -right-16 w-44 h-44 rounded-full border border-[#1e1e1e]" />
+          <div className="absolute bottom-20 right-20 w-28 h-28 border border-[#1e1e1e] rotate-45" />
         </div>
-      </header>
 
       <main
-        className="flex-1 flex flex-col items-center px-6 py-14"
-        style={{
-          backgroundImage: "linear-gradient(#141414 1px, transparent 1px), linear-gradient(90deg, #141414 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
+        className="flex-1 flex flex-col px-6 sm:px-10 py-10 sm:py-16 relative"
       >
-        <div className="w-full max-w-[700px] flex flex-col gap-8">
+        <div className="w-full max-w-[900px] mx-auto flex flex-col gap-8">
 
           {/* Encabezado */}
           <div className="flex flex-col gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Tu CV, a medida de cada oferta</h1>
-            <p className="text-[#A0A0A0] text-base">Sube tu currículum, pega la oferta y Postulai hace el resto.</p>
+            <h1 className="text-[28px] sm:text-[34px] font-bold text-white tracking-tight">Tu CV, a medida de cada oferta</h1>
+            <p className="text-[#aaa] text-base">Sube tu currículum, pega la oferta y Postulai hace el resto.</p>
           </div>
 
           {/* Subir CV */}
           <div className="flex flex-col gap-3">
             <div>
               <p className="text-sm font-bold text-white">Tu currículum</p>
-              <p className="text-xs text-[#A0A0A0] mt-0.5">Sube tu archivo en PDF o Word (.docx).</p>
+              <p className="text-xs text-[#aaa] mt-0.5">Sube tu archivo en PDF o Word (.docx).</p>
             </div>
 
             {cvStatus === "success" ? (
@@ -138,7 +163,7 @@ export default function AdaptarPage() {
             ) : cvStatus === "loading" ? (
               <div className="border border-[#222] bg-[#111] rounded-xl px-5 py-4 flex items-center gap-3">
                 <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin shrink-0" />
-                <span className="text-sm text-[#A0A0A0]">Leyendo {fileName}...</span>
+                <span className="text-sm text-[#aaa]">Leyendo {fileName}...</span>
               </div>
             ) : cvStatus === "error" ? (
               <div className="border border-red-500/30 bg-red-500/10 rounded-xl px-5 py-4 flex items-center justify-between gap-4">
@@ -161,7 +186,7 @@ export default function AdaptarPage() {
                 </svg>
                 <div className="flex flex-col gap-1.5">
                   <p className="text-base font-bold text-white">Tu currículum</p>
-                  <p className="text-sm text-[#A0A0A0]">PDF o Word — arrastra aquí o haz click para buscar.</p>
+                  <p className="text-sm text-[#aaa]">PDF o Word — arrastra aquí o haz click para buscar.</p>
                 </div>
                 <button
                   type="button"
@@ -180,7 +205,7 @@ export default function AdaptarPage() {
           <div className="flex flex-col gap-4">
             <div>
               <p className="text-sm font-bold text-white">Oferta de trabajo</p>
-              <p className="text-xs text-[#A0A0A0] mt-0.5">Pega el texto o el link de la oferta.</p>
+              <p className="text-xs text-[#aaa] mt-0.5">Pega el texto o el link de la oferta.</p>
             </div>
             <div className="flex gap-1 bg-[#111] border border-[#222] rounded-lg p-1 w-fit">
               {(["texto", "link"] as const).map((tab) => (
@@ -219,7 +244,7 @@ export default function AdaptarPage() {
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold text-white">Instrucciones adicionales</span>
-              <span className="text-xs text-[#A0A0A0] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md">Opcional</span>
+              <span className="text-xs text-[#aaa] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md">Opcional</span>
             </div>
             <textarea
               rows={3}
@@ -234,7 +259,7 @@ export default function AdaptarPage() {
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={loading || cvStatus !== "success"}
+            disabled={loading || cvStatus !== "success" || !ofertaText.trim()}
             className="w-full py-4 bg-white text-black font-bold rounded-xl text-base tracking-tight hover:bg-gray-100 active:bg-gray-200 transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {loading ? "Procesando..." : "Adaptar mi currículum →"}
@@ -243,7 +268,7 @@ export default function AdaptarPage() {
           {loading && (
             <div className="flex items-center justify-center gap-3 py-4">
               <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-              <span className="text-sm text-[#A0A0A0]">Postulai está adaptando tu currículum...</span>
+              <span className="text-sm text-[#aaa]">Postulai está adaptando tu currículum...</span>
             </div>
           )}
 
@@ -256,6 +281,7 @@ export default function AdaptarPage() {
         </div>
       </main>
 
+      </div>
     </div>
   );
 }

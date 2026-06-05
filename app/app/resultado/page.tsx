@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Sidebar from "@/app/components/Sidebar";
+import { supabase } from "@/lib/supabase";
 
 interface ResultData {
   cv_adaptado: string;
@@ -9,6 +11,8 @@ interface ResultData {
   sugerencias: string[];
   principales_cambios: string[];
   generadoEn: string;
+  titulo_postulacion?: string;
+  modo?: string;
 }
 
 function truncateWords(text: string, max: number): string {
@@ -44,12 +48,22 @@ function CardHeading({ children }: { children: React.ReactNode }) {
   );
 }
 
+const ALLOWED_EMAIL = "pedro.ignacio.heresi@gmail.com";
+
 export default function ResultadoPage() {
   const router = useRouter();
   const [data, setData] = useState<ResultData | null>(null);
   const [copiedCarta, setCopiedCarta] = useState(false);
   const [copiedCv, setCopiedCv] = useState(false);
   const [downloading, setDownloading] = useState<"pdf" | "word" | null>(null);
+  const savedRef = useRef(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.replace("/login"); return; }
+      if (session.user.email !== ALLOWED_EMAIL) { router.replace("/"); }
+    });
+  }, [router]);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("postulai_resultado");
@@ -57,6 +71,27 @@ export default function ResultadoPage() {
     try { setData(JSON.parse(raw)); }
     catch { router.replace("/app/adaptar"); }
   }, [router]);
+
+  useEffect(() => {
+    if (!data || savedRef.current) return;
+    savedRef.current = true;
+
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) return;
+      const match = data.titulo_postulacion?.match(/CV para (.+?) · (.+)/);
+      await supabase.from("postulaciones").insert({
+        user_id: session.user.id,
+        tipo: data.modo ?? "adaptar",
+        empresa: match?.[1] ?? null,
+        cargo: match?.[2] ?? null,
+        titulo_postulacion: data.titulo_postulacion ?? null,
+        cv_adaptado: data.cv_adaptado,
+        carta_presentacion: data.carta_presentacion,
+        principales_cambios: data.principales_cambios ?? null,
+        sugerencias: data.sugerencias ?? null,
+      });
+    });
+  }, [data]);
 
   async function copyCarta() {
     if (!data) return;
@@ -72,119 +107,33 @@ export default function ResultadoPage() {
     setTimeout(() => setCopiedCv(false), 2000);
   }
 
-  function handleDownloadPDF() {
+  async function handleDownloadPDF() {
     if (!data || downloading) return;
     setDownloading("pdf");
-
-    const isSep = (t: string) => t.length > 1 && /^[%\-=_*~─━]+$/.test(t.trim());
-    const esc = (s: string) =>
-      s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-    type Role = "name" | "title" | "contact" | "section" | "bullet" | "body" | "blank";
-    const parsed: { role: Role; text: string }[] = [];
-    let state: "name" | "title" | "contact" | "body" = "name";
-
-    for (const raw of data.cv_adaptado.split("\n")) {
-      if (isSep(raw)) continue;
-      const t = raw.replace(/%%%/g, "").replace(/[─━]+/g, "").trim();
-      if (t === "") { parsed.push({ role: "blank", text: "" }); continue; }
-      const allCaps = t.length > 1 && t.length < 60 && t === t.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(t);
-
-      if (state === "name") {
-        parsed.push({ role: "name", text: t }); state = "title";
-      } else if (state === "title") {
-        if (allCaps) { state = "body"; parsed.push({ role: "section", text: t }); }
-        else { parsed.push({ role: "title", text: t }); state = "contact"; }
-      } else if (state === "contact") {
-        if (allCaps) { state = "body"; parsed.push({ role: "section", text: t }); }
-        else { parsed.push({ role: "contact", text: t }); state = "body"; }
-      } else {
-        if (allCaps) parsed.push({ role: "section", text: t });
-        else if (/^•/.test(t)) parsed.push({ role: "bullet", text: t.replace(/^•\s*/, "") });
-        else parsed.push({ role: "body", text: t });
-      }
+    try {
+      const [{ pdf }, { default: CVDocument }] = await Promise.all([
+        import("@react-pdf/renderer"),
+        import("@/app/components/CVDocument"),
+      ]);
+      const blob = await pdf(<CVDocument cvText={data.cv_adaptado} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "cv-postulai.pdf";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } finally {
+      setDownloading(null);
     }
-
-    let cvHtml = "";
-    let ruleDone = false;
-    for (const ln of parsed) {
-      switch (ln.role) {
-        case "name":
-          cvHtml += `<p class="cv-name">${esc(ln.text)}</p>`; break;
-        case "title":
-          cvHtml += `<p class="cv-title">${esc(ln.text)}</p>`; break;
-        case "contact":
-          cvHtml += `<p class="cv-contact">${esc(ln.text)}</p>`;
-          if (!ruleDone) { cvHtml += `<hr class="cv-rule">`; ruleDone = true; }
-          break;
-        case "section":
-          if (!ruleDone) { cvHtml += `<hr class="cv-rule">`; ruleDone = true; }
-          cvHtml += `<p class="cv-section">${esc(ln.text)}</p>`; break;
-        case "bullet":
-          cvHtml += `<p class="cv-bullet">• ${esc(ln.text)}</p>`; break;
-        case "body":
-          cvHtml += `<p class="cv-body">${esc(ln.text)}</p>`; break;
-        case "blank":
-          cvHtml += `<p class="cv-blank"> </p>`; break;
-      }
-    }
-
-    const html = `<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>CV — Postulai</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,Helvetica,sans-serif;font-size:10pt;color:#000;background:#e8e8e8}
-@page{margin:18mm;size:letter portrait}
-@media screen{
-  .bar{background:#111;color:#fff;text-align:center;padding:12px 20px;font-size:13px;font-family:Arial,sans-serif;position:sticky;top:0;z-index:9}
-  .bar button{background:#fff;color:#111;border:none;cursor:pointer;padding:7px 18px;font-size:13px;font-weight:700;border-radius:6px;margin-left:12px}
-  .bar button:hover{background:#eee}
-  .cv{max-width:216mm;margin:24px auto 48px;background:#fff;padding:18mm;box-shadow:0 4px 24px rgba(0,0,0,.18)}
-}
-@media print{
-  body{background:#fff}
-  .bar{display:none!important}
-  .cv{padding:0;max-width:none;margin:0;box-shadow:none}
-}
-.cv-name{font-size:20pt;font-weight:700;text-align:center;text-transform:uppercase;letter-spacing:2px;margin-bottom:5px}
-.cv-title{font-size:11pt;text-align:center;color:#444;margin-bottom:3px}
-.cv-contact{font-size:9pt;text-align:center;color:#444;margin-bottom:8px}
-.cv-rule{border:none;border-top:1px solid #000;margin:8px 0 10px}
-.cv-section{font-size:10pt;font-weight:700;text-transform:uppercase;border-bottom:1px solid #999;padding-bottom:2px;margin-top:10px;margin-bottom:4px}
-.cv-body{font-size:10pt;line-height:1.4;margin:2px 0}
-.cv-bullet{font-size:10pt;line-height:1.4;padding-left:12px;margin:2px 0}
-.cv-blank{height:5px}
-.cv-footer{font-size:7pt;text-align:center;color:#999;margin-top:24px}
-</style>
-</head>
-<body>
-<div class="bar">
-  Guarda como PDF: <strong>Cmd+P</strong> (Mac) o <strong>Ctrl+P</strong> (Windows) → selecciona <strong>"Guardar como PDF"</strong>
-  <button onclick="window.print()">Imprimir / Guardar PDF</button>
-</div>
-<div class="cv">
-${cvHtml}
-<p class="cv-footer">Generado por Postulai · postulai.cl</p>
-</div>
-<script>setTimeout(function(){window.print()},400)</script>
-</body>
-</html>`;
-
-    const win = window.open("", "_blank");
-    if (!win) { alert("Permite ventanas emergentes para descargar el PDF."); setDownloading(null); return; }
-    win.document.write(html);
-    win.document.close();
-    setDownloading(null);
   }
 
   async function handleDownloadWord() {
     if (!data || downloading) return;
     setDownloading("word");
     try {
-      const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = await import("docx");
+      const { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle } = await import("docx");
 
       const isSep = (t: string) => t.length > 1 && /^[%\-=_*~─━]+$/.test(t.trim());
       type Role = "name" | "title" | "contact" | "section" | "bullet" | "body" | "blank";
@@ -215,74 +164,68 @@ ${cvHtml}
       const children: InstanceType<typeof Paragraph>[] = [];
       let ruleDone = false;
 
+      const headerRule = () => new Paragraph({
+        border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: "000000", space: 4 } },
+        spacing: { after: 120 },
+        children: [],
+      });
+
       for (const { role, text } of parsed) {
         switch (role) {
           case "name":
             children.push(new Paragraph({
-              heading: HeadingLevel.HEADING_1,
               alignment: AlignmentType.CENTER,
-              children: [new TextRun({ text, font: "Arial", size: 40, bold: true })],
-              spacing: { after: 120 },
+              children: [new TextRun({ text: text.toUpperCase(), font: "Calibri", size: 32, bold: true, color: "000000" })],
+              spacing: { after: 60 },
             }));
             break;
           case "title":
             children.push(new Paragraph({
               alignment: AlignmentType.CENTER,
-              children: [new TextRun({ text, font: "Arial", size: 22, color: "444444" })],
-              spacing: { after: 60 },
+              children: [new TextRun({ text, font: "Calibri", size: 22, color: "555555" })],
+              spacing: { after: 40 },
             }));
             break;
           case "contact":
             children.push(new Paragraph({
               alignment: AlignmentType.CENTER,
-              children: [new TextRun({ text, font: "Arial", size: 18, color: "444444" })],
+              children: [new TextRun({ text, font: "Calibri", size: 20, color: "777777" })],
               spacing: { after: 60 },
             }));
-            if (!ruleDone) {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              children.push(new Paragraph({ border: { bottom: { style: "single" as any, size: 6, color: "000000", space: 4 } }, spacing: { after: 160 }, children: [] }));
-              ruleDone = true;
-            }
+            if (!ruleDone) { children.push(headerRule()); ruleDone = true; }
             break;
           case "section":
-            if (!ruleDone) {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              children.push(new Paragraph({ border: { bottom: { style: "single" as any, size: 6, color: "000000", space: 4 } }, spacing: { after: 160 }, children: [] }));
-              ruleDone = true;
-            }
+            if (!ruleDone) { children.push(headerRule()); ruleDone = true; }
             children.push(new Paragraph({
-              heading: HeadingLevel.HEADING_2,
-              children: [new TextRun({ text, font: "Arial", size: 20, bold: true })],
-              spacing: { before: 240, after: 80 },
+              children: [new TextRun({ text: text.toUpperCase(), font: "Calibri", size: 22, bold: true, color: "000000" })],
+              border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: "AAAAAA", space: 4 } },
+              spacing: { before: 200, after: 80 },
             }));
             break;
           case "bullet":
             children.push(new Paragraph({
               bullet: { level: 0 },
-              children: [new TextRun({ text, font: "Arial", size: 20 })],
+              children: [new TextRun({ text, font: "Calibri", size: 22, color: "000000" })],
               spacing: { after: 40 },
             }));
             break;
           case "body":
             children.push(new Paragraph({
-              children: [new TextRun({ text, font: "Arial", size: 20 })],
+              children: [new TextRun({ text, font: "Calibri", size: 22, color: "000000" })],
               spacing: { after: 60, line: 276 },
             }));
             break;
           default:
-            children.push(new Paragraph({ children: [new TextRun({ text: " " })], spacing: { after: 0 } }));
+            children.push(new Paragraph({
+              children: [new TextRun({ text: "", font: "Calibri", size: 22 })],
+              spacing: { after: 0 },
+            }));
         }
       }
 
-      children.push(new Paragraph({
-        alignment: AlignmentType.CENTER,
-        children: [new TextRun({ text: "Generado por Postulai · postulai.cl", font: "Arial", size: 14, color: "999999" })],
-        spacing: { before: 480 },
-      }));
-
       const doc = new Document({
         sections: [{
-          properties: { page: { margin: { top: 1134, bottom: 1134, left: 1134, right: 1134 } } },
+          properties: { page: { margin: { top: 720, bottom: 720, left: 900, right: 900 } } },
           children,
         }],
       });
@@ -317,49 +260,42 @@ ${cvHtml}
   const cartaEsTruncada = cartaTruncada !== data.carta_presentacion;
 
   return (
-    <div
-      className="min-h-screen text-white flex flex-col"
-      style={{
-        backgroundColor: "#0A0A0A",
-        backgroundImage:
-          "radial-gradient(ellipse 90% 45% at 50% 0%, #141414 0%, #0A0A0A 70%), " +
-          "repeating-linear-gradient(-45deg, transparent, transparent 40px, #ffffff04 40px, #ffffff04 41px)",
-      }}
-    >
-      {/* Navbar */}
-      <header className="w-full border-b border-white/10 bg-[#0A0A0A]/90 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <a href="/" className="text-xl font-black tracking-tight text-white hover:opacity-80 transition-opacity duration-150">
-            Postulai
-          </a>
-          <button
-            type="button"
-            onClick={() => router.push("/app/adaptar")}
-            className="text-sm font-medium text-white/60 hover:text-white transition-colors duration-150 flex items-center gap-1.5"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-            </svg>
-            Adaptar otro
-          </button>
-        </div>
-      </header>
+    <div className="h-screen overflow-hidden bg-[#0A0A0A] text-white flex flex-col md:flex-row">
+      <Sidebar />
+      <div className="flex-1 flex flex-col min-h-0 overflow-y-auto relative">
 
-      <main className="flex-1 px-6 py-12">
-        <div className="max-w-6xl mx-auto flex flex-col gap-10">
+        {/* Figuras decorativas */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+          <div className="absolute -top-32 -right-32 w-[400px] h-[400px] rounded-full border border-[#1e1e1e]" />
+          <div className="absolute top-[55%] -right-16 w-44 h-44 rounded-full border border-[#1e1e1e]" />
+          <div className="absolute bottom-20 right-20 w-28 h-28 border border-[#1e1e1e] rotate-45" />
+        </div>
+
+      <main className="flex-1 px-6 sm:px-10 py-10 sm:py-14 relative">
+        <div className="w-full max-w-[900px] mx-auto flex flex-col gap-10">
 
           {/* ── Encabezado + botones ── */}
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <div className="flex flex-col gap-1.5">
-              <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Tu currículum adaptado</h1>
-              <p className="text-sm text-[#D1D5DB]">Generado el {fecha}</p>
+              <h1 className="text-[28px] sm:text-[34px] font-bold text-white tracking-tight">Tu currículum adaptado</h1>
+              <p className="text-sm text-[#aaa]">Generado el {fecha}</p>
             </div>
-            <div className="flex gap-3 shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => router.push("/app/adaptar")}
+                className="text-sm font-medium text-white/50 hover:text-white transition-colors duration-150 flex items-center gap-1.5 w-fit"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Adaptar otro
+              </button>
               <button
                 type="button"
                 onClick={handleDownloadPDF}
                 disabled={!!downloading}
-                className="flex items-center gap-2 px-5 py-2.5 bg-white text-black text-sm font-bold rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white text-black text-sm font-bold rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
               >
                 {downloading === "pdf"
                   ? <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
@@ -370,7 +306,7 @@ ${cvHtml}
                 type="button"
                 onClick={handleDownloadWord}
                 disabled={!!downloading}
-                className="flex items-center gap-2 px-5 py-2.5 bg-transparent text-white text-sm font-semibold border border-white/20 rounded-xl hover:border-white/40 hover:bg-white/5 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-transparent text-white text-sm font-semibold border border-white/20 rounded-xl hover:border-white/40 hover:bg-white/5 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
               >
                 {downloading === "word"
                   ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -388,7 +324,7 @@ ${cvHtml}
               <div className="px-6 py-5 border-b border-[#222] flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <span className="text-base font-bold text-white">CV Adaptado</span>
-                  <span className="text-xs text-[#D1D5DB] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md">ATS 2026</span>
+                  <span className="text-xs text-[#aaa] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md">ATS 2026</span>
                 </div>
                 <button
                   type="button"
@@ -464,6 +400,8 @@ ${cvHtml}
 
         </div>
       </main>
+
+      </div>
     </div>
   );
 }

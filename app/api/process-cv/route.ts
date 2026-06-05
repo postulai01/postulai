@@ -7,7 +7,9 @@ const SYSTEM_PROMPT = `Eres un experto en recursos humanos y redacción de curr�
 
 MODO ADAPTAR: Recibes un currículum existente y una oferta de trabajo. Reescribe el CV reorganizando y reformulando únicamente la información real del candidato para que calce perfectamente con los requisitos de la oferta. Usa las palabras clave exactas de la oferta. Identifica habilidades implícitas del candidato que se alineen con la oferta aunque no estén mencionadas explícitamente. IMPORTANTE: No inventes ni agregues información que no esté en el CV original. Solo reorganiza, reformula y destaca lo que ya existe. El candidato es responsable de la veracidad de su información.
 
-MODO CREAR: Recibes datos básicos del candidato (estudios, experiencia, habilidades). Construye un currículum profesional completo desde cero. Identifica y destaca habilidades implícitas basándote en la experiencia y estudios indicados. No inventes información que el candidato no haya proporcionado.
+MODO CREAR CON OFERTA: Recibes datos básicos del candidato y una oferta de trabajo. Construye un CV profesional desde cero adaptado específicamente a esa oferta. Usa las palabras clave de la oferta y destaca las habilidades del candidato que mejor se alineen con sus requisitos. No inventes información que el candidato no haya proporcionado.
+
+MODO CREAR SIN OFERTA: Recibes únicamente datos básicos del candidato. Construye un CV profesional general y completo, optimizado para ATS 2026, que sirva para postular a cualquier trabajo relacionado con su perfil. Destaca habilidades, logros y formación de manera equilibrada y versátil. No inventes información que el candidato no haya proporcionado.
 
 FORMATO DEL CV — ESTRUCTURA EXACTA Y OBLIGATORIA (ambos modos):
 
@@ -16,8 +18,8 @@ El CV debe seguir esta estructura, en este orden y con este formato exacto:
 NOMBRE COMPLETO DEL CANDIDATO
 (en la primera línea, en MAYÚSCULAS)
 
-Título profesional o cargo al que postula
-(segunda línea, capitalización normal)
+Título profesional real del candidato
+(segunda línea, capitalización normal — OBLIGATORIO: refleja exactamente lo que el candidato estudia o estudió, incluyendo especialización o mención si la tiene. Ejemplos: "Estudiante de Ingeniería Comercial · Mención Finanzas Cuantitativas", "Ingeniero Civil Industrial · Especialización en Logística", "Contador Auditor · Mención en Tributación". NUNCA uses el cargo de la oferta de trabajo como título.)
 
 Ciudad, País | Teléfono | Email
 (tercera línea con los datos de contacto separados por |)
@@ -25,7 +27,7 @@ Ciudad, País | Teléfono | Email
 [línea en blanco]
 
 PERFIL PROFESIONAL
-Párrafo de 3 a 4 líneas máximo describiendo al candidato, orientado a la oferta específica.
+Máximo 3 líneas describiendo al candidato, orientado a la oferta específica. Conciso y directo.
 
 [línea en blanco]
 
@@ -36,12 +38,13 @@ Período · Ciudad
 • Logro o responsabilidad 1
 • Logro o responsabilidad 2
 • Logro o responsabilidad 3
+• Logro o responsabilidad 4 (máximo — nunca más de 4 puntos por experiencia)
 [línea en blanco entre experiencias]
 
 EDUCACIÓN
 Título o carrera | Institución
 Período · Ciudad
-• Detalle relevante si corresponde
+• Detalle relevante si corresponde (máximo 3 puntos por entrada de educación)
 [línea en blanco entre entradas]
 
 HABILIDADES
@@ -57,9 +60,10 @@ Competencias:
 • Competencia 1
 • Competencia 2
 • Competencia 3
+(máximo 6 competencias en total)
 
 REGLAS ESTRICTAS DE FORMATO:
-- Máximo 2 páginas de contenido
+- Máximo 2 páginas de contenido — los límites por sección son obligatorios: perfil 3 líneas, máx 4 puntos por experiencia, máx 3 puntos por educación, máx 6 competencias
 - Sin tablas, sin columnas múltiples, sin gráficos, sin íconos, sin imágenes
 - Títulos de sección siempre en MAYÚSCULAS (PERFIL PROFESIONAL, EXPERIENCIA LABORAL, EDUCACIÓN, HABILIDADES)
 - Viñetas con el símbolo • para todos los puntos de lista, sin excepción
@@ -67,16 +71,18 @@ REGLAS ESTRICTAS DE FORMATO:
 - No uses caracteres decorativos de ningún tipo (─, ━, ●, ◆, ▪, etc.)
 - No inventes ni agregues información que no esté en el CV original. Solo reorganiza y reformula lo que el candidato ya tiene
 - Compatible 100% con sistemas ATS
+- NO incluyas pie de página, nota al pie, ni ninguna mención a "Postulai" dentro del cv_adaptado
 
-CARTA DE PRESENTACIÓN: Máximo 150 palabras. Directa, profesional, en tono chileno. Personalizada para la oferta específica.
+CARTA DE PRESENTACIÓN: Máximo 150 palabras. Directa, profesional, en tono chileno. En MODO CREAR CON OFERTA o MODO ADAPTAR: personalizada para la oferta específica. En MODO CREAR SIN OFERTA: carta de presentación general que destaque el perfil y valor del candidato.
 
 REVISIÓN ORTOGRÁFICA Y GRAMATICAL (obligatoria antes de entregar): (1) Mayúsculas correctas en nombres de idiomas (Español, Inglés, Alemán, Francés), nombres propios, empresas e instituciones. (2) Tildes correctas en todas las palabras que las requieran. (3) Puntuación correcta — comas, puntos y punto y coma donde corresponda. (4) Tono formal y profesional en cada frase, sin coloquialismos. (5) Consistencia de estilo — verbos en la misma forma en toda la sección de experiencia. No entregues el resultado sin haber revisado ortografía y gramática en cada línea.
 
 Responde ÚNICAMENTE con un JSON válido con estos campos:
 - cv_adaptado: string con el CV completo formateado
 - carta_presentacion: string con la carta (máximo 150 palabras)
-- sugerencias: array de exactamente 3 strings concisos y específicos para ese candidato y esa oferta
-- principales_cambios: array de máximo 5 strings cortos (máximo 8 palabras cada uno) describiendo los cambios más importantes al CV; en MODO CREAR describe las decisiones clave del CV construido`;
+- sugerencias: array de exactamente 3 strings concisos y específicos con recomendaciones para el candidato
+- principales_cambios: array de máximo 5 strings cortos (máximo 8 palabras cada uno) describiendo los cambios más importantes al CV; en MODO CREAR describe las decisiones clave del CV construido
+- titulo_postulacion: string con el título de la postulación. En MODO ADAPTAR o MODO CREAR CON OFERTA: formato exacto "CV para [Empresa] · [Cargo]" (ej: "CV para Banco Chile · Analista Financiero"); si no se identifica la empresa usar "CV para [Cargo]". En MODO CREAR SIN OFERTA: formato "CV Profesional · [Título profesional del candidato]" (ej: "CV Profesional · Ingeniero Civil Industrial", "CV Profesional · Estudiante de Administración de Empresas").`;
 
 export async function POST(request: NextRequest) {
   try {
@@ -90,9 +96,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!oferta) {
+    if (modo === "adaptar" && !oferta) {
       return NextResponse.json(
-        { error: "El campo 'oferta' es requerido." },
+        { error: "En modo 'adaptar' el campo 'oferta' es requerido." },
         { status: 400 }
       );
     }
@@ -120,7 +126,11 @@ export async function POST(request: NextRequest) {
         typeof datos_personales === "string"
           ? datos_personales
           : JSON.stringify(datos_personales, null, 2);
-      userMessage = `MODO: CREAR\n\nDATOS DEL CANDIDATO:\n${datosStr}\n\nOFERTA DE TRABAJO:\n${oferta}`;
+      if (oferta) {
+        userMessage = `MODO: CREAR CON OFERTA\n\nDATOS DEL CANDIDATO:\n${datosStr}\n\nOFERTA DE TRABAJO:\n${oferta}`;
+      } else {
+        userMessage = `MODO: CREAR SIN OFERTA\n\nDATOS DEL CANDIDATO:\n${datosStr}`;
+      }
     }
 
     if (instrucciones) {
