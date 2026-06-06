@@ -15,17 +15,22 @@ export default function LoginPage() {
   async function handleLogin() {
     setError(null);
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setError(
-        error.message === "Invalid login credentials"
-          ? "Correo o contraseña incorrectos."
-          : error.message
-      );
+    try {
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      if (authError) {
+        setError(
+          authError.message === "Invalid login credentials"
+            ? "Correo o contraseña incorrectos."
+            : authError.message
+        );
+        setLoading(false);
+        return;
+      }
+      router.push("/app");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error inesperado al iniciar sesión.");
       setLoading(false);
-      return;
     }
-    router.push("/app");
   }
 
   return (

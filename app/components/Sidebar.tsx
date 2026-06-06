@@ -270,7 +270,7 @@ export default function Sidebar() {
       {/* ── Desktop sidebar ── */}
       <aside className="hidden md:flex flex-col w-[270px] shrink-0 bg-[#111] border-r border-[#1e1e1e]">
         <div className="px-4 pt-5 pb-4 border-b border-[#1e1e1e] shrink-0 flex flex-col gap-3">
-          <a href="/" className="text-[18px] font-medium text-white hover:opacity-70 transition-opacity duration-150 leading-none">
+          <a href="/" className="text-[18px] font-black text-white hover:opacity-70 transition-opacity duration-150 leading-none">
             Postulai
           </a>
           {newPostButton}
@@ -281,7 +281,7 @@ export default function Sidebar() {
 
       {/* ── Mobile header bar ── */}
       <header className="md:hidden shrink-0 h-14 bg-[#111] border-b border-[#1e1e1e] flex items-center justify-between px-5 z-30">
-        <a href="/" className="text-[18px] font-medium text-white leading-none">
+        <a href="/" className="text-[18px] font-black text-white leading-none">
           Postulai
         </a>
         <button
@@ -310,7 +310,7 @@ export default function Sidebar() {
       >
         <div className="px-4 pt-5 pb-4 border-b border-[#1e1e1e] shrink-0 flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <a href="/" className="text-[18px] font-medium text-white leading-none">
+            <a href="/" className="text-[18px] font-black text-white leading-none">
               Postulai
             </a>
             <button
