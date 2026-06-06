@@ -16,7 +16,7 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) {
         setError(
           authError.message === "Invalid login credentials"
@@ -26,6 +26,7 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
+      console.log("Login exitoso", data.session);
       router.push("/app");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error inesperado al iniciar sesión.");
