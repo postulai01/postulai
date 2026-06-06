@@ -317,7 +317,7 @@ export default function ResultadoPage() {
           </div>
 
           {/* ── Grid dos columnas ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-6 items-start">
 
             {/* COLUMNA IZQUIERDA — CV */}
             <div className="bg-[#111] border border-[#222] rounded-2xl flex flex-col overflow-hidden">
@@ -334,7 +334,7 @@ export default function ResultadoPage() {
                   {copiedCv ? <><IconCheck />Copiado</> : <><IconCopy />Copiar</>}
                 </button>
               </div>
-              <div className="px-7 py-6 overflow-y-auto max-h-[580px] lg:max-h-[660px]">
+              <div className="px-7 py-6 overflow-y-auto max-h-[580px] md:max-h-[660px]">
                 <pre className="text-sm text-white/90 leading-relaxed whitespace-pre-wrap font-sans">{data.cv_adaptado}</pre>
               </div>
             </div>

@@ -79,7 +79,7 @@ export default function AppPage() {
             </div>
 
             {/* Cards */}
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
               <a
                 href="/app/crear"

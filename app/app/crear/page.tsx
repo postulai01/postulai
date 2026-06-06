@@ -190,7 +190,7 @@ export default function CrearPage() {
         </div>
 
       <main
-        className="flex-1 flex flex-col px-6 sm:px-10 py-10 sm:py-16 relative"
+        className="flex-1 flex flex-col px-4 md:px-10 py-10 md:py-16 relative"
       >
         <div className="w-full max-w-[900px] mx-auto flex flex-col gap-8">
 
