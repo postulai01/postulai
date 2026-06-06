@@ -1,20 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { useState } from "react";
 import Sidebar from "@/app/components/Sidebar";
 
 export default function AppPage() {
-  const router = useRouter();
-  const [modalVisible, setModalVisible] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { router.replace("/login"); return; }
-      setModalVisible(false);
-    });
-  }, [router]);
+  const [modalVisible, setModalVisible] = useState<boolean | null>(false);
 
   return (
     <div className="h-screen overflow-hidden bg-[#0A0A0A] text-white flex flex-col">

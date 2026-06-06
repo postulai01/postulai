@@ -53,11 +53,6 @@ type Trabajo = {
 export default function CrearPage() {
   const router = useRouter();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { router.replace("/login"); return; }
-    });
-  }, [router]);
 
   // Personal
   const [nombre, setNombre] = useState("");

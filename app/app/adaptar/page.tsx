@@ -13,11 +13,6 @@ type CvStatus = "idle" | "loading" | "success" | "error";
 export default function AdaptarPage() {
   const router = useRouter();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { router.replace("/login"); return; }
-    });
-  }, [router]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [cvText, setCvText] = useState("");

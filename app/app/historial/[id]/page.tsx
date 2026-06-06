@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Sidebar from "@/app/components/Sidebar";
 import { supabase } from "@/lib/supabase";
 
@@ -55,7 +55,7 @@ function truncateWords(text: string, max: number): string {
 
 export default function HistorialIdPage() {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
+
   const [post, setPost] = useState<Postulacion | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [copiedCv, setCopiedCv] = useState(false);
@@ -68,7 +68,7 @@ export default function HistorialIdPage() {
     loadedRef.current = true;
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) { router.replace("/login"); return; }
+      if (!session) { setNotFound(true); return; }
 
       const { data, error } = await supabase
         .from("postulaciones")
@@ -78,12 +78,11 @@ export default function HistorialIdPage() {
 
       if (error || !data || data.user_id !== session.user.id) {
         setNotFound(true);
-        setTimeout(() => router.replace("/app"), 2000);
         return;
       }
       setPost(data as Postulacion);
     });
-  }, [id, router]);
+  }, [id]);
 
   async function copyCv() {
     if (!post) return;

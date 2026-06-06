@@ -57,12 +57,6 @@ export default function ResultadoPage() {
   const savedRef = useRef(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { router.replace("/login"); return; }
-    });
-  }, [router]);
-
-  useEffect(() => {
     const raw = sessionStorage.getItem("postulai_resultado");
     if (!raw) { router.replace("/app/adaptar"); return; }
     try { setData(JSON.parse(raw)); }
