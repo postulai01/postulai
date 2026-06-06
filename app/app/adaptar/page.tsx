@@ -10,15 +10,12 @@ const inputClass =
 
 type CvStatus = "idle" | "loading" | "success" | "error";
 
-const ALLOWED_EMAIL = "pedro.ignacio.heresi@gmail.com";
-
 export default function AdaptarPage() {
   const router = useRouter();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) { router.replace("/login"); return; }
-      if (session.user.email !== ALLOWED_EMAIL) { router.replace("/"); }
     });
   }, [router]);
   const fileInputRef = useRef<HTMLInputElement>(null);

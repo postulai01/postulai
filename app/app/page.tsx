@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Sidebar from "@/app/components/Sidebar";
 
-const ALLOWED_EMAIL = "pedro.ignacio.heresi@gmail.com";
-
 export default function AppPage() {
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState<boolean | null>(null);
@@ -14,7 +12,6 @@ export default function AppPage() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) { router.replace("/login"); return; }
-      if (session.user.email !== ALLOWED_EMAIL) { router.replace("/"); return; }
       setModalVisible(false);
     });
   }, [router]);

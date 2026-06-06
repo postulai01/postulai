@@ -50,15 +50,12 @@ type Trabajo = {
   descripcion: string;
 };
 
-const ALLOWED_EMAIL = "pedro.ignacio.heresi@gmail.com";
-
 export default function CrearPage() {
   const router = useRouter();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) { router.replace("/login"); return; }
-      if (session.user.email !== ALLOWED_EMAIL) { router.replace("/"); }
     });
   }, [router]);
 

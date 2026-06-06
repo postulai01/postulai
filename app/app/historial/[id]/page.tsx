@@ -69,7 +69,6 @@ export default function HistorialIdPage() {
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) { router.replace("/login"); return; }
-      if (session.user.email !== "pedro.ignacio.heresi@gmail.com") { router.replace("/"); return; }
 
       const { data, error } = await supabase
         .from("postulaciones")

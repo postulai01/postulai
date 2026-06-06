@@ -48,8 +48,6 @@ function CardHeading({ children }: { children: React.ReactNode }) {
   );
 }
 
-const ALLOWED_EMAIL = "pedro.ignacio.heresi@gmail.com";
-
 export default function ResultadoPage() {
   const router = useRouter();
   const [data, setData] = useState<ResultData | null>(null);
@@ -61,7 +59,6 @@ export default function ResultadoPage() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) { router.replace("/login"); return; }
-      if (session.user.email !== ALLOWED_EMAIL) { router.replace("/"); }
     });
   }, [router]);
 
