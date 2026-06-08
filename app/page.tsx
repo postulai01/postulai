@@ -1,7 +1,7 @@
 "use client";
 
 import { Space_Grotesk } from "next/font/google";
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -109,197 +109,92 @@ const benefits = [
   { title: "Encuentra dónde quieres trabajar", desc: "Dinos qué empresa o tipo de trabajo te interesa. Postulai detecta las oportunidades disponibles en el mercado laboral chileno y adapta tu perfil para que llegues primero." },
 ];
 
-function MartinaCv({ borderLeft = false }: { borderLeft?: boolean }) {
+function NotifCard({ title, role, time, success }: { title: string; role: string; time: string; success: boolean }) {
   return (
     <div style={{
-      background: "#FFFFFF",
-      boxShadow: "0 4px 24px rgba(0,0,0,0.10)",
-      borderRadius: 10,
-      padding: "1.75rem",
-      borderLeft: borderLeft ? "3px solid #0A0A0A" : "3px solid transparent",
-      boxSizing: "border-box",
+      background: "rgba(255,255,255,0.94)",
+      borderRadius: 16,
+      padding: "11px 14px",
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      boxShadow: "0 1px 4px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.06)",
+      borderLeft: success ? "2.5px solid #22C55E" : "2.5px solid transparent",
     }}>
-      <p style={{ fontWeight: 700, fontSize: "1rem", color: "#0A0A0A", margin: 0 }}>Martina González</p>
-      <p style={{ fontWeight: 400, fontSize: "0.78rem", color: "#888", margin: "3px 0 12px" }}>Analista de Marketing</p>
-      <div style={{ height: "0.5px", background: "#EEEEEE", marginBottom: 14 }} />
-      <p style={{ fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.12em", color: "#BBB", margin: "0 0 8px", textTransform: "uppercase" }}>Experiencia</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
-        {[
-          [{ w: "55%", dark: true }, { w: "85%", dark: false }, { w: "70%", dark: false }],
-          [{ w: "45%", dark: true }, { w: "90%", dark: false }, { w: "60%", dark: false }],
-          [{ w: "50%", dark: true }, { w: "75%", dark: false }],
-        ].map((job, i) => (
-          <div key={i} style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-            {job.map((bar, j) => (
-              <div key={j} style={{ height: 7, borderRadius: 3, background: bar.dark ? "#DDDDDD" : "#EEEEEE", width: bar.w }} />
-            ))}
-          </div>
-        ))}
+      <div style={{
+        width: 36, height: 36, borderRadius: 9, flexShrink: 0,
+        background: success ? "#DCFCE7" : "#E8ECF0",
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        {success ? (
+          <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth={2.8} strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        ) : (
+          <span style={{ fontSize: 17 }}>📄</span>
+        )}
       </div>
-      <p style={{ fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.12em", color: "#BBB", margin: "0 0 8px", textTransform: "uppercase" }}>Educación</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-        {[{ w: "60%", dark: true }, { w: "80%", dark: false }].map((bar, i) => (
-          <div key={i} style={{ height: 7, borderRadius: 3, background: bar.dark ? "#DDDDDD" : "#EEEEEE", width: bar.w }} />
-        ))}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontWeight: 700, fontSize: "0.82rem", color: "#0A0A0A", margin: 0, lineHeight: 1.3 }}>{title}</p>
+        <p style={{ fontSize: "0.74rem", color: "#888888", margin: "2px 0 0", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{role}</p>
       </div>
+      <span style={{ fontSize: "0.7rem", color: "#BBBBBB", flexShrink: 0, fontWeight: 500 }}>{time}</span>
     </div>
   );
 }
 
-function StoryAnimation() {
-  const DURATIONS = [1400, 1100, 1400, 1100, 1400, 1100, 1500, 1000, 1000, 1000, 2000];
-  const N = DURATIONS.length;
-
-  const [tick, setTick] = useState(0);
-  const [prefersReduced, setPrefersReduced] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReduced(mq.matches);
-  }, []);
-
-  useEffect(() => {
-    if (prefersReduced) return;
-    const tr = tick % N;
-    const t = setTimeout(() => setTick(prev => prev + 1), DURATIONS[tr]);
-    return () => clearTimeout(t);
-  }, [tick, prefersReduced]);
-
-  const tr = tick % N;
-  const ease = "cubic-bezier(0.23, 1, 0.32, 1)";
-
-  const showOriginal = tr <= 5;
-  const showProcessing = tr === 6;
-  const showOptimized = tr >= 7;
-  const isShaking = tr === 1 || tr === 3 || tr === 5;
-  const showProblemText = tr === 5;
-
-  let chipText = "";
-  let chipIsRejected = false;
-  if (tr === 0)      { chipText = "→ Enviado a Falabella"; }
-  else if (tr === 1) { chipText = "✕ Rechazado"; chipIsRejected = true; }
-  else if (tr === 2) { chipText = "→ Enviado a Ripley"; }
-  else if (tr === 3) { chipText = "✕ Rechazado"; chipIsRejected = true; }
-  else if (tr === 4) { chipText = "→ Enviado a Banco Santander"; }
-  else if (tr === 5) { chipText = "✕ Rechazado"; chipIsRejected = true; }
-
-  if (prefersReduced) {
-    return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
-        <div style={{ position: "relative", maxWidth: 480, width: "100%" }}>
-          <MartinaCv borderLeft />
-          <div style={{ position: "absolute", top: -14, right: 0, background: "#0A0A0A", color: "white", padding: "4px 12px", borderRadius: 999, fontSize: "0.75rem", fontWeight: 600, whiteSpace: "nowrap" }}>
-            ✓ Optimizado por Postulai
-          </div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {[
-            { label: "→ Enviado a Banco Santander", green: false },
-            { label: "✓ Entrevista agendada", green: true },
-          ].map(({ label, green }) => (
-            <div key={label} style={{ padding: "4px 12px", borderRadius: 999, fontSize: "0.75rem", fontWeight: 600, background: green ? "#F0FAF0" : "#F5F5F5", color: green ? "#2D7D2D" : "#444", border: green ? "0.5px solid #C3E6C3" : "0.5px solid #DDD" }}>{label}</div>
-          ))}
-        </div>
-        <p style={{ fontSize: "0.9rem", color: "#0A0A0A", fontWeight: 700 }}>Postulai y listo. 🇨🇱</p>
-      </div>
-    );
-  }
+function BeforeAfterDisplay() {
+  const before = [
+    { title: "Postulación enviada", role: "Analista de Marketing", time: "5d" },
+    { title: "Postulación enviada", role: "Asistente Comercial",   time: "3d" },
+    { title: "Postulación enviada", role: "Ejecutivo de Cuentas",  time: "1d" },
+  ];
+  const after = [
+    { title: "Te llamaron para entrevista", role: "Analista de Marketing", time: "5d" },
+    { title: "Avanzaste a segunda etapa",   role: "Asistente Comercial",   time: "3d" },
+    { title: "Recibiste una oferta",        role: "Ejecutivo de Cuentas",  time: "1d" },
+  ];
 
   return (
-    <div style={{ position: "relative", height: 420, maxWidth: 480, margin: "0 auto" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 36, width: "100%", maxWidth: 420, margin: "0 auto" }}>
 
-      {/* Original CV — phases 1–3 */}
-      <div style={{
-        position: "absolute", top: 20, left: 0, right: 0, bottom: 0,
-        display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
-        opacity: showOriginal ? 1 : 0,
-        transform: showOriginal ? "translateY(0)" : "translateY(-16px)",
-        transition: `opacity 400ms ${ease}, transform 400ms ${ease}`,
-        pointerEvents: "none",
-      }}>
-        <div style={{ position: "relative", width: "100%" }}>
-          <div style={{ animation: isShaking ? "story-shake 0.45s ease-in-out" : "none" }}>
-            <MartinaCv />
-          </div>
-          {chipText && (
-            <div
-              key={`chip-${tr}`}
-              style={{
-                position: "absolute", top: -14, right: 0,
-                padding: "4px 12px", borderRadius: 999, fontSize: "0.75rem", fontWeight: 600,
-                background: chipIsRejected ? "#FFF0F0" : "#F0F0F0",
-                color: chipIsRejected ? "#CC3333" : "#444",
-                border: chipIsRejected ? "0.5px solid #FFCDD2" : "0.5px solid #DDD",
-                animation: `fadeChipIn 300ms ${ease}`,
-                whiteSpace: "nowrap",
-              }}
-            >{chipText}</div>
-          )}
-        </div>
-        {showProblemText && (
-          <p style={{ fontSize: "0.85rem", color: "#CC3333", fontWeight: 600, textAlign: "center", animation: `fadeChipIn 300ms ${ease}`, margin: 0 }}>
-            El problema no eres tú. Es el formato.
-          </p>
-        )}
-      </div>
-
-      {/* Processing — phase 4 */}
-      <div style={{
-        position: "absolute", inset: 0, display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center", gap: 16,
-        opacity: showProcessing ? 1 : 0,
-        transition: `opacity 400ms ${ease}`,
-        pointerEvents: "none",
-      }}>
-        <span style={{ fontWeight: 700, fontSize: "1.1rem", color: "#0A0A0A", letterSpacing: "-0.01em" }}>Postulai</span>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          {[0, 1, 2].map(i => (
-            <div key={i} style={{
-              width: 8, height: 8, borderRadius: "50%", background: "#0A0A0A",
-              animation: showProcessing ? `dotBounce 1.2s ${i * 160}ms ease-in-out infinite` : "none",
-            }} />
+      {/* Bloque sin Postulai */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+          {before.map((item, i) => (
+            <NotifCard key={i} title={item.title} role={item.role} time={item.time} success={false} />
           ))}
         </div>
-        <p style={{ fontSize: "0.88rem", color: "#666", fontWeight: 400, margin: 0 }}>Optimizando tu CV…</p>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "center" }}>
+          <span style={{ fontWeight: 900, fontSize: "clamp(2rem, 6vw, 3.2rem)", color: "#0A0A0A", letterSpacing: "-1.5px", lineHeight: 1 }}>
+            0 respuestas
+          </span>
+          <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#E53535", flexShrink: 0 }} />
+        </div>
       </div>
 
-      {/* Optimized CV — phases 5–6 */}
-      <div style={{
-        position: "absolute", top: 20, left: 0, right: 0, bottom: 0,
-        display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
-        opacity: showOptimized ? 1 : 0,
-        transform: showOptimized ? "translateY(0)" : "translateY(24px)",
-        transition: `opacity 500ms ${ease}, transform 500ms ${ease}`,
-        pointerEvents: "none",
-      }}>
-        <div style={{ position: "relative", width: "100%" }}>
-          <MartinaCv borderLeft />
-          <div style={{ position: "absolute", top: -14, right: 0, background: "#0A0A0A", color: "white", padding: "4px 12px", borderRadius: 999, fontSize: "0.75rem", fontWeight: 600, whiteSpace: "nowrap" }}>
-            ✓ Optimizado por Postulai
-          </div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%", alignItems: "flex-start" }}>
-          <div style={{
-            opacity: tr >= 8 ? 1 : 0,
-            transform: tr >= 8 ? "translateY(0)" : "translateY(8px)",
-            transition: `opacity 300ms ${ease}, transform 300ms ${ease}`,
-            padding: "4px 12px", borderRadius: 999, fontSize: "0.75rem", fontWeight: 600,
-            background: "#F0F0F0", color: "#444", border: "0.5px solid #DDD",
-          }}>→ Enviado a Banco Santander</div>
-          <div style={{
-            opacity: tr >= 9 ? 1 : 0,
-            transform: tr >= 9 ? "translateY(0)" : "translateY(8px)",
-            transition: `opacity 300ms ${ease}, transform 300ms ${ease}`,
-            padding: "4px 12px", borderRadius: 999, fontSize: "0.75rem", fontWeight: 600,
-            background: "#F0FAF0", color: "#2D7D2D", border: "0.5px solid #C3E6C3",
-          }}>✓ Entrevista agendada</div>
-        </div>
-        <p style={{
-          fontSize: "0.9rem", color: "#0A0A0A", fontWeight: 700, textAlign: "center", margin: 0,
-          opacity: tr >= 10 ? 1 : 0,
-          transition: `opacity 400ms 100ms ${ease}`,
-        }}>Postulai y listo. 🇨🇱</p>
+      {/* Separador */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ flex: 1, height: "0.5px", background: "#D8D8D8" }} />
+        <span style={{ fontSize: "0.62rem", fontWeight: 700, letterSpacing: "0.12em", color: "#AAAAAA" }}>CON POSTULAI</span>
+        <div style={{ flex: 1, height: "0.5px", background: "#D8D8D8" }} />
       </div>
+
+      {/* Bloque con Postulai */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+          {after.map((item, i) => (
+            <NotifCard key={i} title={item.title} role={item.role} time={item.time} success={true} />
+          ))}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "center" }}>
+          <span style={{ fontWeight: 900, fontSize: "clamp(1.5rem, 4vw, 2.2rem)", color: "#0A0A0A", letterSpacing: "-1px", lineHeight: 1 }}>
+            3 oportunidades reales
+          </span>
+          <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#22C55E", flexShrink: 0 }} />
+        </div>
+      </div>
+
     </div>
   );
 }
@@ -322,30 +217,6 @@ export default function Home() {
         .fade-up {
           opacity: 0;
           animation: fadeUp 600ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
-        }
-        @keyframes shake {
-          0%   { transform: translateX(0); }
-          15%  { transform: translateX(-5px); }
-          30%  { transform: translateX(5px); }
-          45%  { transform: translateX(-4px); }
-          60%  { transform: translateX(4px); }
-          75%  { transform: translateX(-2px); }
-          90%  { transform: translateX(2px); }
-          100% { transform: translateX(0); }
-        }
-        @keyframes dotBounce {
-          0%, 80%, 100% { transform: scale(0.3); opacity: 0.3; }
-          40%            { transform: scale(1);   opacity: 1; }
-        }
-        @keyframes story-shake {
-          0%   { transform: translateX(0); }
-          25%  { transform: translateX(-4px); }
-          75%  { transform: translateX(4px); }
-          100% { transform: translateX(0); }
-        }
-        @keyframes fadeChipIn {
-          from { opacity: 0; transform: translateY(-4px); }
-          to   { opacity: 1; transform: translateY(0); }
         }
         @media (prefers-reduced-motion: reduce) {
           .fade-up { animation-duration: 0.01ms !important; }
@@ -462,13 +333,13 @@ export default function Home() {
           <div style={{ maxWidth: 640, margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: 48 }}>
               <h2 style={{ fontWeight: 900, fontSize: "clamp(1.6rem, 3vw, 2.2rem)", color: "#0A0A0A", marginBottom: 12, lineHeight: 1.2 }}>
-                Lo que pasa sin Postulai.
+                El antes y el después de tu postulación.
               </h2>
               <p style={{ color: "#666", fontWeight: 400, fontSize: 15 }}>
                 El mismo CV. Empresa tras empresa. Siempre rechazado.
               </p>
             </div>
-            <StoryAnimation />
+            <BeforeAfterDisplay />
           </div>
         </section>
 
