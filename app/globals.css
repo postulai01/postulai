@@ -1,16 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #1e293b;
+  --background: #0A0A0A;
+  --foreground: #ffffff;
 }
 
 html {
   scroll-behavior: smooth;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background: #0A0A0A;
 }
 
 body {
-  background: var(--background);
+  margin: 0;
+  padding: 0;
+  background: #0A0A0A;
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
