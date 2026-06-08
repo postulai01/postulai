@@ -254,19 +254,18 @@ export default function Home() {
       `}</style>
 
       {/* ── NAVBAR ── */}
-      <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(10,10,10,0.9)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderBottom: "0.5px solid #1e1e1e" }}>
-        <div className="flex items-center justify-between" style={{ maxWidth: 1152, margin: "0 auto", padding: "0 24px", height: 64 }}>
-          <a href="#" className="nav-link" style={{ fontWeight: 700, fontSize: 18, color: "white", textDecoration: "none" }}>
+      <header style={{ position: "sticky", top: 0, zIndex: 50, background: "#0A0A0A", borderBottom: "0.5px solid #1e1e1e" }}>
+        <div className="flex items-center justify-between" style={{ maxWidth: 1152, margin: "0 auto", padding: "0 24px", height: 72 }}>
+          <a href="#" className="nav-link" style={{ fontWeight: 700, fontSize: 19, color: "white", textDecoration: "none" }}>
             Postulai
           </a>
 
           <nav className="hidden sm:flex items-center gap-7">
-            <a href="#como-funciona" className="nav-link" style={{ fontWeight: 500, color: "#888888", fontSize: 14, textDecoration: "none" }}>¿Cómo funciona?</a>
-            <a href="#beneficios"    className="nav-link" style={{ fontWeight: 500, color: "#888888", fontSize: 14, textDecoration: "none" }}>¿Por qué Postulai?</a>
+            <a href="#beneficios" className="nav-link" style={{ fontWeight: 500, color: "#888888", fontSize: 14.5, textDecoration: "none" }}>¿Por qué Postulai?</a>
           </nav>
 
           <div className="flex items-center gap-3">
-            <span className="hidden sm:block" style={{ border: "0.5px solid #222", borderRadius: 20, padding: "5px 14px", fontSize: 12, color: "#555555", fontWeight: 500, letterSpacing: "0.02em" }}>
+            <span className="hidden sm:block" style={{ border: "0.5px solid #2a2a2a", borderRadius: 20, padding: "6px 16px", fontSize: 12.5, color: "#606060", fontWeight: 500, letterSpacing: "0.02em" }}>
               Acceso anticipado
             </span>
             <button
@@ -285,8 +284,7 @@ export default function Home() {
 
         {menuOpen && (
           <div className="sm:hidden flex flex-col gap-6" style={{ borderTop: "0.5px solid #1e1e1e", background: "#0A0A0A", padding: "24px" }}>
-            <a href="#como-funciona" onClick={() => setMenuOpen(false)} style={{ fontWeight: 500, color: "#888888", fontSize: 15, textDecoration: "none" }}>¿Cómo funciona?</a>
-            <a href="#beneficios"    onClick={() => setMenuOpen(false)} style={{ fontWeight: 500, color: "#888888", fontSize: 15, textDecoration: "none" }}>¿Por qué Postulai?</a>
+            <a href="#beneficios" onClick={() => setMenuOpen(false)} style={{ fontWeight: 500, color: "#888888", fontSize: 15, textDecoration: "none" }}>¿Por qué Postulai?</a>
           </div>
         )}
       </header>
@@ -329,7 +327,7 @@ export default function Home() {
         </section>
 
         {/* ── HISTORIA POSTULAI — gris claro ── */}
-        <section style={{ background: "#F5F5F5", padding: "88px 24px", borderTop: "0.5px solid #E5E5E5" }}>
+        <section id="el-problema" style={{ background: "#F5F5F5", padding: "88px 24px", borderTop: "0.5px solid #E5E5E5", scrollMarginTop: 80 }}>
           <div style={{ maxWidth: 640, margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: 48 }}>
               <h2 style={{ fontWeight: 900, fontSize: "clamp(1.6rem, 3vw, 2.2rem)", color: "#0A0A0A", marginBottom: 12, lineHeight: 1.2 }}>
@@ -372,7 +370,7 @@ export default function Home() {
         </section>
 
         {/* ── POSTULAI Y LISTO — blanco ── */}
-        <section id="como-funciona" style={{ padding: "8rem 24px", background: "#FFFFFF", borderTop: "0.5px solid #E5E5E5", scrollMarginTop: 80, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <section style={{ padding: "8rem 24px", background: "#FFFFFF", borderTop: "0.5px solid #E5E5E5", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <p style={{ fontWeight: 900, fontSize: "clamp(3rem, 8vw, 6rem)", letterSpacing: "-1.5px", color: "#0A0A0A", textAlign: "center", lineHeight: 1.1, margin: 0 }}>
             Postulai y listo. 🇨🇱
           </p>
