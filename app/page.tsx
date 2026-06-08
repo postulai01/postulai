@@ -155,43 +155,51 @@ function BeforeAfterDisplay() {
     { title: "Recibiste una oferta",        role: "Ejecutivo de Cuentas",  time: "1d" },
   ];
 
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 36, width: "100%", maxWidth: 420, margin: "0 auto" }}>
+  const colLabel: React.CSSProperties = {
+    fontWeight: 900,
+    fontSize: "clamp(1.4rem, 2.5vw, 1.9rem)",
+    color: "#0A0A0A",
+    margin: 0,
+    lineHeight: 1.2,
+    marginBottom: 20,
+  };
 
-      {/* Bloque sin Postulai */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+  const resultStat: React.CSSProperties = {
+    fontWeight: 900,
+    fontSize: "clamp(1.6rem, 3vw, 2.2rem)",
+    color: "#0A0A0A",
+    letterSpacing: "-1px",
+    lineHeight: 1,
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: "48px 48px", width: "100%", alignItems: "start" }}>
+
+      {/* Columna izquierda — Sin Postulai */}
+      <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+        <p style={colLabel}>Sin Postulai</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
           {before.map((item, i) => (
             <NotifCard key={i} title={item.title} role={item.role} time={item.time} success={false} />
           ))}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "center" }}>
-          <span style={{ fontWeight: 900, fontSize: "clamp(2rem, 6vw, 3.2rem)", color: "#0A0A0A", letterSpacing: "-1.5px", lineHeight: 1 }}>
-            0 respuestas
-          </span>
-          <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#E53535", flexShrink: 0 }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 28 }}>
+          <span style={resultStat}>0 respuestas</span>
+          <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#E53535", flexShrink: 0 }} />
         </div>
       </div>
 
-      {/* Separador */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ flex: 1, height: "0.5px", background: "#D8D8D8" }} />
-        <span style={{ fontSize: "0.62rem", fontWeight: 700, letterSpacing: "0.12em", color: "#AAAAAA" }}>CON POSTULAI</span>
-        <div style={{ flex: 1, height: "0.5px", background: "#D8D8D8" }} />
-      </div>
-
-      {/* Bloque con Postulai */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      {/* Columna derecha — Con Postulai */}
+      <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+        <p style={colLabel}>Con Postulai</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
           {after.map((item, i) => (
             <NotifCard key={i} title={item.title} role={item.role} time={item.time} success={true} />
           ))}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "center" }}>
-          <span style={{ fontWeight: 900, fontSize: "clamp(1.5rem, 4vw, 2.2rem)", color: "#0A0A0A", letterSpacing: "-1px", lineHeight: 1 }}>
-            3 oportunidades reales
-          </span>
-          <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#22C55E", flexShrink: 0 }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 28 }}>
+          <span style={resultStat}>3 oportunidades reales</span>
+          <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#22C55E", flexShrink: 0 }} />
         </div>
       </div>
 
@@ -328,7 +336,7 @@ export default function Home() {
 
         {/* ── HISTORIA POSTULAI — gris claro ── */}
         <section id="el-problema" style={{ background: "#F5F5F5", padding: "88px 24px", borderTop: "0.5px solid #E5E5E5", scrollMarginTop: 80 }}>
-          <div style={{ maxWidth: 640, margin: "0 auto" }}>
+          <div style={{ maxWidth: 900, margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: 48 }}>
               <h2 style={{ fontWeight: 900, fontSize: "clamp(1.6rem, 3vw, 2.2rem)", color: "#0A0A0A", marginBottom: 12, lineHeight: 1.2 }}>
                 El antes y el después de tu postulación.
