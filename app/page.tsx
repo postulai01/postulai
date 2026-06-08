@@ -106,6 +106,7 @@ const benefits = [
   { title: "Adaptado con precisión a cada oferta", desc: "No importa si tienes poca experiencia o mucha. Postulai identifica lo que pide la oferta y reorganiza tu currículum para que el reclutador vea lo que necesita ver." },
   { title: "Una carta de presentación que suena a ti", desc: "Sin frases genéricas ni copiar y pegar de internet. Postulai genera una carta adaptada al mercado laboral chileno, directa y profesional." },
   { title: "Más entrevistas, menos esfuerzo", desc: "Deja de invertir horas en cada postulación. Postulai optimiza tu perfil en segundos para que puedas enfocarte en lo que importa: preparar la entrevista." },
+  { title: "Encuentra dónde quieres trabajar", desc: "Dinos qué empresa o tipo de trabajo te interesa. Postulai detecta las oportunidades disponibles en el mercado laboral chileno y adapta tu perfil para que llegues primero." },
 ];
 
 function MartinaCv({ borderLeft = false }: { borderLeft?: boolean }) {
@@ -369,8 +370,15 @@ export default function Home() {
           transition: border-top-color 200ms ease;
         }
         .benefit-card:not(:last-child) { border-bottom: 0.5px solid #E5E5E5; }
-        @media (min-width: 768px) {
-          .benefit-card:not(:last-child) { border-bottom: none; border-right: 0.5px solid #E5E5E5; }
+        @media (min-width: 640px) {
+          .benefit-card:not(:last-child) { border-bottom: none; }
+          .benefit-card:nth-child(odd)  { border-right: 0.5px solid #E5E5E5; }
+          .benefit-card:nth-child(-n+2) { border-bottom: 0.5px solid #E5E5E5; }
+        }
+        @media (min-width: 1024px) {
+          .benefit-card:nth-child(-n+2) { border-bottom: none; }
+          .benefit-card:nth-child(odd)  { border-right: none; }
+          .benefit-card:not(:last-child) { border-right: 0.5px solid #E5E5E5; }
         }
       `}</style>
 
@@ -466,10 +474,6 @@ export default function Home() {
 
         {/* ── STATS BAND — blanco ── */}
         <div style={{ background: "#FFFFFF", borderTop: "0.5px solid #E5E5E5", borderBottom: "0.5px solid #E5E5E5" }}>
-          <div aria-hidden="true" style={{ position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: -40, right: -40, width: 180, height: 180, border: "0.5px solid #E0E0E0", borderRadius: "50%", pointerEvents: "none" }} />
-            <div style={{ position: "absolute", bottom: -30, left: 60, width: 80, height: 80, border: "0.5px solid #E0E0E0", pointerEvents: "none" }} />
-          </div>
           <div className="grid grid-cols-1 sm:grid-cols-3" style={{ maxWidth: 1152, margin: "0 auto", position: "relative" }}>
             {[
               { value: "75%",      label: "de los CVs nunca llegan a un reclutador" },
@@ -511,13 +515,13 @@ export default function Home() {
               <div style={{ position: "absolute", bottom: 20, left: -30, width: 60, height: 60, border: "0.5px solid #E0E0E0" }} />
             </div>
 
-            <h2 className="text-center" style={{ fontWeight: 700, fontSize: "clamp(1.6rem, 2.5vw, 2rem)", marginBottom: 12, color: "#0A0A0A" }}>
+            <h2 className="text-center" style={{ fontWeight: 700, fontSize: "clamp(1.6rem, 2.5vw, 2.2rem)", marginBottom: 12, color: "#0A0A0A" }}>
               ¿Por qué Postulai?
             </h2>
             <p className="text-center" style={{ color: "#444444", maxWidth: 480, margin: "0 auto 48px", fontSize: 15, fontWeight: 400 }}>
               Cada postulación exige tiempo, energía y precisión. Postulai se encarga de eso por ti.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3" style={{ border: "0.5px solid #E5E5E5", borderRadius: 2, position: "relative", zIndex: 1 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ border: "0.5px solid #E5E5E5", borderRadius: 2, overflow: "hidden", position: "relative", zIndex: 1 }}>
               {benefits.map((b) => (
                 <div
                   key={b.title}
