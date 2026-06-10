@@ -9,6 +9,14 @@ export default function LoginPage() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
   const [email, setEmail] = useState("");
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? (typeof window !== "undefined" ? window.location.origin : "");
+
+  async function handleGoogleLogin() {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${siteUrl}/auth/callback` },
+    });
+  }
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -56,6 +64,7 @@ export default function LoginPage() {
         {/* Google */}
         <button
           type="button"
+          onClick={handleGoogleLogin}
           className="w-full flex items-center justify-center gap-3 bg-white text-black font-semibold text-sm px-5 py-3.5 rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors duration-150"
         >
           <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
@@ -92,7 +101,7 @@ export default function LoginPage() {
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold text-white/70">Contraseña</label>
-              <a href="#" className="text-xs text-[#A0A0A0] hover:text-white transition-colors duration-150">
+              <a href="/forgot-password" className="text-xs text-[#A0A0A0] hover:text-white transition-colors duration-150">
                 ¿Olvidaste tu contraseña?
               </a>
             </div>

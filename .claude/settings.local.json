@@ -15,7 +15,8 @@
       "Bash(node *)",
       "Bash(npm show *)",
       "Bash(npm uninstall *)",
-      "Bash(xargs cat)"
+      "Bash(xargs cat)",
+      "Bash(pkill -f \"next dev\")"
     ]
   }
 }
