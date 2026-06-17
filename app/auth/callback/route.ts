@@ -26,7 +26,8 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    console.log('[auth/callback] exchangeCodeForSession →', { session: data?.session ?? null, error: error?.message ?? null });
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
