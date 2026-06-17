@@ -13,9 +13,8 @@ export default function RegistroPage() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? (typeof window !== "undefined" ? window.location.origin : "");
-
   async function handleGoogleSignUp() {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${siteUrl}/auth/callback` },
@@ -23,6 +22,7 @@ export default function RegistroPage() {
   }
 
   async function handleSignUp() {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
     setErrorMsg("");
     if (!email || !password) return;
     if (password.length < 6) {
