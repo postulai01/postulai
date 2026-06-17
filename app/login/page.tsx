@@ -19,9 +19,9 @@ export default function LoginPage() {
   }
 
   async function handleLogin() {
-    setError(null);
-    setLoading(true);
     try {
+      setError(null);
+      setLoading(true);
       const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) {
         setError(
@@ -35,6 +35,8 @@ export default function LoginPage() {
       console.log("Login exitoso", data.session);
       window.location.href = "/app";
     } catch (e) {
+      console.error("ERROR COMPLETO:", e);
+      console.error("STACK:", (e as Error).stack);
       setError(e instanceof Error ? e.message : "Error inesperado al iniciar sesión.");
       setLoading(false);
     }

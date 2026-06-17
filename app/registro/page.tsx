@@ -22,34 +22,41 @@ export default function RegistroPage() {
   }
 
   async function handleSignUp() {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
-    setErrorMsg("");
-    if (!email || !password) return;
-    if (password.length < 6) {
-      setErrorMsg("La contraseña debe tener al menos 6 caracteres.");
-      return;
-    }
-    setStatus("loading");
+    try {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
+      setErrorMsg("");
+      if (!email || !password) return;
+      if (password.length < 6) {
+        setErrorMsg("La contraseña debe tener al menos 6 caracteres.");
+        return;
+      }
+      setStatus("loading");
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: nombre.trim() || undefined },
-        emailRedirectTo: `${siteUrl}/auth/callback`,
-      },
-    });
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: nombre.trim() || undefined },
+          emailRedirectTo: `${siteUrl}/auth/callback`,
+        },
+      });
 
-    if (error) {
-      setErrorMsg(
-        error.message === "User already registered"
-          ? "Ya existe una cuenta con ese correo. ¿Quieres iniciar sesión?"
-          : "Ocurrió un error. Intenta de nuevo."
-      );
+      if (error) {
+        setErrorMsg(
+          error.message === "User already registered"
+            ? "Ya existe una cuenta con ese correo. ¿Quieres iniciar sesión?"
+            : "Ocurrió un error. Intenta de nuevo."
+        );
+        setStatus("error");
+        return;
+      }
+      setStatus("sent");
+    } catch (e) {
+      console.error("ERROR COMPLETO:", e);
+      console.error("STACK:", (e as Error).stack);
+      setErrorMsg(e instanceof Error ? e.message : "Error inesperado.");
       setStatus("error");
-      return;
     }
-    setStatus("sent");
   }
 
   if (status === "sent") {
