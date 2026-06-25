@@ -6,10 +6,10 @@ import Sidebar, { saveHistorialEntry } from "@/app/components/Sidebar";
 import { supabase } from "@/lib/supabase";
 
 const inputClass =
-  "w-full bg-[#0A0A0A] border border-[#222] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/20 transition-colors duration-150";
+  "w-full bg-[#111] border border-[#222] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/20 transition-colors duration-150";
 
 const textareaClass =
-  "w-full bg-[#0A0A0A] border border-[#222] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 resize-none focus:outline-none focus:border-white/20 transition-colors duration-150 leading-relaxed";
+  "w-full bg-[#111] border border-[#222] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 resize-none focus:outline-none focus:border-white/20 transition-colors duration-150 leading-relaxed";
 
 function YesNo({
   value,
@@ -174,13 +174,6 @@ export default function CrearPage() {
       <Sidebar />
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto relative">
 
-        {/* Figuras decorativas */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
-          <div className="absolute -top-32 -right-32 w-[400px] h-[400px] rounded-full border border-[#1e1e1e]" />
-          <div className="absolute top-[55%] -right-16 w-44 h-44 rounded-full border border-[#1e1e1e]" />
-          <div className="absolute bottom-20 right-20 w-28 h-28 border border-[#1e1e1e] rotate-45" />
-        </div>
-
       <main
         className="flex-1 flex flex-col px-4 md:px-10 py-10 md:py-16 relative"
       >
@@ -287,7 +280,7 @@ export default function CrearPage() {
                   <select
                     value={estadoEstudio}
                     onChange={(e) => setEstadoEstudio(e.target.value)}
-                    className="w-full bg-[#0A0A0A] border border-[#222] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white/20 transition-colors duration-150 cursor-pointer"
+                    className="w-full bg-[#111] border border-[#222] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white/20 transition-colors duration-150 cursor-pointer"
                   >
                     <option value="" disabled>Estado actual</option>
                     <option value="titulado">Titulado</option>

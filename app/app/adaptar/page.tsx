@@ -106,13 +106,6 @@ export default function AdaptarPage() {
       <Sidebar />
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto relative">
 
-        {/* Figuras decorativas */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
-          <div className="absolute -top-32 -right-32 w-[400px] h-[400px] rounded-full border border-[#1e1e1e]" />
-          <div className="absolute top-[55%] -right-16 w-44 h-44 rounded-full border border-[#1e1e1e]" />
-          <div className="absolute bottom-20 right-20 w-28 h-28 border border-[#1e1e1e] rotate-45" />
-        </div>
-
       <main
         className="flex-1 flex flex-col px-4 md:px-10 py-10 md:py-16 relative"
       >
