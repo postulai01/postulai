@@ -76,9 +76,7 @@ export default function AppPage() {
 
   return (
     <div
-      className={`bg-[#0A0A0A] text-white relative flex flex-col ${
-        !showAll ? "md:h-screen md:overflow-hidden" : ""
-      }`}
+      className="bg-[#0A0A0A] text-white relative flex flex-col"
       style={{ minHeight: "100vh" }}
     >
       <style>{`
@@ -130,7 +128,7 @@ export default function AppPage() {
 
       {/* Header */}
       <header
-        className="relative z-10 shrink-0 flex items-center justify-between px-5 md:px-10"
+        className="relative z-50 shrink-0 flex items-center justify-between px-5 md:px-10"
         style={{ height: 64, borderBottom: "1px solid #1a1a1a" }}
       >
         <a
@@ -268,22 +266,14 @@ export default function AppPage() {
       </header>
 
       {/* Body */}
-      <div
-        className={`relative z-10 flex flex-col flex-1 min-h-0 px-5 py-5 md:px-10 md:py-6 ${
-          !showAll ? "md:overflow-hidden" : ""
-        }`}
-      >
+      <div className="relative z-10 flex flex-col flex-1 min-h-0 px-5 py-5 md:px-10 md:py-6">
         {/* Tool cards grid */}
-        <div
-          className={`grid grid-cols-1 md:grid-cols-3 gap-4 ${
-            !showAll ? "md:flex-1 md:min-h-0" : "mb-8"
-          }`}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           {/* Card 1: Adaptar */}
           <button
             type="button"
             onClick={() => router.push("/app/adaptar")}
-            className="tool-card interactive flex flex-col items-center justify-center text-center px-6 py-10 md:py-0 w-full"
+            className="tool-card interactive flex flex-col items-center justify-center text-center px-6 py-5 w-full"
           >
             <p
               className="card-title transition-colors duration-[350ms]"
@@ -309,7 +299,7 @@ export default function AppPage() {
           <button
             type="button"
             onClick={() => router.push("/app/crear")}
-            className="tool-card interactive flex flex-col items-center justify-center text-center px-6 py-10 md:py-0 w-full"
+            className="tool-card interactive flex flex-col items-center justify-center text-center px-6 py-5 w-full"
           >
             <p
               className="card-title transition-colors duration-[350ms]"
@@ -333,7 +323,7 @@ export default function AppPage() {
 
           {/* Card 3: Buscar trabajo — disabled */}
           <div
-            className="tool-card flex flex-col items-center justify-center text-center px-6 py-10 md:py-0"
+            className="tool-card flex flex-col items-center justify-center text-center px-6 py-5"
             style={{ cursor: "default" }}
           >
             <p
