@@ -7,6 +7,8 @@ import { supabase } from "@/lib/supabase";
 type PostulacionRow = {
   id: string;
   tipo: string;
+  cargo: string | null;
+  empresa: string | null;
   titulo_postulacion: string | null;
   created_at: string;
 };
@@ -17,10 +19,17 @@ function getInitials(name: string): string {
   return (parts[0][0] + parts[1][0]).toUpperCase();
 }
 
-function rowDisplay(row: PostulacionRow): string {
+function rowCargo(row: PostulacionRow): string {
+  if (row.cargo?.trim()) return row.cargo.trim();
   const title = row.titulo_postulacion?.trim();
   if (title) return title.length > 42 ? title.slice(0, 42) + "…" : title;
   return row.tipo === "adaptar" ? "CV Adaptado" : "CV Creado";
+}
+
+function empresaInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
 }
 
 function rowFecha(created_at: string): string {
@@ -53,7 +62,7 @@ export default function AppPage() {
       setUserEmail(session.user.email ?? null);
       const { data } = await supabase
         .from("postulaciones")
-        .select("id, tipo, titulo_postulacion, created_at")
+        .select("id, tipo, cargo, empresa, titulo_postulacion, created_at")
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false })
         .limit(50);
@@ -368,13 +377,17 @@ export default function AppPage() {
           className="shrink-0 mt-4 pt-4"
           style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}
         >
-          <div className="flex items-center justify-between mb-3">
-            <span
-              className="text-[11px] font-semibold uppercase"
-              style={{ color: "rgba(255,255,255,.35)", letterSpacing: "0.12em" }}
-            >
-              Tus postulaciones
-            </span>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-baseline gap-2.5">
+              <span style={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>
+                Tus postulaciones
+              </span>
+              {postulaciones && postulaciones.length > 0 && (
+                <span style={{ fontSize: 13.5, color: "rgba(255,255,255,.6)" }}>
+                  {postulaciones.length} en total
+                </span>
+              )}
+            </div>
             {showAll ? (
               <button
                 type="button"
@@ -407,7 +420,7 @@ export default function AppPage() {
               </span>
             </div>
           ) : displayed.length === 0 ? (
-            <p className="text-xs py-2" style={{ color: "rgba(255,255,255,.3)" }}>
+            <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.5)", paddingTop: 8, paddingBottom: 8 }}>
               Aún no tienes postulaciones. Comienza adaptando o creando tu CV.
             </p>
           ) : (
@@ -416,13 +429,28 @@ export default function AppPage() {
                 <a
                   key={row.id}
                   href={`/app/historial/${row.id}`}
-                  className="flex items-center justify-between py-2.5 hover:opacity-75 transition-opacity duration-150"
-                  style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}
+                  className="flex items-center gap-3 hover:opacity-75 transition-opacity duration-150"
+                  style={{ borderBottom: "1px solid rgba(255,255,255,.04)", paddingTop: 17, paddingBottom: 17 }}
                 >
-                  <span className="text-sm truncate" style={{ color: "rgba(255,255,255,.65)" }}>
-                    {rowDisplay(row)}
-                  </span>
-                  <span className="text-xs ml-4 shrink-0" style={{ color: "rgba(255,255,255,.3)" }}>
+                  <div
+                    className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center"
+                    style={{ background: "#1e1e1e", border: "1px solid #2a2a2a" }}
+                  >
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>
+                      {empresaInitials(row.empresa ?? row.titulo_postulacion ?? (row.tipo === "adaptar" ? "CV" : "CV"))}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="truncate" style={{ fontSize: 16, fontWeight: 600, color: "#fff", lineHeight: 1.3 }}>
+                      {rowCargo(row)}
+                    </p>
+                    {row.empresa && (
+                      <p className="truncate mt-0.5" style={{ fontSize: 13.5, color: "rgba(255,255,255,.75)", lineHeight: 1.3 }}>
+                        {row.empresa}
+                      </p>
+                    )}
+                  </div>
+                  <span className="shrink-0 ml-2" style={{ fontSize: 13.5, color: "rgba(255,255,255,.75)" }}>
                     {rowFecha(row.created_at)}
                   </span>
                 </a>
@@ -434,7 +462,7 @@ export default function AppPage() {
             <button
               type="button"
               onClick={() => setShowAll(true)}
-              className="mt-3 text-xs px-4 py-2 rounded-lg hover:opacity-80 transition-opacity duration-150"
+              className="mt-4 text-xs px-4 py-2 rounded-lg hover:opacity-80 transition-opacity duration-150"
               style={{ color: "rgba(255,255,255,.5)", border: "1px solid rgba(255,255,255,.1)" }}
             >
               Ver todas ({postulaciones.length})
