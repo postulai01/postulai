@@ -266,14 +266,14 @@ export default function AppPage() {
       </header>
 
       {/* Body */}
-      <div className="relative z-10 flex flex-col flex-1 min-h-0 px-5 py-5 md:px-10 md:py-6">
+      <div className="relative z-10 flex flex-col flex-1 min-h-0 px-5 py-5 md:px-10 md:py-6 justify-center">
         {/* Tool cards grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           {/* Card 1: Adaptar */}
           <button
             type="button"
             onClick={() => router.push("/app/adaptar")}
-            className="tool-card interactive flex flex-col items-center justify-center text-center px-6 py-5 w-full"
+            className="tool-card interactive flex flex-col items-center justify-center text-center px-6 py-9 w-full"
           >
             <p
               className="card-title transition-colors duration-[350ms]"
@@ -299,7 +299,7 @@ export default function AppPage() {
           <button
             type="button"
             onClick={() => router.push("/app/crear")}
-            className="tool-card interactive flex flex-col items-center justify-center text-center px-6 py-5 w-full"
+            className="tool-card interactive flex flex-col items-center justify-center text-center px-6 py-9 w-full"
           >
             <p
               className="card-title transition-colors duration-[350ms]"
@@ -323,7 +323,7 @@ export default function AppPage() {
 
           {/* Card 3: Buscar trabajo — disabled */}
           <div
-            className="tool-card flex flex-col items-center justify-center text-center px-6 py-5"
+            className="tool-card flex flex-col items-center justify-center text-center px-6 py-9"
             style={{ cursor: "default" }}
           >
             <p
@@ -364,7 +364,7 @@ export default function AppPage() {
 
         {/* Postulations section */}
         <div
-          className="shrink-0 mt-4 pt-4"
+          className="shrink-0 mt-4 pt-4 pb-12"
           style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}
         >
           <div className="flex items-center justify-between mb-4">
