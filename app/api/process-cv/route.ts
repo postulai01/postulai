@@ -74,7 +74,7 @@ EDUCACIÓN
 ═══════════════════════════════
 
 - Formato: Carrera | Institución — MM/AAAA – MM/AAAA · Ciudad
-- Sin bullets salvo que haya un dato concreto y diferenciador relevante para la oferta: premio, distinción, promedio destacado, proyecto específico directamente aplicable al cargo.
+- Sin bullets en la gran mayoría de los casos. La única excepción es un logro concreto, verificable y directamente relevante para la oferta: un premio nacional, promedio sobre 6.0, proyecto publicado, o distinción específica. NO son excepciones válidas: mencionar que el programa tiene magíster integrado, mencionar la duración de la carrera, mencionar que el colegio era bilingüe si ya está implícito en el nombre. Si no hay un logro concreto verificable, la sección va sin bullets en absoluto.
 - No repetir en bullets lo que ya dice el título.
 - Para seniors y ejecutivos con más de 10 años de experiencia: educación va al final y sin bullets, solo el título.
 - Incluir postgrados, MBAs, magísteres, diplomados relevantes para la oferta.
@@ -89,6 +89,8 @@ Habilidades técnicas (máximo 6):
 - Solo herramientas, software, plataformas, metodologías, lenguajes, certificaciones.
 - Ejemplos válidos: Excel avanzado, Python, SQL, SAP, Salesforce, Power BI, AutoCAD, metodologías ágiles, normas ISO.
 - PROHIBIDO incluir: descripciones de funciones, responsabilidades, competencias blandas disfrazadas de técnicas.
+
+TEST OBLIGATORIO para habilidades técnicas: antes de incluir cada ítem, preguntarse '¿es esto un software, herramienta, plataforma, lenguaje o certificación con nombre propio?' Si la respuesta es no, eliminarlo. Ejemplos que NUNCA deben aparecer como habilidad técnica: 'gestión comercial en terreno', 'análisis de procesos operativos', 'gestión operativa', 'manejo de equipos', 'atención al cliente'. Ejemplos que SÍ son habilidades técnicas: 'Microsoft Excel', 'SAP', 'Salesforce', 'SQL', 'Power BI', 'Google Analytics'.
 
 Habilidades blandas (máximo 5):
 - Solo las más relevantes para el cargo y sector de la oferta.
@@ -130,7 +132,7 @@ Lista de exactamente 5 cambios concretos. Formato: qué había → qué hay ahor
 PALABRAS PROHIBIDAS EN TODO EL CV
 ═══════════════════════════════
 
-Antes de entregar, escanear el CV completo y eliminar cualquier aparición de: apoyando, contribuyendo, colaborando, participando, multifuncional, end-to-end (salvo que la oferta lo use), sinergia, dinámico, innovador, apasionado, ciclo completo, disposición al aprendizaje, orientado a resultados (sin evidencia), proactivo (sin evidencia), potenciando, resguardando, generando valor, entorno dinámico, aprendizaje rápido, rápida adaptación, me caracterizo, busco desafíos, gestión operativa (como habilidad técnica).
+Antes de entregar, escanear el CV completo y eliminar cualquier aparición de: apoyando, contribuyendo, colaborando, participando, multifuncional, end-to-end (salvo que la oferta lo use), sinergia, dinámico, innovador, apasionado, ciclo completo, disposición al aprendizaje, orientado a resultados (sin evidencia), proactivo (sin evidencia), potenciando, resguardando, generando valor, entorno dinámico, aprendizaje rápido, rápida adaptación, me caracterizo, busco desafíos, gestión operativa (como habilidad técnica), ciclo completo del negocio, ciclo end-to-end, proceso completo, de principio a fin (como frase de relleno).
 
 ═══════════════════════════════
 CHECKLIST FINAL — verificar antes de entregar
