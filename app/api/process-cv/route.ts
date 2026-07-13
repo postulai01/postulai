@@ -47,7 +47,7 @@ PERFIL PROFESIONAL
 - Debe incluir: nivel de experiencia o etapa profesional, área de especialidad, 2 fortalezas concretas con evidencia, y el cargo o área a la que postula.
 - Al menos una frase debe conectar directamente con la empresa o el sector de la oferta.
 - Adaptar el tono al nivel: directo y con logros para seniors, enfocado en potencial y formación para practicantes.
-- PROHIBIDO: "yo", primera persona, "apasionado", "proactivo" sin evidencia, "orientado a resultados" sin evidencia, "busco nuevos desafíos", "me caracterizo por", "soy una persona", "tengo como objetivo". Prohibido usar el verbo "apoyar" en ninguna forma (apoyar, orientado a apoyar, busca apoyar). El candidato ejecuta, lidera, gestiona o desarrolla — nunca apoya. Además, prohibido usar frases que evadan las palabras prohibidas con sinónimos: si una frase comunica lo mismo que una palabra prohibida, también está prohibida.
+- PROHIBIDO: "yo", primera persona, "apasionado", "proactivo" sin evidencia, "orientado a resultados" sin evidencia, "busco nuevos desafíos", "me caracterizo por", "soy una persona", "tengo como objetivo". Prohibido en cualquier forma: apoyar, aportar, contribuir, colaborar. El candidato ejecuta, lidera, gestiona, desarrolla, analiza, diseña o coordina. Nunca apoya ni aporta. Además, prohibido usar frases que evadan palabras prohibidas con sinónimos: si una frase comunica lo mismo que una palabra prohibida, también está prohibida.
 
 ═══════════════════════════════
 EXPERIENCIA LABORAL
@@ -64,7 +64,7 @@ Reglas de bullets:
 - SIEMPRE empezar con verbo en primera persona singular pasado.
 - Para cargos actuales, usar presente: gestiono, lidero, coordino.
 - Verbos permitidos (elegir el más preciso según el logro): gestioné, lideré, implementé, reduje, aumenté, coordiné, desarrollé, ejecuté, diseñé, negocié, optimicé, construí, lancé, estructuré, analicé, capacité, supervisé, dirigí, administré, establecí, generé, logré, impulsé, consolidé, transformé, reestructuré, definí, propuse, piloté, escalé.
-- PROHIBIDO como verbo inicial: participé, apoyé, contribuí, colaboré, ayudé, asistí, estuve a cargo de, fui responsable de, trabajé en, me encargué de. Estos verbos hacen al candidato secundario de su propia historia.
+- PROHIBIDO como verbo inicial o en cualquier parte del bullet: participé, apoyé, contribuí, colaboré, ayudé, asistí, estuve a cargo de, fui responsable de. TAMBIÉN PROHIBIDO en cualquier parte del bullet: 'contribuyendo', 'apoyando', 'colaborando', 'aportando'. Si aparece cualquiera de estas palabras en un bullet, reescribir el bullet completo desde cero con un verbo de acción fuerte. No hay excepciones.
 - Al menos 1 bullet por cargo debe tener resultado medible: número, porcentaje, monto, cantidad, tiempo, ranking. Si el candidato no lo mencionó, inferir un dato conservador y razonable basado en el contexto descrito. Nunca inventar datos absurdos.
 - Escalar el impacto según el nivel: un practicante puede tener "50 unidades vendidas", un gerente debe tener "incremento de 23% en margen operacional en 18 meses".
 - Eliminar frases de relleno al final de bullets: "en un entorno dinámico", "generando valor", "potenciando sinergias", "aportando al equipo".
@@ -132,7 +132,9 @@ Lista de exactamente 5 cambios concretos. Formato: qué había → qué hay ahor
 PALABRAS PROHIBIDAS EN TODO EL CV
 ═══════════════════════════════
 
-Antes de entregar, escanear el CV completo y eliminar cualquier aparición de: apoyando, contribuyendo, colaborando, participando, multifuncional, end-to-end (salvo que la oferta lo use), sinergia, dinámico, innovador, apasionado, ciclo completo, disposición al aprendizaje, orientado a resultados (sin evidencia), proactivo (sin evidencia), potenciando, resguardando, generando valor, entorno dinámico, aprendizaje rápido, rápida adaptación, me caracterizo, busco desafíos, gestión operativa (como habilidad técnica), ciclo completo del negocio, ciclo end-to-end, proceso completo, de principio a fin (como frase de relleno), ciclo productivo y comercial completo, ciclo productivo, proceso productivo completo, orientado a apoyar, busca apoyar, con el objetivo de apoyar, demostré producto (reemplazar siempre por 'ejecuté demostraciones de producto').
+INSTRUCCIÓN CRÍTICA: Este escaneo es obligatorio y ocurre DESPUÉS de escribir el CV completo. Leer cada oración del CV y verificar que no contenga ninguna de las siguientes palabras en ninguna forma conjugada (gerundio, infinitivo, participio). Si aparece cualquiera, reescribir esa oración completa antes de entregar.
+
+Palabras y frases prohibidas: apoyando, contribuyendo, colaborando, participando, multifuncional, end-to-end (salvo que la oferta lo use), sinergia, dinámico, innovador, apasionado, ciclo completo, disposición al aprendizaje, orientado a resultados (sin evidencia), proactivo (sin evidencia), potenciando, resguardando, generando valor, entorno dinámico, aprendizaje rápido, rápida adaptación, me caracterizo, busco desafíos, gestión operativa (como habilidad técnica), ciclo completo del negocio, ciclo end-to-end, proceso completo, de principio a fin (como frase de relleno), ciclo productivo y comercial completo, ciclo productivo, proceso productivo completo, orientado a apoyar, busca apoyar, con el objetivo de apoyar, demostré producto (reemplazar siempre por 'ejecuté demostraciones de producto'), aportar, aportando, aporté (como sinónimo de apoyar), ciclo completo (en cualquier combinación de palabras).
 
 ═══════════════════════════════
 CHECKLIST FINAL — verificar antes de entregar
