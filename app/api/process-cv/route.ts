@@ -47,7 +47,7 @@ PERFIL PROFESIONAL
 - Debe incluir: nivel de experiencia o etapa profesional, área de especialidad, 2 fortalezas concretas con evidencia, y el cargo o área a la que postula.
 - Al menos una frase debe conectar directamente con la empresa o el sector de la oferta.
 - Adaptar el tono al nivel: directo y con logros para seniors, enfocado en potencial y formación para practicantes.
-- PROHIBIDO: "yo", primera persona, "apasionado", "proactivo" sin evidencia, "orientado a resultados" sin evidencia, "busco nuevos desafíos", "me caracterizo por", "soy una persona", "tengo como objetivo".
+- PROHIBIDO: "yo", primera persona, "apasionado", "proactivo" sin evidencia, "orientado a resultados" sin evidencia, "busco nuevos desafíos", "me caracterizo por", "soy una persona", "tengo como objetivo". Prohibido usar el verbo "apoyar" en ninguna forma (apoyar, orientado a apoyar, busca apoyar). El candidato ejecuta, lidera, gestiona o desarrolla — nunca apoya. Además, prohibido usar frases que evadan las palabras prohibidas con sinónimos: si una frase comunica lo mismo que una palabra prohibida, también está prohibida.
 
 ═══════════════════════════════
 EXPERIENCIA LABORAL
@@ -132,7 +132,7 @@ Lista de exactamente 5 cambios concretos. Formato: qué había → qué hay ahor
 PALABRAS PROHIBIDAS EN TODO EL CV
 ═══════════════════════════════
 
-Antes de entregar, escanear el CV completo y eliminar cualquier aparición de: apoyando, contribuyendo, colaborando, participando, multifuncional, end-to-end (salvo que la oferta lo use), sinergia, dinámico, innovador, apasionado, ciclo completo, disposición al aprendizaje, orientado a resultados (sin evidencia), proactivo (sin evidencia), potenciando, resguardando, generando valor, entorno dinámico, aprendizaje rápido, rápida adaptación, me caracterizo, busco desafíos, gestión operativa (como habilidad técnica), ciclo completo del negocio, ciclo end-to-end, proceso completo, de principio a fin (como frase de relleno).
+Antes de entregar, escanear el CV completo y eliminar cualquier aparición de: apoyando, contribuyendo, colaborando, participando, multifuncional, end-to-end (salvo que la oferta lo use), sinergia, dinámico, innovador, apasionado, ciclo completo, disposición al aprendizaje, orientado a resultados (sin evidencia), proactivo (sin evidencia), potenciando, resguardando, generando valor, entorno dinámico, aprendizaje rápido, rápida adaptación, me caracterizo, busco desafíos, gestión operativa (como habilidad técnica), ciclo completo del negocio, ciclo end-to-end, proceso completo, de principio a fin (como frase de relleno), ciclo productivo y comercial completo, ciclo productivo, proceso productivo completo, orientado a apoyar, busca apoyar, con el objetivo de apoyar, demostré producto (reemplazar siempre por 'ejecuté demostraciones de producto').
 
 ═══════════════════════════════
 CHECKLIST FINAL — verificar antes de entregar
