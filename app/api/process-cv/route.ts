@@ -82,7 +82,28 @@ Responde ÚNICAMENTE con un JSON válido con estos campos:
 - carta_presentacion: string con la carta (máximo 150 palabras)
 - sugerencias: array de exactamente 3 strings concisos y específicos con recomendaciones para el candidato
 - principales_cambios: array de máximo 5 strings cortos (máximo 8 palabras cada uno) describiendo los cambios más importantes al CV; en MODO CREAR describe las decisiones clave del CV construido
-- titulo_postulacion: string con el título de la postulación. En MODO ADAPTAR o MODO CREAR CON OFERTA: formato exacto "CV para [Empresa] · [Cargo]" (ej: "CV para Banco Chile · Analista Financiero"); si no se identifica la empresa usar "CV para [Cargo]". En MODO CREAR SIN OFERTA: formato "CV Profesional · [Título profesional del candidato]" (ej: "CV Profesional · Ingeniero Civil Industrial", "CV Profesional · Estudiante de Administración de Empresas").`;
+- titulo_postulacion: string con el título de la postulación. En MODO ADAPTAR o MODO CREAR CON OFERTA: formato exacto "CV para [Empresa] · [Cargo]" (ej: "CV para Banco Chile · Analista Financiero"); si no se identifica la empresa usar "CV para [Cargo]". En MODO CREAR SIN OFERTA: formato "CV Profesional · [Título profesional del candidato]" (ej: "CV Profesional · Ingeniero Civil Industrial", "CV Profesional · Estudiante de Administración de Empresas").
+- palabras_clave_oferta: string[] — SOLO en MODO ADAPTAR o MODO CREAR CON OFERTA. Lista de palabras clave, habilidades, herramientas y requisitos extraídos de la oferta de trabajo. REGLAS ESTRICTAS: (1) cada item debe ser corto y atómico: 1 a 3 palabras máximo; (2) si una habilidad compuesta tiene varias partes, sepárala en items distintos (ej. "análisis cuantitativo y modelización" → ["análisis cuantitativo", "modelización"]); (3) incluye entre 8 y 15 items; (4) incluye solo términos que aparezcan o se infieran directamente de la oferta (no agregues genéricos). En MODO CREAR SIN OFERTA: array vacío [].`;
+
+function calcularMatch(keywords: string[], cvText: string): { keywords_totales: number; keywords_encontradas: number } {
+  const cv = cvText.toLowerCase();
+  const encontradas = keywords.filter(kw => {
+    const palabras = kw.toLowerCase().trim().split(/\s+/);
+    if (palabras.length === 1) {
+      const base = palabras[0];
+      const sinS = base.endsWith("s") ? base.slice(0, -1) : base + "s";
+      return cv.includes(base) || cv.includes(sinS);
+    }
+    // Multi-word: match si al menos la mitad de las palabras individuales aparecen en el CV
+    const minMatch = Math.ceil(palabras.length / 2);
+    const hits = palabras.filter(p => {
+      const sinS = p.endsWith("s") ? p.slice(0, -1) : p + "s";
+      return cv.includes(p) || cv.includes(sinS);
+    }).length;
+    return hits >= minMatch;
+  });
+  return { keywords_totales: keywords.length, keywords_encontradas: encontradas.length };
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -156,7 +177,15 @@ export async function POST(request: NextRequest) {
     }
 
     const result = JSON.parse(jsonMatch[0]);
-    return NextResponse.json(result);
+
+    const keywords: string[] = Array.isArray(result.palabras_clave_oferta)
+      ? result.palabras_clave_oferta
+      : [];
+    const matchData = keywords.length > 0
+      ? calcularMatch(keywords, result.cv_adaptado ?? "")
+      : { keywords_totales: 0, keywords_encontradas: 0 };
+
+    return NextResponse.json({ ...result, ...matchData });
   } catch (error) {
     console.error("Error en /api/process-cv:", error);
     const message =

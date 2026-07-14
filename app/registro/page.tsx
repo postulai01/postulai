@@ -13,12 +13,10 @@ export default function RegistroPage() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? (typeof window !== "undefined" ? window.location.origin : "");
-
   async function handleGoogleSignUp() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${siteUrl}/auth/callback` },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
   }
 
@@ -36,11 +34,12 @@ export default function RegistroPage() {
       password,
       options: {
         data: { full_name: nombre.trim() || undefined },
-        emailRedirectTo: `${siteUrl}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 
     if (error) {
+      console.error("[signUp error]", error.message, error.status);
       setErrorMsg(
         error.message === "User already registered"
           ? "Ya existe una cuenta con ese correo. ¿Quieres iniciar sesión?"
