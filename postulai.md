@@ -186,3 +186,15 @@ En desarrollo / pendiente:
 - No cambiar la paleta de colores, tipografía o estilo visual sin discutirlo antes.
 - No agregar dependencias nuevas sin avisar (afecta el bundle y el deploy en Vercel).
 - No usar el dato del 75% de CVs rechazados por ATS — no tiene fuente válida.
+
+---
+
+## Reglas de Git (obligatorio respetar, sin excepciones)
+
+- Nunca hacer commit ni push directo sobre main, bajo ninguna circunstancia, aunque técnicamente se pueda.
+- Nunca copiar archivos "por encima" de otra rama como solución alternativa a conflictos o desincronización. Si una rama está atrasada respecto a main o hay conflictos, explicar la situación y esperar instrucciones.
+- El flujo correcto es siempre: git pull origin main → trabajar en una rama → git push de esa rama → abrir Pull Request en GitHub hacia main. El merge a main lo hace una persona, no Claude Code.
+- Si aparece un bloqueo técnico, detenerse y explicar el problema con opciones claras — no buscar atajos.
+- Antes de cualquier commit, correr git status y confirmar con el usuario si hay archivos inesperados.
+- Antes de cualquier push, mostrar el resumen de qué se va a subir y a qué rama, y esperar confirmación explícita.
+- No declarar un cambio como "resuelto" o "funcionando en producción" sin haber verificado el resultado real, no solo que el comando no dio error.
