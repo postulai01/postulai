@@ -316,6 +316,8 @@ export default function ResultadoPage() {
         carta_presentacion: data.carta_presentacion,
         principales_cambios: data.principales_cambios ?? null,
         sugerencias: data.sugerencias ?? null,
+        keywords_totales: data.keywords_totales ?? null,
+        keywords_encontradas: data.keywords_encontradas ?? null,
       });
     });
   }, [data]);

@@ -18,6 +18,8 @@ interface Postulacion {
   principales_cambios: string[] | null;
   sugerencias: string[] | null;
   created_at: string;
+  keywords_totales: number | null;
+  keywords_encontradas: number | null;
 }
 
 // ── Icons ──────────────────────────────────────────────────────────────
@@ -128,13 +130,20 @@ function CVPreviewElements({ text }: { text: string }) {
   return <>{elements}</>;
 }
 
-// ── Hero (sin keywords — historial no las almacena) ────────────────────
+// ── Hero ───────────────────────────────────────────────────────────────
 const ATS_CHECKS = ["Formato de columna única", "Sin tablas ni gráficos", "Máximo 2 páginas"];
+const CIRCLE_R = 44;
+const CIRCLE_C = 2 * Math.PI * CIRCLE_R;
 
 function HeroBlock({ post }: { post: Postulacion }) {
   const tituloMatch = post.titulo_postulacion?.match(/CV para (.+?) · (.+)/);
   const empresa = tituloMatch?.[1];
   const cargo = tituloMatch?.[2];
+
+  const hasKeywords = (post.keywords_totales ?? 0) > 0;
+  const found = post.keywords_encontradas ?? 0;
+  const total = post.keywords_totales ?? 0;
+  const dashOffset = CIRCLE_C * (1 - (hasKeywords ? found / total : 0));
 
   return (
     <div className="relative bg-[#111] border border-[#222] rounded-2xl overflow-hidden">
@@ -144,25 +153,62 @@ function HeroBlock({ post }: { post: Postulacion }) {
         style={{ border: "0.5px solid rgba(255,255,255,0.05)" }} />
 
       <div className="relative z-10 px-8 py-7 flex flex-col sm:flex-row gap-8 items-start sm:items-center">
-        <div className="shrink-0 w-[120px] h-[120px] rounded-full border-2 border-[#22c55e]/30 flex items-center justify-center">
-          <svg className="w-10 h-10 text-[#22c55e]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
+        {/* Indicador visual */}
+        {hasKeywords ? (
+          <div className="shrink-0">
+            <svg width="120" height="120" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r={CIRCLE_R} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="7" />
+              <circle
+                cx="50" cy="50" r={CIRCLE_R}
+                fill="none" stroke="#22c55e" strokeWidth="7" strokeLinecap="round"
+                strokeDasharray={CIRCLE_C} strokeDashoffset={dashOffset}
+                transform="rotate(-90 50 50)"
+                style={{ transition: "stroke-dashoffset 0.8s ease" }}
+              />
+              <text x="50" y="45" textAnchor="middle" fill="white" fontSize="22" fontWeight="900" fontFamily="inherit">{found}</text>
+              <text x="50" y="62" textAnchor="middle" fill="rgba(255,255,255,0.38)" fontSize="10" fontFamily="inherit">de {total}</text>
+            </svg>
+          </div>
+        ) : (
+          <div className="shrink-0 w-[120px] h-[120px] rounded-full border-2 border-[#22c55e]/30 flex items-center justify-center">
+            <svg className="w-10 h-10 text-[#22c55e]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        )}
 
         <div className="flex-1 flex flex-col gap-4">
           <div>
-            <h2 className="text-[28px] sm:text-[34px] leading-tight text-white" style={{ fontWeight: 900 }}>
-              CV optimizado para{" "}
-              <span className="text-[#22c55e]">ATS 2026</span>
-            </h2>
-            <p className="mt-1.5 text-sm text-white/50">
-              {cargo && empresa
-                ? `${post.tipo === "adaptar" ? "Adaptado" : "Creado"} para ${cargo} en ${empresa}`
-                : cargo
-                ? `${post.tipo === "adaptar" ? "Adaptado" : "Creado"} para ${cargo}`
-                : "Generado con las mejores prácticas para sistemas ATS"}
-            </p>
+            {hasKeywords ? (
+              <>
+                <h2 className="text-[28px] sm:text-[34px] leading-tight text-white" style={{ fontWeight: 900 }}>
+                  Tu CV cubre{" "}
+                  <span className="text-[#22c55e]">{found} de {total}</span>{" "}
+                  palabras clave
+                </h2>
+                <p className="mt-1.5 text-sm text-white/50">
+                  {cargo && empresa
+                    ? `Coincidencias con la oferta de ${cargo} en ${empresa}`
+                    : cargo
+                    ? `Coincidencias con la oferta de ${cargo}`
+                    : "Coincidencias detectadas en la oferta de trabajo"}
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="text-[28px] sm:text-[34px] leading-tight text-white" style={{ fontWeight: 900 }}>
+                  CV optimizado para{" "}
+                  <span className="text-[#22c55e]">ATS 2026</span>
+                </h2>
+                <p className="mt-1.5 text-sm text-white/50">
+                  {cargo && empresa
+                    ? `${post.tipo === "adaptar" ? "Adaptado" : "Creado"} para ${cargo} en ${empresa}`
+                    : cargo
+                    ? `${post.tipo === "adaptar" ? "Adaptado" : "Creado"} para ${cargo}`
+                    : "Generado con las mejores prácticas para sistemas ATS"}
+                </p>
+              </>
+            )}
           </div>
           <div className="flex flex-wrap gap-x-6 gap-y-1.5">
             {ATS_CHECKS.map(check => (
