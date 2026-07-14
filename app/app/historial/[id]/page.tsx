@@ -20,6 +20,7 @@ interface Postulacion {
   created_at: string;
 }
 
+// ── Icons ──────────────────────────────────────────────────────────────
 const IconDownload = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -38,65 +39,188 @@ const IconCheck = () => (
   </svg>
 );
 
-function CardHeading({ children }: { children: React.ReactNode }) {
+// ── CV parsing ─────────────────────────────────────────────────────────
+type CvRole = "name" | "title" | "contact" | "section" | "bullet" | "body" | "blank";
+interface ParsedLine { role: CvRole; text: string; }
+
+function parseCvText(cvText: string): ParsedLine[] {
+  const isSep = (t: string) => t.length > 1 && /^[%\-=_*~─━]+$/.test(t.trim());
+  const parsed: ParsedLine[] = [];
+  let state: "name" | "title" | "contact" | "body" = "name";
+  for (const raw of cvText.split("\n")) {
+    if (isSep(raw)) continue;
+    const t = raw.replace(/%%%/g, "").replace(/[─━]+/g, "").trim();
+    if (t === "") { parsed.push({ role: "blank", text: "" }); continue; }
+    const allCaps = t.length > 1 && t.length < 60 && t === t.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(t);
+    if (state === "name") {
+      parsed.push({ role: "name", text: t }); state = "title";
+    } else if (state === "title") {
+      if (allCaps) { state = "body"; parsed.push({ role: "section", text: t }); }
+      else { parsed.push({ role: "title", text: t }); state = "contact"; }
+    } else if (state === "contact") {
+      if (allCaps) { state = "body"; parsed.push({ role: "section", text: t }); }
+      else { parsed.push({ role: "contact", text: t }); state = "body"; }
+    } else {
+      if (allCaps) parsed.push({ role: "section", text: t });
+      else if (/^•/.test(t)) parsed.push({ role: "bullet", text: t.replace(/^•\s*/, "") });
+      else parsed.push({ role: "body", text: t });
+    }
+  }
+  return parsed;
+}
+
+function CVPreviewElements({ text }: { text: string }) {
+  const lines = parseCvText(text);
+  let ruleDone = false;
+  const elements: React.ReactNode[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const { role, text: t } = lines[i];
+    switch (role) {
+      case "name":
+        elements.push(
+          <p key={i} style={{ fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif" }}
+            className="text-center font-bold uppercase tracking-widest text-[14px] text-white mb-1.5 leading-tight">{t}</p>
+        ); break;
+      case "title":
+        elements.push(
+          <p key={i} style={{ fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif" }}
+            className="text-center text-[11px] text-white/55 mb-0.5 leading-snug">{t}</p>
+        ); break;
+      case "contact":
+        elements.push(
+          <p key={i} style={{ fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif" }}
+            className="text-center text-[10px] text-white/45 mb-2.5 leading-snug">{t}</p>
+        );
+        if (!ruleDone) {
+          elements.push(<hr key={`rule-${i}`} className="border-white/25 mb-3 mt-0.5" />);
+          ruleDone = true;
+        }
+        break;
+      case "section":
+        if (!ruleDone) {
+          elements.push(<hr key={`rule-${i}`} className="border-white/25 mb-3 mt-0.5" />);
+          ruleDone = true;
+        }
+        elements.push(
+          <p key={i} style={{ fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif" }}
+            className="text-[9.5px] font-bold uppercase tracking-wider text-white/65 border-b border-white/12 pb-1 mt-4 mb-2 leading-none">{t}</p>
+        ); break;
+      case "bullet":
+        elements.push(
+          <div key={i} className="flex gap-2 mb-0.5 pl-2.5">
+            <span style={{ fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif" }}
+              className="text-white/60 text-[10px] shrink-0 mt-[1px] leading-relaxed">•</span>
+            <span style={{ fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif" }}
+              className="text-[10px] text-white/80 leading-relaxed">{t}</span>
+          </div>
+        ); break;
+      case "body":
+        elements.push(
+          <p key={i} style={{ fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif" }}
+            className="text-[10px] text-white/80 leading-relaxed mb-0.5">{t}</p>
+        ); break;
+      case "blank":
+        elements.push(<div key={i} className="h-2" />);
+        break;
+    }
+  }
+  return <>{elements}</>;
+}
+
+// ── Hero (sin keywords — historial no las almacena) ────────────────────
+const ATS_CHECKS = ["Formato de columna única", "Sin tablas ni gráficos", "Máximo 2 páginas"];
+
+function HeroBlock({ post }: { post: Postulacion }) {
+  const tituloMatch = post.titulo_postulacion?.match(/CV para (.+?) · (.+)/);
+  const empresa = tituloMatch?.[1];
+  const cargo = tituloMatch?.[2];
+
   return (
-    <div>
-      <h2 className="text-xl font-bold text-white">{children}</h2>
-      <div className="mt-2 w-8 h-0.5 bg-white/20 rounded-full" />
+    <div className="relative bg-[#111] border border-[#222] rounded-2xl overflow-hidden">
+      <div aria-hidden className="absolute -top-14 -left-14 w-52 h-52 rounded-full"
+        style={{ border: "0.5px solid rgba(255,255,255,0.07)" }} />
+      <div aria-hidden className="absolute -bottom-20 left-32 w-72 h-72 rounded-full"
+        style={{ border: "0.5px solid rgba(255,255,255,0.05)" }} />
+
+      <div className="relative z-10 px-8 py-7 flex flex-col sm:flex-row gap-8 items-start sm:items-center">
+        <div className="shrink-0 w-[120px] h-[120px] rounded-full border-2 border-[#22c55e]/30 flex items-center justify-center">
+          <svg className="w-10 h-10 text-[#22c55e]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+
+        <div className="flex-1 flex flex-col gap-4">
+          <div>
+            <h2 className="text-[28px] sm:text-[34px] leading-tight text-white" style={{ fontWeight: 900 }}>
+              CV optimizado para{" "}
+              <span className="text-[#22c55e]">ATS 2026</span>
+            </h2>
+            <p className="mt-1.5 text-sm text-white/50">
+              {cargo && empresa
+                ? `${post.tipo === "adaptar" ? "Adaptado" : "Creado"} para ${cargo} en ${empresa}`
+                : cargo
+                ? `${post.tipo === "adaptar" ? "Adaptado" : "Creado"} para ${cargo}`
+                : "Generado con las mejores prácticas para sistemas ATS"}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-x-6 gap-y-1.5">
+            {ATS_CHECKS.map(check => (
+              <span key={check} className="flex items-center gap-1.5 text-xs text-white/55">
+                <svg className="w-3.5 h-3.5 text-[#22c55e] shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                {check}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-function truncateWords(text: string, max: number): string {
-  const words = text.trim().split(/\s+/);
-  if (words.length <= max) return text;
-  return words.slice(0, max).join(" ") + "…";
-}
-
+// ── Página principal ───────────────────────────────────────────────────
 export default function HistorialIdPage() {
   const { id } = useParams<{ id: string }>();
 
   const [post, setPost] = useState<Postulacion | null>(null);
   const [notFound, setNotFound] = useState(false);
-  const [copiedCv, setCopiedCv] = useState(false);
-  const [copiedCarta, setCopiedCarta] = useState(false);
+  const [activeTab, setActiveTab] = useState<"cv" | "carta">("cv");
+  const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState<"pdf" | "word" | null>(null);
+  const [cambiosExpanded, setCambiosExpanded] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const loadedRef = useRef(false);
+
+  function switchTab(tab: "cv" | "carta") {
+    setActiveTab(tab);
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }
+
+  async function copyActive() {
+    if (!post) return;
+    await navigator.clipboard.writeText(
+      activeTab === "cv" ? post.cv_adaptado : post.carta_presentacion
+    );
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   useEffect(() => {
     if (loadedRef.current) return;
     loadedRef.current = true;
-
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) { setNotFound(true); return; }
-
       const { data, error } = await supabase
         .from("postulaciones")
         .select("*")
         .eq("id", id)
         .single();
-
-      if (error || !data || data.user_id !== session.user.id) {
-        setNotFound(true);
-        return;
-      }
+      if (error || !data || data.user_id !== session.user.id) { setNotFound(true); return; }
       setPost(data as Postulacion);
     });
   }, [id]);
-
-  async function copyCv() {
-    if (!post) return;
-    await navigator.clipboard.writeText(post.cv_adaptado);
-    setCopiedCv(true);
-    setTimeout(() => setCopiedCv(false), 2000);
-  }
-
-  async function copyCarta() {
-    if (!post) return;
-    await navigator.clipboard.writeText(post.carta_presentacion);
-    setCopiedCarta(true);
-    setTimeout(() => setCopiedCarta(false), 2000);
-  }
 
   async function handleDownloadPDF() {
     if (!post || downloading) return;
@@ -109,15 +233,10 @@ export default function HistorialIdPage() {
       const blob = await pdf(<CVDocument cvText={post.cv_adaptado} />).toBlob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url;
-      a.download = "cv-postulai.pdf";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } finally {
-      setDownloading(null);
-    }
+      a.href = url; a.download = "cv-postulai.pdf";
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+    } finally { setDownloading(null); }
   }
 
   async function handleDownloadWord() {
@@ -125,7 +244,6 @@ export default function HistorialIdPage() {
     setDownloading("word");
     try {
       const { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle } = await import("docx");
-
       const isSep = (t: string) => t.length > 1 && /^[%\-=_*~─━]+$/.test(t.trim());
       type Role = "name" | "title" | "contact" | "section" | "bullet" | "body" | "blank";
       const parsed: { role: Role; text: string }[] = [];
@@ -154,61 +272,41 @@ export default function HistorialIdPage() {
       let ruleDone = false;
       const headerRule = () => new Paragraph({
         border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: "000000", space: 4 } },
-        spacing: { after: 120 },
-        children: [],
+        spacing: { after: 120 }, children: [],
       });
 
       for (const { role, text } of parsed) {
         switch (role) {
-          case "name":
-            children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: text.toUpperCase(), font: "Calibri", size: 32, bold: true, color: "000000" })], spacing: { after: 60 } }));
-            break;
-          case "title":
-            children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text, font: "Calibri", size: 22, color: "555555" })], spacing: { after: 40 } }));
-            break;
+          case "name": children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: text.toUpperCase(), font: "Calibri", size: 32, bold: true, color: "000000" })], spacing: { after: 60 } })); break;
+          case "title": children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text, font: "Calibri", size: 22, color: "555555" })], spacing: { after: 40 } })); break;
           case "contact":
             children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text, font: "Calibri", size: 20, color: "777777" })], spacing: { after: 60 } }));
-            if (!ruleDone) { children.push(headerRule()); ruleDone = true; }
-            break;
+            if (!ruleDone) { children.push(headerRule()); ruleDone = true; } break;
           case "section":
             if (!ruleDone) { children.push(headerRule()); ruleDone = true; }
-            children.push(new Paragraph({ children: [new TextRun({ text: text.toUpperCase(), font: "Calibri", size: 22, bold: true, color: "000000" })], border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: "AAAAAA", space: 4 } }, spacing: { before: 200, after: 80 } }));
-            break;
-          case "bullet":
-            children.push(new Paragraph({ bullet: { level: 0 }, children: [new TextRun({ text, font: "Calibri", size: 22, color: "000000" })], spacing: { after: 40 } }));
-            break;
-          case "body":
-            children.push(new Paragraph({ children: [new TextRun({ text, font: "Calibri", size: 22, color: "000000" })], spacing: { after: 60, line: 276 } }));
-            break;
-          default:
-            children.push(new Paragraph({ children: [new TextRun({ text: "", font: "Calibri", size: 22 })], spacing: { after: 0 } }));
+            children.push(new Paragraph({ children: [new TextRun({ text: text.toUpperCase(), font: "Calibri", size: 22, bold: true, color: "000000" })], border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: "AAAAAA", space: 4 } }, spacing: { before: 200, after: 80 } })); break;
+          case "bullet": children.push(new Paragraph({ bullet: { level: 0 }, children: [new TextRun({ text, font: "Calibri", size: 22, color: "000000" })], spacing: { after: 40 } })); break;
+          case "body": children.push(new Paragraph({ children: [new TextRun({ text, font: "Calibri", size: 22, color: "000000" })], spacing: { after: 60, line: 276 } })); break;
+          default: children.push(new Paragraph({ children: [new TextRun({ text: "", font: "Calibri", size: 22 })], spacing: { after: 0 } }));
         }
       }
 
-      const doc = new Document({
-        sections: [{ properties: { page: { margin: { top: 720, bottom: 720, left: 900, right: 900 } } }, children }],
-      });
+      const doc = new Document({ sections: [{ properties: { page: { margin: { top: 720, bottom: 720, left: 900, right: 900 } } }, children }] });
       const blob = await Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url;
-      a.download = "cv-postulai.docx";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } finally {
-      setDownloading(null);
-    }
+      a.href = url; a.download = "cv-postulai.docx";
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+    } finally { setDownloading(null); }
   }
 
-  // Loading / not found states
   if (notFound) {
     return (
       <div className="h-screen overflow-hidden bg-[#0A0A0A] text-white flex flex-col md:flex-row">
         <Sidebar />
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-sm text-white/40">Postulación no encontrada. Redirigiendo...</p>
+          <p className="text-sm text-white/40">Postulación no encontrada.</p>
         </div>
       </div>
     );
@@ -222,34 +320,35 @@ export default function HistorialIdPage() {
     );
   }
 
-  const titulo = post.empresa && post.cargo
-    ? `CV para ${post.empresa} · ${post.cargo}`
-    : post.cargo ?? post.empresa ?? "Tu postulación";
-
   const fecha = new Date(post.created_at).toLocaleDateString("es-CL", {
     day: "numeric", month: "long", year: "numeric",
   });
 
-  const cartaTruncada = truncateWords(post.carta_presentacion, 150);
-  const cartaEsTruncada = cartaTruncada !== post.carta_presentacion;
+  const cambios = post.principales_cambios ?? [];
+  const sugerencias = post.sugerencias ?? [];
 
   return (
     <div className="h-screen overflow-hidden bg-[#0A0A0A] text-white flex flex-col md:flex-row">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-h-0 overflow-y-auto relative">
 
-        <main className="flex-1 px-4 sm:px-8 py-10">
-          <div className="w-full max-w-[900px] mx-auto flex flex-col gap-10">
+        {/* Figuras decorativas */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+          <div className="absolute -top-32 -right-32 w-[400px] h-[400px] rounded-full border border-[#1e1e1e]" />
+          <div className="absolute top-[55%] -right-16 w-44 h-44 rounded-full border border-[#1e1e1e]" />
+          <div className="absolute bottom-20 right-20 w-28 h-28 border border-[#1e1e1e] rotate-45" />
+        </div>
+
+        <main className="flex-1 px-6 sm:px-10 py-10 sm:py-14 relative">
+          <div className="w-full max-w-[960px] mx-auto flex flex-col gap-8">
 
             {/* Encabezado */}
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-              <div className="flex flex-col gap-1.5">
-                <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
-                  {titulo}
-                </h1>
-                <p className="text-sm text-[#D1D5DB]">
-                  {post.tipo === "adaptar" ? "Adaptado" : "Creado"} el {fecha}
+              <div className="flex flex-col gap-1">
+                <p className="text-xs text-white/35 uppercase tracking-widest font-semibold">
+                  {post.tipo === "adaptar" ? "CV Adaptado" : "CV Creado"}
                 </p>
+                <p className="text-sm text-white/45">{fecha}</p>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
                 <button
@@ -277,94 +376,108 @@ export default function HistorialIdPage() {
               </div>
             </div>
 
-            {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-6 items-start">
+            {/* Hero */}
+            <HeroBlock post={post} />
 
-              {/* CV adaptado */}
+            {/* Grid asimétrico */}
+            <div className="grid grid-cols-1 md:grid-cols-[5fr_3fr] gap-6 items-start">
+
+              {/* Card CV / Carta con tabs */}
               <div className="bg-[#111] border border-[#222] rounded-2xl flex flex-col overflow-hidden">
-                <div className="px-6 py-5 border-b border-[#222] flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-base font-bold text-white">CV Adaptado</span>
-                    <span className="text-xs text-[#D1D5DB] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md">ATS 2026</span>
+                <div className="px-4 border-b border-[#222] flex items-center justify-between gap-2">
+                  <div className="flex items-center">
+                    <button
+                      type="button"
+                      onClick={() => switchTab("cv")}
+                      className={`relative px-3 py-4 text-sm font-semibold transition-colors duration-150 flex items-center gap-2 ${
+                        activeTab === "cv" ? "text-white" : "text-white/35 hover:text-white/60"
+                      }`}
+                    >
+                      CV Adaptado
+                      {activeTab === "cv" && (
+                        <>
+                          <span className="text-xs text-[#aaa] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md font-normal">ATS 2026</span>
+                          <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-white rounded-t-full" />
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => switchTab("carta")}
+                      className={`relative px-3 py-4 text-sm font-semibold transition-colors duration-150 ${
+                        activeTab === "carta" ? "text-white" : "text-white/35 hover:text-white/60"
+                      }`}
+                    >
+                      Carta de presentación
+                      {activeTab === "carta" && (
+                        <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-white rounded-t-full" />
+                      )}
+                    </button>
                   </div>
                   <button
                     type="button"
-                    onClick={copyCv}
-                    className="flex items-center gap-1.5 text-xs font-medium text-white/70 hover:text-white transition-colors duration-150 px-3 py-1.5 border border-white/20 rounded-lg hover:border-white/40"
+                    onClick={copyActive}
+                    className="flex items-center gap-1.5 text-xs font-medium text-white/70 hover:text-white transition-colors duration-150 px-3 py-1.5 border border-white/20 rounded-lg hover:border-white/40 shrink-0"
                   >
-                    {copiedCv ? <><IconCheck />Copiado</> : <><IconCopy />Copiar</>}
+                    {copied ? <><IconCheck />Copiado</> : <><IconCopy />Copiar</>}
                   </button>
                 </div>
-                <div className="px-7 py-6 overflow-y-auto max-h-[580px] md:max-h-[660px]">
-                  <pre className="text-sm text-white/90 leading-relaxed whitespace-pre-wrap font-sans">{post.cv_adaptado}</pre>
+                <div className="relative flex-1 min-h-0">
+                  <div className="absolute top-0 inset-x-0 h-7 bg-gradient-to-b from-[#111] to-transparent pointer-events-none z-10" />
+                  <div ref={scrollRef} className="overflow-y-auto max-h-[580px] md:max-h-[660px] px-7 py-5">
+                    {activeTab === "cv"
+                      ? <CVPreviewElements text={post.cv_adaptado} />
+                      : <p className="text-sm text-white/90 leading-relaxed whitespace-pre-wrap">{post.carta_presentacion}</p>
+                    }
+                  </div>
+                  <div className="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-[#111] to-transparent pointer-events-none z-10" />
                 </div>
               </div>
 
-              {/* Columna derecha */}
-              <div className="flex flex-col gap-5">
-
-                {/* Qué cambió */}
-                {post.principales_cambios && post.principales_cambios.length > 0 && (
-                  <div className="bg-[#111] border border-[#222] rounded-2xl p-7 flex flex-col gap-5">
-                    <CardHeading>Qué cambió</CardHeading>
-                    <div className="flex flex-wrap gap-2">
-                      {post.principales_cambios.map((cambio, i) => (
-                        <span
-                          key={i}
-                          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#1a1a1a] border border-[#333] text-white"
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
-                          {cambio}
-                        </span>
-                      ))}
-                    </div>
+              {/* Qué cambió — lista liviana */}
+              {cambios.length > 0 && (
+                <div className="flex flex-col gap-2 pt-1">
+                  <p className="text-xs font-bold text-white/35 uppercase tracking-widest px-1 mb-1">Qué cambió</p>
+                  <div className="flex flex-col">
+                    {(cambiosExpanded ? cambios : cambios.slice(0, 3)).map((cambio, i) => (
+                      <div key={i} className="flex items-start gap-3 py-3 border-b border-white/[0.06] last:border-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] shrink-0 mt-[6px]" />
+                        <span className="text-sm text-white/75 leading-snug">{cambio}</span>
+                      </div>
+                    ))}
                   </div>
-                )}
-
-                {/* Carta */}
-                <div className="bg-[#111] border border-[#222] rounded-2xl p-7 flex flex-col gap-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <CardHeading>Carta de presentación</CardHeading>
+                  {cambios.length > 3 && (
                     <button
                       type="button"
-                      onClick={copyCarta}
-                      className="flex items-center gap-1.5 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 transition-colors duration-150 px-3.5 py-2 border border-white/20 rounded-lg hover:border-white/40 shrink-0 mt-0.5"
+                      onClick={() => setCambiosExpanded(e => !e)}
+                      className="text-xs text-white/35 hover:text-white/60 transition-colors duration-150 text-left px-1 pt-1 flex items-center gap-1"
                     >
-                      {copiedCarta ? <><IconCheck />Copiado</> : <><IconCopy />Copiar</>}
+                      {cambiosExpanded ? "Ver menos ↑" : `Ver ${cambios.length - 3} más ↓`}
                     </button>
-                  </div>
-                  <p className="text-sm text-white/90 leading-relaxed">
-                    {cartaTruncada}
-                    {cartaEsTruncada && <span className="text-white/40"> …ver todo al copiar</span>}
-                  </p>
+                  )}
                 </div>
-
-              </div>
+              )}
             </div>
 
-            {/* Sugerencias — ancho completo */}
-            {post.sugerencias && post.sugerencias.length > 0 && (
-              <div className="flex flex-col gap-5">
-                <CardHeading>Sugerencias</CardHeading>
+            {/* Sugerencias */}
+            {sugerencias.length > 0 && (
+              <div className="flex flex-col gap-4">
+                <p className="text-xs font-bold text-white/35 uppercase tracking-widest">Sugerencias</p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {post.sugerencias.map((s, i) => (
-                    <div key={i} className="bg-[#111] border border-[#222] rounded-2xl px-6 py-6 relative overflow-hidden min-h-[130px]">
-                      <span
-                        aria-hidden
-                        className="absolute -bottom-4 -right-2 text-[6rem] font-black leading-none select-none pointer-events-none"
-                        style={{ color: "rgba(255,255,255,0.06)" }}
-                      >
+                  {sugerencias.map((s, i) => (
+                    <div key={i} className="relative rounded-2xl px-5 pt-10 pb-6 bg-[#111] border border-[#222]">
+                      <span className="absolute top-4 left-4 w-6 h-6 rounded-full bg-[#22c55e]/15 border border-[#22c55e]/30 flex items-center justify-center text-[10px] font-bold text-[#22c55e] leading-none">
                         {i + 1}
                       </span>
-                      <p className="text-sm text-white/90 leading-relaxed relative z-10">{s}</p>
+                      <p className="text-sm text-white/75 leading-relaxed">{s}</p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
+
           </div>
         </main>
-
       </div>
     </div>
   );
