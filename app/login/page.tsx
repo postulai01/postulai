@@ -1,27 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { createBrowserClient } from "@supabase/ssr";
 
 export default function LoginPage() {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
   const [email, setEmail] = useState("");
+
+  async function handleGoogleLogin() {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+  }
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleGoogleLogin() {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${siteUrl}/auth/callback` },
-    });
-  }
-
   async function handleLogin() {
+    setError(null);
+    setLoading(true);
     try {
-      setError(null);
-      setLoading(true);
       const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) {
         setError(
@@ -35,8 +38,6 @@ export default function LoginPage() {
       console.log("Login exitoso", data.session);
       window.location.href = "/app";
     } catch (e) {
-      console.error("ERROR COMPLETO:", e);
-      console.error("STACK:", (e as Error).stack);
       setError(e instanceof Error ? e.message : "Error inesperado al iniciar sesión.");
       setLoading(false);
     }

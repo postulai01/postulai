@@ -14,49 +14,41 @@ export default function RegistroPage() {
   const [errorMsg, setErrorMsg] = useState("");
 
   async function handleGoogleSignUp() {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${siteUrl}/auth/callback` },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
   }
 
   async function handleSignUp() {
-    try {
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
-      setErrorMsg("");
-      if (!email || !password) return;
-      if (password.length < 6) {
-        setErrorMsg("La contraseña debe tener al menos 6 caracteres.");
-        return;
-      }
-      setStatus("loading");
-
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { full_name: nombre.trim() || undefined },
-          emailRedirectTo: `${siteUrl}/auth/callback`,
-        },
-      });
-
-      if (error) {
-        setErrorMsg(
-          error.message === "User already registered"
-            ? "Ya existe una cuenta con ese correo. ¿Quieres iniciar sesión?"
-            : "Ocurrió un error. Intenta de nuevo."
-        );
-        setStatus("error");
-        return;
-      }
-      setStatus("sent");
-    } catch (e) {
-      console.error("ERROR COMPLETO:", e);
-      console.error("STACK:", (e as Error).stack);
-      setErrorMsg(e instanceof Error ? e.message : "Error inesperado.");
-      setStatus("error");
+    setErrorMsg("");
+    if (!email || !password) return;
+    if (password.length < 6) {
+      setErrorMsg("La contraseña debe tener al menos 6 caracteres.");
+      return;
     }
+    setStatus("loading");
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: nombre.trim() || undefined },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (error) {
+      console.error("[signUp error]", error.message, error.status);
+      setErrorMsg(
+        error.message === "User already registered"
+          ? "Ya existe una cuenta con ese correo. ¿Quieres iniciar sesión?"
+          : "Ocurrió un error. Intenta de nuevo."
+      );
+      setStatus("error");
+      return;
+    }
+    setStatus("sent");
   }
 
   if (status === "sent") {
