@@ -197,8 +197,10 @@ function HeroBlock({ post }: { post: Postulacion }) {
             ) : (
               <>
                 <h2 className="text-[28px] sm:text-[34px] leading-tight text-white" style={{ fontWeight: 900 }}>
-                  CV optimizado para{" "}
-                  <span className="text-[#22c55e]">ATS 2026</span>
+                  {post.tipo === "adaptar" || (cargo && empresa)
+                    ? <>CV adaptado a la <span className="text-[#22c55e]">oferta</span></>
+                    : <>CV optimizado para <span className="text-[#22c55e]">ATS 2026</span></>
+                  }
                 </h2>
                 <p className="mt-1.5 text-sm text-white/50">
                   {cargo && empresa
@@ -382,7 +384,7 @@ export default function HistorialIdPage() {
         <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
           <div className="absolute -top-32 -right-32 w-[400px] h-[400px] rounded-full border border-[#1e1e1e]" />
           <div className="absolute top-[55%] -right-16 w-44 h-44 rounded-full border border-[#1e1e1e]" />
-          <div className="absolute bottom-20 right-20 w-28 h-28 border border-[#1e1e1e] rotate-45" />
+          <div className="absolute bottom-20 right-20 w-28 h-28 rounded-full border border-[#1e1e1e]" />
         </div>
 
         <main className="flex-1 px-6 sm:px-10 py-10 sm:py-14 relative">
