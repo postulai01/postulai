@@ -92,6 +92,7 @@ PROHIBIDO en bullets:
 ✗ Verbos iniciales débiles: participé, apoyé, contribuí, colaboré, ayudé, asistí, estuve a cargo de, fui responsable de
 ✗ Gerundios de soporte en cualquier parte: apoyando, contribuyendo, colaborando, aportando, participando
 ✗ Frases de proceso completo: "ciclo completo", "desde la producción hasta", "de principio a fin", "end-to-end", "gestión integral"
+✗ "cubriendo todas las etapas" y cualquier frase que describa haber cubierto múltiples etapas de un proceso — es ciclo completo disfrazado.
 ✗ Palabras prohibidas en cualquier parte: multifuncional, proactivo, dinámico, sinergia, potenciando, resguardando
 
 RESULTADO MEDIBLE: al menos 1 bullet por cargo debe tener número, porcentaje, monto, cantidad o tiempo. Si el candidato no lo mencionó, inferir un dato conservador basado en el contexto.
@@ -165,7 +166,7 @@ CHECKLIST — ejecutar antes de entregar
 □ 4. ¿La educación va sin bullets?
 □ 5. ¿Las habilidades técnicas son solo herramientas con nombre propio?
 □ 6. ¿El 70% de palabras clave de la oferta están en el CV?
-□ 7. Escanear cada oración: apoyando, contribuyendo, colaborando, participando, aportando, ciclo completo, end-to-end, multifuncional, proactivo, dinámico, sinergia, apoyaron, apoyó (como verbo de bullet), busca, productivo-comercial, operativo-comercial, realicé, ha liderado, ha desarrollado, ha gestionado (tercera persona en perfil), coordiné mi desempeño, asumiendo responsabilidad en (variante de ciclo completo), demostré producto — si aparece alguna → reescribir.
+□ 7. Escanear cada oración: apoyando, contribuyendo, colaborando, participando, aportando, ciclo completo, end-to-end, multifuncional, proactivo, dinámico, sinergia, apoyaron, apoyó (como verbo de bullet), busca, productivo-comercial, operativo-comercial, realicé, ha liderado, ha desarrollado, ha gestionado (tercera persona en perfil), coordiné mi desempeño, asumiendo responsabilidad en (variante de ciclo completo), demostré producto, cubriendo todas las etapas, cubriendo etapas, todas las etapas operativas, etapas operativas y comerciales — si aparece alguna → reescribir.
 □ 8. ¿Tono y extensión corresponden al nivel del candidato?
 
 Si cualquier punto falla → corregir antes de entregar. Sin excepciones.
