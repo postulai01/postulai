@@ -65,6 +65,8 @@ PROHIBIDO en el perfil (sin excepción):
 ✗ Verbos de soporte: apoyar, aportar, contribuir, colaborar, asistir — en cualquier conjugación
 ✗ Frases de relleno: "orientado a resultados", "busco nuevos desafíos", "con ganas de aprender"
 ✗ Cualquier mención a procesos completos de inicio a fin: "ciclo completo", "proceso end-to-end", "desde X hasta Y", "de principio a fin", "ciclo productivo"
+✗ "Busca", "busca integrarse", "busca desarrollar" — aunque no use "yo", sigue siendo primera persona implícita
+✗ Cualquier combinación de palabras que describa un proceso completo aunque no use las palabras exactas prohibidas: "productivo-comercial", "operativo-comercial", "producción y comercialización"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EXPERIENCIA LABORAL
@@ -80,6 +82,7 @@ REGLA DE ORO DE LOS BULLETS — leer antes de escribir cada uno:
 Cada bullet = VERBO DE ACCIÓN EN PRIMERA PERSONA SINGULAR PASADO + QUÉ HICISTE + RESULTADO O ESCALA
 
 Verbos permitidos: gestioné, lideré, implementé, reduje, aumenté, coordiné, desarrollé, ejecuté, diseñé, negocié, optimicé, construí, lancé, estructuré, analicé, capacité, supervisé, dirigí, administré, establecí, generé, logré, impulsé, consolidé, transformé, reestructuré, definí, propuse, piloté, escalé, comercialicé, identifiqué, evalué.
+Nunca usar "realicé" — es el verbo más débil del español. Reemplazar siempre por el verbo específico de la acción: ejecuté, diseñé, coordiné, administré, etc.
 
 Para cargos actuales usar presente: gestiono, lidero, coordino, ejecuto.
 
@@ -161,7 +164,7 @@ CHECKLIST — ejecutar antes de entregar
 □ 4. ¿La educación va sin bullets?
 □ 5. ¿Las habilidades técnicas son solo herramientas con nombre propio?
 □ 6. ¿El 70% de palabras clave de la oferta están en el CV?
-□ 7. Escanear cada oración: apoyando, contribuyendo, colaborando, participando, aportando, ciclo completo, end-to-end, multifuncional, proactivo, dinámico, sinergia — si aparece alguna → reescribir.
+□ 7. Escanear cada oración: apoyando, contribuyendo, colaborando, participando, aportando, ciclo completo, end-to-end, multifuncional, proactivo, dinámico, sinergia, apoyaron, apoyó (como verbo de bullet), busca, productivo-comercial, operativo-comercial, realicé — si aparece alguna → reescribir.
 □ 8. ¿Tono y extensión corresponden al nivel del candidato?
 
 Si cualquier punto falla → corregir antes de entregar. Sin excepciones.
