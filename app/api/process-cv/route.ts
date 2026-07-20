@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
     let userMessage = "";
 
     if (modo === "adaptar") {
-      userMessage = `MODO: ADAPTAR\n\nCV DEL CANDIDATO:\n${cv}\n\nOFERTA DE TRABAJO:\n${oferta}`;
+      userMessage = `MODO: ADAPTAR\n\nINSTRUCCIÓN CRÍTICA: El CV del candidato que aparece abajo es el punto de partida. Su contenido, estilo, verbos y estructura original deben ser IGNORADOS. Debes reescribir completamente cada sección aplicando todas las reglas del system prompt. No copies frases del CV original — transforma cada bullet en una acción con resultado medible.\n\nCV DEL CANDIDATO (materia prima — reescribir completamente):\n${cv}\n\nOFERTA DE TRABAJO (extraer palabras clave e integrarlas):\n${oferta}`;
     } else {
       const datosStr =
         typeof datos_personales === "string"
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
 
     const response = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 4096,
+      max_tokens: 8000,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
     });
