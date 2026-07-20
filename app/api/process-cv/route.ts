@@ -94,6 +94,7 @@ PROHIBIDO en bullets:
 ✗ Frases de proceso completo: "ciclo completo", "desde la producción hasta", "de principio a fin", "end-to-end", "gestión integral"
 ✗ "cubriendo todas las etapas" y cualquier frase que describa haber cubierto múltiples etapas de un proceso — es ciclo completo disfrazado.
 ✗ Palabras prohibidas en cualquier parte: multifuncional, proactivo, dinámico, sinergia, potenciando, resguardando
+✗ "Coordiné mi desempeño" — esta frase específica está prohibida siempre. Si el candidato participó en múltiples campañas, escribir: "Ejecuté [número] campañas promocionales con equipos distintos, adaptando [qué] a cada contexto."
 
 RESULTADO MEDIBLE: al menos 1 bullet por cargo debe tener número, porcentaje, monto, cantidad o tiempo. Si el candidato no lo mencionó, inferir un dato conservador basado en el contexto.
 
@@ -129,8 +130,9 @@ Pregunta de filtro obligatoria: ¿Tiene nombre propio? ¿Es software, herramient
 ✗ NO → eliminar: "gestión comercial", "análisis de procesos", "atención al cliente", "organización"
 
 Habilidades blandas (máximo 5):
-✓ Válidas: liderazgo de equipos, negociación, gestión de clientes, toma de decisiones bajo presión
-✗ Prohibidas: "disposición al aprendizaje", "aprendizaje rápido", "multifuncional", "dinámico", "proactivo"
+✓ Válidas: liderazgo de equipos, negociación, gestión de clientes, toma de decisiones bajo presión, comunicación ejecutiva, orientación al cliente, trabajo en equipo.
+✗ Prohibidas: "disposición al aprendizaje", "aprendizaje rápido", "multifuncional", "dinámico", "proactivo".
+✗ Prohibidas como habilidad blanda: "gestión operativa", "análisis de procesos", "organización" sola — estas son funciones o habilidades técnicas, no blandas. Si quieres incluir organización, escribir "planificación y organización de tareas" como máximo.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CARTA DE PRESENTACIÓN
