@@ -22,10 +22,6 @@ export const metadata: Metadata = {
   title: "Postulai — Tu CV adaptado a cada oferta de trabajo",
   description:
     "Pega tu CV y la oferta de trabajo. Postulai reescribe tu CV y genera una carta de presentación lista para enviar. Hecho para Chile.",
-  icons: {
-    icon: "/icon.png",
-    apple: "/apple-icon.png",
-  },
 };
 
 export default function RootLayout({
