@@ -206,6 +206,7 @@ export default function ResultadoPage() {
   const [data, setData] = useState<ResultData | null>(null);
   const [downloading, setDownloading] = useState<"cv-pdf" | "cv-word" | "carta-pdf" | "carta-word" | null>(null);
   const [cambiosExpanded, setCambiosExpanded] = useState(false);
+  const [formato, setFormato] = useState<string>("minimalista");
   const savedRef = useRef(false);
 
   useEffect(() => {
@@ -241,11 +242,11 @@ export default function ResultadoPage() {
     if (!data || downloading) return;
     setDownloading("cv-pdf");
     try {
-      const [{ pdf }, { default: CVDocument }] = await Promise.all([
+      const [{ pdf }, { getCVDocument }] = await Promise.all([
         import("@react-pdf/renderer"),
-        import("@/app/components/CVDocument"),
+        import("@/app/components/CVDocumentSelector"),
       ]);
-      const blob = await pdf(<CVDocument cvText={data.cv_adaptado} />).toBlob();
+      const blob = await pdf(getCVDocument(formato, data.cv_adaptado)).toBlob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url; a.download = "cv-postulai.pdf";
@@ -364,11 +365,11 @@ export default function ResultadoPage() {
   const cartaText = data.carta_presentacion;
 
   async function generateCvBlob() {
-    const [{ pdf }, { default: CVDocument }] = await Promise.all([
+    const [{ pdf }, { getCVDocument }] = await Promise.all([
       import("@react-pdf/renderer"),
-      import("@/app/components/CVDocument"),
+      import("@/app/components/CVDocumentSelector"),
     ]);
-    return pdf(<CVDocument cvText={cvText} />).toBlob();
+    return pdf(getCVDocument(formato, cvText)).toBlob();
   }
 
   async function generateCartaBlob() {
@@ -419,6 +420,33 @@ export default function ResultadoPage() {
             {/* Hero */}
             <HeroBlock data={data} />
 
+            {/* Template selector */}
+            <div className="flex flex-col gap-2.5">
+              <p className="text-xs font-bold text-white/35 uppercase tracking-widest">Formato del PDF</p>
+              <div className="flex flex-wrap gap-2">
+                {(["minimalista", "clasico", "moderno", "profesional", "simple"] as const).map(f => {
+                  const label: Record<string, string> = {
+                    minimalista: "Minimalista", clasico: "Clásico", moderno: "Moderno",
+                    profesional: "Profesional", simple: "Simple",
+                  };
+                  return (
+                    <button
+                      key={f}
+                      type="button"
+                      onClick={() => setFormato(f)}
+                      className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors duration-150 ${
+                        formato === f
+                          ? "bg-white text-black"
+                          : "bg-transparent text-white/50 border border-white/15 hover:border-white/35 hover:text-white/80"
+                      }`}
+                    >
+                      {label[f]}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Document cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
@@ -426,7 +454,7 @@ export default function ResultadoPage() {
               <div className="bg-[#141414] border border-[#1e1e1e] rounded-2xl overflow-hidden flex flex-col">
                 <div className="py-7 px-5 bg-[#111] flex justify-center border-b border-[#1e1e1e]">
                   <div className="shadow-2xl rounded-sm overflow-hidden" style={{ width: 148, aspectRatio: "210/297" }}>
-                    <PdfThumbnail generate={generateCvBlob} fallback={<DocumentSkeleton type="cv" />} />
+                    <PdfThumbnail key={formato} generate={generateCvBlob} fallback={<DocumentSkeleton type="cv" />} />
                   </div>
                 </div>
                 <div className="px-5 pt-4 pb-5 flex flex-col gap-4">
