@@ -1,6 +1,12 @@
 import { createBrowserClient } from "@supabase/ssr";
 
-export const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error(
+    `[postulai] Supabase env vars missing. URL=${supabaseUrl ?? "undefined"}, KEY=${supabaseKey ? "set" : "undefined"}`
+  );
+}
+
+export const supabase = createBrowserClient(supabaseUrl, supabaseKey);

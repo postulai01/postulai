@@ -16,7 +16,8 @@
       "Bash(npm show *)",
       "Bash(npm uninstall *)",
       "Bash(xargs cat)",
-      "Bash(pkill -f \"next dev\")"
+      "Bash(pkill -f \"next dev\")",
+      "Bash(npx vercel *)"
     ]
   }
 }
