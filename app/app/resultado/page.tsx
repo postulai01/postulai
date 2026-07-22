@@ -242,16 +242,15 @@ export default function ResultadoPage() {
     if (!data || downloading) return;
     setDownloading("cv-pdf");
     try {
-      const [{ pdf }, { getCVDocument }] = await Promise.all([
-        import("@react-pdf/renderer"),
-        import("@/app/components/CVDocumentSelector"),
-      ]);
-      const blob = await pdf(getCVDocument(formato, data.cv_adaptado)).toBlob();
+      const { generateCVPDF } = await import("@/app/components/cv-templates/generatePDF");
+      const blob = await generateCVPDF(data.cv_adaptado, formato);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url; a.download = "cv-postulai.pdf";
-      document.body.appendChild(a); a.click();
-      document.body.removeChild(a); URL.revokeObjectURL(url);
+      a.href = url; a.download = `cv-postulai-${formato}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error generando PDF:", error);
     } finally { setDownloading(null); }
   }
 
