@@ -8,7 +8,7 @@ export function parseCvText(cvText: string): ParsedLine[] {
 
   for (const raw of cvText.split("\n")) {
     if (isSep(raw)) continue;
-    const t = raw.replace(/%%%/g, "").replace(/[─━]+/g, "").trim();
+    const t = raw.replace(/%%%/g, "").replace(/[─━]+/g, "").replace(/\s+/g, " ").trim();
     if (t === "") { parsed.push({ role: "blank", text: "" }); continue; }
     const allCaps = t.length > 1 && t.length < 60 && t === t.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(t);
 

@@ -44,7 +44,7 @@ export function CVTemplateClasico({ cvText }: { cvText: string }) {
           ruleDone = true;
         }
         elements.push(
-          <div key={i} style={{ fontFamily: "'Times New Roman', Times, serif", fontSize: "11px", fontWeight: "bold", textTransform: "uppercase", backgroundColor: "#f0f0f0", padding: "3px 8px", marginTop: "16px", marginBottom: "8px" }}>
+          <div key={i} style={{ fontFamily: "'Times New Roman', Times, serif", fontSize: "11px", fontWeight: "bold", textTransform: "uppercase", backgroundColor: "#eeeeee", color: "#1a1a1a", padding: "3px 8px", marginTop: "16px", marginBottom: "8px" }}>
             {text}
           </div>
         );
