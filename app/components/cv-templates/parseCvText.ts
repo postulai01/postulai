@@ -2,7 +2,7 @@ export type Role = "name" | "title" | "contact" | "section" | "bullet" | "body" 
 export interface ParsedLine { role: Role; text: string; }
 
 export function parseCvText(cvText: string): ParsedLine[] {
-  const isSep = (t: string) => t.length > 1 && /^[%\-=_*~─━]+$/.test(t.trim());
+  const isSep = (t: string) => t.length > 1 && /^[%\-=_*~─━—]+$/.test(t.trim());
   const parsed: ParsedLine[] = [];
   let state: "name" | "title" | "contact" | "body" = "name";
 
