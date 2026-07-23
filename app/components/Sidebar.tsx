@@ -17,25 +17,19 @@ type PostulacionRow = {
   empresa: string | null;
   titulo_postulacion: string | null;
   created_at: string;
+  anclado: boolean;
 };
 
 export function saveHistorialEntry(_entry: HistorialEntry) {}
 
-function rowDisplay(row: PostulacionRow): string {
-  const title = row.titulo_postulacion?.trim();
-  if (title) return title.length > 28 ? title.slice(0, 28) + "…" : title;
-  return row.tipo === "adaptar" ? "CV Adaptado" : "CV Creado";
-}
-
-function rowFecha(created_at: string): string {
-  const d = new Date(created_at);
-  const now = new Date();
-  if (
-    d.getDate() === now.getDate() &&
-    d.getMonth() === now.getMonth() &&
-    d.getFullYear() === now.getFullYear()
-  ) return "hoy";
-  return d.toLocaleDateString("es-CL", { day: "numeric", month: "short" });
+function truncateWords(text: string, maxChars: number): string {
+  if (text.length <= maxChars) return text;
+  let cut = text.slice(0, maxChars);
+  if (text[maxChars] !== " ") {
+    const lastSpace = cut.lastIndexOf(" ");
+    if (lastSpace > 0) cut = cut.slice(0, lastSpace);
+  }
+  return cut.replace(/[\s·\-–—,;:.]+$/, "") + "…";
 }
 
 function getInitials(name: string): string {
@@ -59,6 +53,24 @@ const IconX = () => (
 const IconPlus = () => (
   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+  </svg>
+);
+
+const IconPin = ({ filled }: { filled: boolean }) => (
+  <svg
+    className="w-3.5 h-3.5"
+    viewBox="0 0 24 24"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 17v5" stroke="currentColor" strokeWidth={2} />
+    <path
+      d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78-.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1v3.76z"
+      fill={filled ? "currentColor" : "none"}
+      stroke={filled ? "none" : "currentColor"}
+      strokeWidth={2}
+    />
   </svg>
 );
 
@@ -86,7 +98,7 @@ export default function Sidebar() {
       setUserEmail(session.user.email ?? null);
       const { data } = await supabase
         .from("postulaciones")
-        .select("id, tipo, cargo, empresa, titulo_postulacion, created_at")
+        .select("id, tipo, cargo, empresa, titulo_postulacion, created_at, anclado")
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false })
         .limit(30);
@@ -102,6 +114,76 @@ export default function Sidebar() {
     if (pathname === `/app/historial/${id}`) router.push("/app");
   }
 
+  async function handlePin(id: string, currentlyPinned: boolean) {
+    const newValue = !currentlyPinned;
+    const { error } = await supabase
+      .from("postulaciones")
+      .update({ anclado: newValue })
+      .eq("id", id);
+    if (error) return;
+    setDbHistorial((prev) =>
+      prev ? prev.map((r) => (r.id === id ? { ...r, anclado: newValue } : r)) : prev
+    );
+  }
+
+  const pinnedItems = dbHistorial?.filter((r) => r.anclado) ?? [];
+  const recentItems = dbHistorial?.filter((r) => !r.anclado) ?? [];
+
+  function renderRow(row: PostulacionRow) {
+    const isActive = pathname === `/app/historial/${row.id}`;
+    const rawTitle =
+      row.titulo_postulacion?.trim() ||
+      (row.tipo === "adaptar" ? "CV Adaptado" : "CV Creado");
+    const displayTitle = truncateWords(rawTitle, 30);
+
+    return (
+      <div key={row.id} className="group relative flex items-stretch">
+        <div
+          className={`w-[2px] shrink-0 my-[4px] rounded-r-full transition-colors duration-150 ${
+            isActive ? "bg-white" : "bg-transparent"
+          }`}
+        />
+        <a
+          href={`/app/historial/${row.id}`}
+          className={`flex-1 flex items-center pl-3 pr-14 py-2.5 transition-colors duration-150 ${
+            isActive ? "bg-white/[0.04]" : "hover:bg-white/[0.03]"
+          }`}
+        >
+          <p
+            title={rawTitle}
+            className={`text-[13px] leading-snug transition-colors duration-150 ${
+              isActive ? "text-white font-medium" : "text-[#888]"
+            }`}
+          >
+            {displayTitle}
+          </p>
+        </a>
+        <button
+          type="button"
+          onClick={() => handlePin(row.id, row.anclado)}
+          className={`absolute top-1/2 -translate-y-1/2 right-8 w-5 h-5 flex items-center justify-center transition-opacity duration-150 ${
+            row.anclado
+              ? "opacity-100 text-white"
+              : "opacity-0 group-hover:opacity-100 text-[#444] hover:text-white"
+          }`}
+          aria-label={row.anclado ? "Desanclar" : "Anclar"}
+        >
+          <IconPin filled={row.anclado} />
+        </button>
+        <button
+          type="button"
+          onClick={() => handleDelete(row.id)}
+          className="absolute top-1/2 -translate-y-1/2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-[#444] hover:text-red-400 w-5 h-5 flex items-center justify-center"
+          aria-label="Eliminar postulación"
+        >
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    );
+  }
+
   const newPostButton = (
     <a
       href="/app"
@@ -112,12 +194,18 @@ export default function Sidebar() {
     </a>
   );
 
-  const historialSection = (
-    <div className="flex-1 flex flex-col overflow-y-auto min-h-0 pt-5 pb-2">
-      <p className="text-[10px] font-semibold tracking-[0.15em] text-[#444] uppercase px-4 mb-2 shrink-0">
-        Recientes
-      </p>
+  const sectionLabel = (label: string, addTopPadding: boolean) => (
+    <p
+      className={`text-[10px] font-semibold tracking-[0.15em] text-[#444] uppercase px-4 pb-1.5 ${
+        addTopPadding ? "pt-4" : "pt-1"
+      }`}
+    >
+      {label}
+    </p>
+  );
 
+  const historialSection = (
+    <div className="flex-1 flex flex-col overflow-y-auto min-h-0 pt-4 pb-2">
       {dbHistorial === null ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="w-4 h-4 border-2 border-white/10 border-t-white/30 rounded-full animate-spin" />
@@ -136,43 +224,18 @@ export default function Sidebar() {
         </div>
       ) : (
         <div className="flex flex-col">
-          {dbHistorial.map((row) => {
-            const isActive = pathname === `/app/historial/${row.id}`;
-            return (
-              <div key={row.id} className="group relative flex items-stretch">
-                <div
-                  className={`w-[2px] shrink-0 my-[4px] rounded-r-full transition-colors duration-150 ${
-                    isActive ? "bg-white" : "bg-transparent"
-                  }`}
-                />
-                <a
-                  href={`/app/historial/${row.id}`}
-                  className={`flex-1 flex flex-col gap-0.5 pl-3 pr-7 py-3 transition-colors duration-150 ${
-                    isActive ? "bg-white/[0.04]" : "hover:bg-white/[0.03]"
-                  }`}
-                >
-                  <p
-                    className={`text-[14px] leading-snug truncate transition-colors duration-150 ${
-                      isActive ? "text-white font-medium" : "text-[#888]"
-                    }`}
-                  >
-                    {rowDisplay(row)}
-                  </p>
-                  <p className="text-[11px] text-[#444]">{rowFecha(row.created_at)}</p>
-                </a>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(row.id)}
-                  className="absolute top-1/2 -translate-y-1/2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-[#444] hover:text-red-400 w-5 h-5 flex items-center justify-center"
-                  aria-label="Eliminar postulación"
-                >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            );
-          })}
+          {pinnedItems.length > 0 && (
+            <>
+              {sectionLabel("Anclado", false)}
+              {pinnedItems.map(renderRow)}
+            </>
+          )}
+          {recentItems.length > 0 && (
+            <>
+              {sectionLabel("Recientes", pinnedItems.length > 0)}
+              {recentItems.map(renderRow)}
+            </>
+          )}
         </div>
       )}
     </div>
@@ -180,7 +243,6 @@ export default function Sidebar() {
 
   const footerSection = (
     <div className="relative px-3 py-3 border-t border-[#1e1e1e] shrink-0">
-
       {isAccountOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsAccountOpen(false)} />
