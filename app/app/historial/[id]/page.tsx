@@ -21,6 +21,7 @@ interface Postulacion {
   created_at: string;
   keywords_totales: number | null;
   keywords_encontradas: number | null;
+  formato?: string;
 }
 
 // ── Icons ──────────────────────────────────────────────────────────────
@@ -235,16 +236,15 @@ export default function HistorialIdPage() {
     if (!post || downloading) return;
     setDownloading("cv-pdf");
     try {
-      const [{ pdf }, { default: CVDocument }] = await Promise.all([
-        import("@react-pdf/renderer"),
-        import("@/app/components/CVDocument"),
-      ]);
-      const blob = await pdf(<CVDocument cvText={post.cv_adaptado} />).toBlob();
+      const { generateCVPDF } = await import("@/app/components/cv-templates/generatePDF");
+      const blob = await generateCVPDF(post.cv_adaptado, post.formato || "minimalista");
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url; a.download = "cv-postulai.pdf";
-      document.body.appendChild(a); a.click();
-      document.body.removeChild(a); URL.revokeObjectURL(url);
+      a.href = url; a.download = `cv-postulai-${post.formato || "minimalista"}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error generando PDF:", error);
     } finally { setDownloading(null); }
   }
 

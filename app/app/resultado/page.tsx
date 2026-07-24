@@ -16,6 +16,7 @@ interface ResultData {
   modo?: string;
   keywords_totales?: number;
   keywords_encontradas?: number;
+  formato?: string;
 }
 
 const CIRCLE_R = 44;
@@ -234,6 +235,7 @@ export default function ResultadoPage() {
         sugerencias: data.sugerencias ?? null,
         keywords_totales: data.keywords_totales ?? null,
         keywords_encontradas: data.keywords_encontradas ?? null,
+        formato: formato,
       });
     });
   }, [data]);
