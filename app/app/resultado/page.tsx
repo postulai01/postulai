@@ -435,7 +435,7 @@ export default function ResultadoPage() {
 
               {/* CV card */}
               <div className="bg-[#141414] border border-[#1e1e1e] rounded-2xl overflow-hidden flex flex-col">
-                <div className="px-5 pt-4 pb-3 flex flex-wrap gap-2 border-b border-[#1e1e1e]">
+                <div className="px-5 pt-4 pb-3 flex gap-1.5 overflow-hidden border-b border-[#1e1e1e]">
                   {(["minimalista", "clasico", "moderno", "profesional", "simple"] as const).map(f => {
                     const label: Record<string, string> = {
                       minimalista: "Minimalista", clasico: "Clásico", moderno: "Moderno",
@@ -446,7 +446,7 @@ export default function ResultadoPage() {
                         key={f}
                         type="button"
                         onClick={() => setFormato(f)}
-                        className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors duration-150 ${
+                        className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors duration-150 ${
                           formato === f
                             ? "bg-white text-black"
                             : "bg-transparent text-white/50 border border-white/15 hover:border-white/35 hover:text-white/80"
