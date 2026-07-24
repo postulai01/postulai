@@ -208,6 +208,7 @@ export default function ResultadoPage() {
   const [downloading, setDownloading] = useState<"cv-pdf" | "cv-word" | "carta-pdf" | "carta-word" | null>(null);
   const [cambiosExpanded, setCambiosExpanded] = useState(false);
   const [formato, setFormato] = useState<string>("minimalista");
+  const [postulacionId, setPostulacionId] = useState<string | null>(null);
   const savedRef = useRef(false);
 
   useEffect(() => {
@@ -223,7 +224,7 @@ export default function ResultadoPage() {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) return;
       const match = data.titulo_postulacion?.match(/CV para (.+?) · (.+)/);
-      await supabase.from("postulaciones").insert({
+      const { data: inserted } = await supabase.from("postulaciones").insert({
         user_id: session.user.id,
         tipo: data.modo ?? "adaptar",
         empresa: match?.[1] ?? null,
@@ -236,7 +237,8 @@ export default function ResultadoPage() {
         keywords_totales: data.keywords_totales ?? null,
         keywords_encontradas: data.keywords_encontradas ?? null,
         formato: formato,
-      });
+      }).select("id").single();
+      if (inserted) setPostulacionId(inserted.id);
     });
   }, [data]);
 
@@ -244,6 +246,13 @@ export default function ResultadoPage() {
     if (!data || downloading) return;
     setDownloading("cv-pdf");
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session && postulacionId) {
+        await supabase
+          .from("postulaciones")
+          .update({ formato: formato })
+          .eq("id", postulacionId);
+      }
       const { generateCVPDF } = await import("@/app/components/cv-templates/generatePDF");
       const blob = await generateCVPDF(data.cv_adaptado, formato);
       const url = URL.createObjectURL(blob);
