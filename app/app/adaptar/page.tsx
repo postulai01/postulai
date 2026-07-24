@@ -8,8 +8,6 @@ import { supabase } from "@/lib/supabase";
 const textareaClass =
   "w-full bg-[#0d0d0d] border border-[#232323] rounded-xl px-4 py-3.5 text-base text-white placeholder-white/20 resize-none focus:outline-none focus:border-white/25 transition-colors duration-150 leading-relaxed";
 
-const inputClass =
-  "w-full bg-[#0d0d0d] border border-[#232323] rounded-xl px-4 py-3.5 text-base text-white placeholder-white/20 focus:outline-none focus:border-white/25 transition-colors duration-150";
 
 type CvStatus = "idle" | "loading" | "success" | "error";
 
@@ -22,7 +20,6 @@ export default function AdaptarPage() {
   const [cvStatus, setCvStatus] = useState<CvStatus>("idle");
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const [ofertaMode, setOfertaMode] = useState<"texto" | "link">("texto");
   const [ofertaText, setOfertaText] = useState("");
 
   const [instrucciones, setInstrucciones] = useState("");
@@ -72,30 +69,13 @@ export default function AdaptarPage() {
     setError(null);
     setLoading(true);
     try {
-      let oferta = ofertaText;
-
-      if (ofertaMode === "link") {
-        const fetchRes = await fetch("/api/fetch-url", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: ofertaText }),
-        });
-        const fetchData = await fetchRes.json();
-        if (!fetchRes.ok || fetchData.error) {
-          setError("No pudimos leer esa página. Intenta pegar el texto directamente.");
-          setLoading(false);
-          return;
-        }
-        oferta = fetchData.texto;
-      }
-
       const res = await fetch("/api/process-cv", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           modo: "adaptar",
           cv: cvText,
-          oferta,
+          oferta: ofertaText,
           instrucciones: instrucciones || undefined,
         }),
       });
@@ -269,42 +249,13 @@ export default function AdaptarPage() {
                 </div>
               </div>
 
-              <div
-                className="flex gap-1 rounded-lg p-1 w-fit"
-                style={{ background: "#0d0d0d", border: "1px solid #232323" }}
-              >
-                {(["texto", "link"] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    type="button"
-                    onClick={() => setOfertaMode(tab)}
-                    className={`px-4 py-1.5 rounded-md text-xs font-medium transition-colors duration-150 ${
-                      ofertaMode === tab ? "bg-white text-black" : "hover:text-white"
-                    }`}
-                    style={ofertaMode !== tab ? { color: "rgba(255,255,255,.45)" } : {}}
-                  >
-                    {tab === "texto" ? "Pegar texto" : "Pegar link"}
-                  </button>
-                ))}
-              </div>
-
-              {ofertaMode === "texto" ? (
-                <textarea
-                  rows={7}
-                  placeholder="Pega aquí el texto completo de la oferta de trabajo..."
-                  value={ofertaText}
-                  onChange={(e) => setOfertaText(e.target.value)}
-                  className={textareaClass}
-                />
-              ) : (
-                <input
-                  type="url"
-                  placeholder="https://..."
-                  value={ofertaText}
-                  onChange={(e) => setOfertaText(e.target.value)}
-                  className={inputClass}
-                />
-              )}
+              <textarea
+                rows={7}
+                placeholder="Pega aquí el texto completo de la oferta de trabajo..."
+                value={ofertaText}
+                onChange={(e) => setOfertaText(e.target.value)}
+                className={textareaClass}
+              />
             </div>
 
             {/* Card 3 — Instrucciones adicionales */}
