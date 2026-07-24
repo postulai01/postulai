@@ -430,38 +430,33 @@ export default function ResultadoPage() {
             {/* Hero */}
             <HeroBlock data={data} />
 
-            {/* Template selector */}
-            <div className="flex flex-col gap-2.5">
-              <p className="text-xs font-bold text-white/35 uppercase tracking-widest">Formato del PDF</p>
-              <div className="flex flex-wrap gap-2">
-                {(["minimalista", "clasico", "moderno", "profesional", "simple"] as const).map(f => {
-                  const label: Record<string, string> = {
-                    minimalista: "Minimalista", clasico: "Clásico", moderno: "Moderno",
-                    profesional: "Profesional", simple: "Simple",
-                  };
-                  return (
-                    <button
-                      key={f}
-                      type="button"
-                      onClick={() => setFormato(f)}
-                      className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors duration-150 ${
-                        formato === f
-                          ? "bg-white text-black"
-                          : "bg-transparent text-white/50 border border-white/15 hover:border-white/35 hover:text-white/80"
-                      }`}
-                    >
-                      {label[f]}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
             {/* Document cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
               {/* CV card */}
               <div className="bg-[#141414] border border-[#1e1e1e] rounded-2xl overflow-hidden flex flex-col">
+                <div className="px-5 pt-4 pb-3 flex flex-wrap gap-2 border-b border-[#1e1e1e]">
+                  {(["minimalista", "clasico", "moderno", "profesional", "simple"] as const).map(f => {
+                    const label: Record<string, string> = {
+                      minimalista: "Minimalista", clasico: "Clásico", moderno: "Moderno",
+                      profesional: "Profesional", simple: "Simple",
+                    };
+                    return (
+                      <button
+                        key={f}
+                        type="button"
+                        onClick={() => setFormato(f)}
+                        className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors duration-150 ${
+                          formato === f
+                            ? "bg-white text-black"
+                            : "bg-transparent text-white/50 border border-white/15 hover:border-white/35 hover:text-white/80"
+                        }`}
+                      >
+                        {label[f]}
+                      </button>
+                    );
+                  })}
+                </div>
                 <div className="py-7 px-5 bg-[#111] flex justify-center border-b border-[#1e1e1e]">
                   <div className="shadow-2xl rounded-sm overflow-hidden" style={{ width: 148, aspectRatio: "210/297" }}>
                     <PdfThumbnail key={formato} generate={generateCvBlob} fallback={<DocumentSkeleton type="cv" />} />
