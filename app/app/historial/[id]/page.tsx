@@ -215,6 +215,7 @@ export default function HistorialIdPage() {
   const [notFound, setNotFound] = useState(false);
   const [downloading, setDownloading] = useState<"cv-pdf" | "cv-word" | "carta-pdf" | "carta-word" | null>(null);
   const [cambiosExpanded, setCambiosExpanded] = useState(false);
+  const [formato, setFormato] = useState<string>("minimalista");
   const loadedRef = useRef(false);
 
   useEffect(() => {
@@ -229,6 +230,7 @@ export default function HistorialIdPage() {
         .single();
       if (error || !data || data.user_id !== session.user.id) { setNotFound(true); return; }
       setPost(data as Postulacion);
+      setFormato(data.formato || "minimalista");
     });
   }, [id]);
 
@@ -237,10 +239,10 @@ export default function HistorialIdPage() {
     setDownloading("cv-pdf");
     try {
       const { generateCVPDF } = await import("@/app/components/cv-templates/generatePDF");
-      const blob = await generateCVPDF(post.cv_adaptado, post.formato || "minimalista");
+      const blob = await generateCVPDF(post.cv_adaptado, formato);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url; a.download = `cv-postulai-${post.formato || "minimalista"}.pdf`;
+      a.href = url; a.download = `cv-postulai-${formato}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
@@ -422,13 +424,35 @@ export default function HistorialIdPage() {
               <div className="bg-[#141414] border border-[#1e1e1e] rounded-2xl overflow-hidden flex flex-col">
                 <div className="py-7 px-5 bg-[#111] flex justify-center border-b border-[#1e1e1e]">
                   <div className="shadow-2xl rounded-sm overflow-hidden" style={{ width: 148, aspectRatio: "210/297" }}>
-                    <PdfThumbnail generate={generateCvBlob} fallback={<DocumentSkeleton type="cv" />} />
+                    <PdfThumbnail key={formato} generate={generateCvBlob} fallback={<DocumentSkeleton type="cv" />} />
                   </div>
                 </div>
                 <div className="px-5 pt-4 pb-5 flex flex-col gap-4">
                   <div>
                     <p className="text-sm font-semibold text-white">CV Adaptado</p>
                     <p className="text-xs text-white/40 mt-0.5">Optimizado ATS 2026</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {(["minimalista", "clasico", "moderno", "profesional", "simple"] as const).map(f => {
+                      const label: Record<string, string> = {
+                        minimalista: "Minimalista", clasico: "Clásico", moderno: "Moderno",
+                        profesional: "Profesional", simple: "Simple",
+                      };
+                      return (
+                        <button
+                          key={f}
+                          type="button"
+                          onClick={() => setFormato(f)}
+                          className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors duration-150 ${
+                            formato === f
+                              ? "bg-white text-black"
+                              : "bg-transparent text-white/50 border border-white/15 hover:border-white/35 hover:text-white/80"
+                          }`}
+                        >
+                          {label[f]}
+                        </button>
+                      );
+                    })}
                   </div>
                   <div className="flex gap-2">
                     <button
