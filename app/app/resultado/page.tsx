@@ -375,11 +375,8 @@ export default function ResultadoPage() {
   const cartaText = data.carta_presentacion;
 
   async function generateCvBlob() {
-    const [{ pdf }, { getCVDocument }] = await Promise.all([
-      import("@react-pdf/renderer"),
-      import("@/app/components/CVDocumentSelector"),
-    ]);
-    return pdf(getCVDocument(formato, cvText)).toBlob();
+    const { generateCVPDF } = await import("@/app/components/cv-templates/generatePDF");
+    return generateCVPDF(cvText, formato);
   }
 
   async function generateCartaBlob() {

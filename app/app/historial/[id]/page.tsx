@@ -372,11 +372,8 @@ export default function HistorialIdPage() {
   const cartaText = post.carta_presentacion;
 
   async function generateCvBlob() {
-    const [{ pdf }, { default: CVDocument }] = await Promise.all([
-      import("@react-pdf/renderer"),
-      import("@/app/components/CVDocument"),
-    ]);
-    return pdf(<CVDocument cvText={cvText} />).toBlob();
+    const { generateCVPDF } = await import("@/app/components/cv-templates/generatePDF");
+    return generateCVPDF(cvText, formato);
   }
 
   async function generateCartaBlob() {
