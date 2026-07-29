@@ -255,7 +255,7 @@ export default function Sidebar() {
               <div className="flex items-center justify-between px-4 py-2">
                 <span className="text-xs text-[#888]">Mi plan</span>
                 <span className="text-[10px] text-[#555] bg-white/5 border border-white/10 px-2 py-0.5 rounded-full">
-                  Prueba gratuita · 7 días
+                  Plan gratuito · 5 usos
                 </span>
               </div>
               <a href="/terminos" className="px-4 py-2 text-xs text-[#888] hover:text-white hover:bg-white/5 transition-colors duration-150">
@@ -299,7 +299,7 @@ export default function Sidebar() {
           </div>
           <div className="flex-1 text-left min-w-0">
             <p className="text-xs font-medium text-white truncate leading-snug">{userName}</p>
-            <p className="text-[10px] text-[#555] leading-snug">7 días de prueba</p>
+            <p className="text-[10px] text-[#555] leading-snug">Plan gratuito · 5 usos</p>
           </div>
           <svg
             className={`w-3 h-3 text-[#444] shrink-0 transition-transform duration-150 ${isAccountOpen ? "rotate-180" : ""}`}

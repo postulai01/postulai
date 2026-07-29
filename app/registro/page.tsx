@@ -91,7 +91,7 @@ export default function RegistroPage() {
 
         <div className="flex flex-col gap-1 text-center">
           <h1 className="text-2xl font-black tracking-tight">Crea tu cuenta</h1>
-          <p className="text-sm text-[#A0A0A0]">7 días gratis, sin tarjeta de crédito.</p>
+          <p className="text-sm text-[#A0A0A0]">5 usos gratis, sin tarjeta de crédito.</p>
         </div>
 
         {/* Google */}

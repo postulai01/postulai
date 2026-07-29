@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/app/components/Sidebar";
 import { supabase } from "@/lib/supabase";
+import UsosAgotadosModal from "@/app/components/UsosAgotadosModal";
 
 const textareaClass =
   "w-full bg-[#0d0d0d] border border-[#232323] rounded-xl px-4 py-3.5 text-base text-white placeholder-white/20 resize-none focus:outline-none focus:border-white/25 transition-colors duration-150 leading-relaxed";
@@ -26,6 +27,7 @@ export default function AdaptarPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   async function processFile(file: File) {
     setFileName(file.name);
@@ -80,6 +82,11 @@ export default function AdaptarPage() {
         }),
       });
       const data = await res.json();
+      if (res.status === 403 && data.error === "sin_usos") {
+        setShowModal(true);
+        setLoading(false);
+        return;
+      }
       if (!res.ok || data.error) throw new Error(data.error || "Error desconocido");
 
       sessionStorage.setItem(
@@ -320,6 +327,8 @@ export default function AdaptarPage() {
           </div>
         </main>
       </div>
+
+      <UsosAgotadosModal open={showModal} onClose={() => setShowModal(false)} />
     </div>
   );
 }

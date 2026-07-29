@@ -374,22 +374,43 @@ export default function ResultadoPage() {
   const cvText = data.cv_adaptado;
   const cartaText = data.carta_presentacion;
 
-  async function generateCvBlob() {
-    const { generateCVPDF } = await import("@/app/components/cv-templates/generatePDF");
-    return generateCVPDF(cvText, formato);
+  async function generateCvThumb(): Promise<string> {
+    const { generateCVThumbnail } = await import("@/app/components/cv-templates/generatePDF");
+    return generateCVThumbnail(cvText, formato);
   }
 
-  async function generateCartaBlob() {
-    const jspdf = await import("jspdf");
-    const doc = new jspdf.jsPDF({ unit: "pt", format: "a4" });
-    const margin = 60;
-    const pageWidth = doc.internal.pageSize.getWidth() - margin * 2;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.setTextColor(33, 33, 33);
-    const lines = doc.splitTextToSize(cartaText, pageWidth);
-    doc.text(lines, margin, margin + 20);
-    return new Blob([doc.output("arraybuffer")], { type: "application/pdf" });
+  function generateCartaThumb(): Promise<string> {
+    return new Promise((resolve) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 595;
+      canvas.height = 842;
+      const ctx = canvas.getContext("2d")!;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, 595, 842);
+      ctx.fillStyle = "#222222";
+      ctx.font = "11px Arial, sans-serif";
+      const margin = 55;
+      const maxWidth = 595 - margin * 2;
+      const lineH = 15;
+      let y = margin + 10;
+      for (const rawLine of cartaText.split("\n")) {
+        if (y > 842 - margin) break;
+        if (!rawLine.trim()) { y += lineH * 0.6; continue; }
+        const words = rawLine.split(" ");
+        let line = "";
+        for (const word of words) {
+          const test = line ? `${line} ${word}` : word;
+          if (ctx.measureText(test).width > maxWidth && line) {
+            ctx.fillText(line, margin, y);
+            line = word;
+            y += lineH;
+            if (y > 842 - margin) break;
+          } else { line = test; }
+        }
+        if (line && y <= 842 - margin) { ctx.fillText(line, margin, y); y += lineH; }
+      }
+      resolve(canvas.toDataURL("image/jpeg", 0.85));
+    });
   }
 
   return (
@@ -432,7 +453,12 @@ export default function ResultadoPage() {
 
               {/* CV card */}
               <div className="bg-[#141414] border border-[#1e1e1e] rounded-2xl overflow-hidden flex flex-col">
-                <div className="px-5 pt-4 pb-3 flex gap-1.5 overflow-hidden border-b border-[#1e1e1e]">
+                <div className="pt-7 px-5 pb-5 bg-[#111] flex justify-center items-start border-b border-[#1e1e1e]">
+                  <div className="shadow-2xl rounded-sm overflow-hidden" style={{ width: 148, aspectRatio: "210/297" }}>
+                    <PdfThumbnail key={formato} generate={generateCvThumb} fallback={<DocumentSkeleton type="cv" />} />
+                  </div>
+                </div>
+                <div className="px-5 pt-3 pb-3 flex gap-1.5 overflow-hidden border-b border-[#1e1e1e]">
                   {(["minimalista", "clasico", "moderno", "profesional", "simple"] as const).map(f => {
                     const label: Record<string, string> = {
                       minimalista: "Minimalista", clasico: "Clásico", moderno: "Moderno",
@@ -453,11 +479,6 @@ export default function ResultadoPage() {
                       </button>
                     );
                   })}
-                </div>
-                <div className="py-7 px-5 bg-[#111] flex justify-center border-b border-[#1e1e1e]">
-                  <div className="shadow-2xl rounded-sm overflow-hidden" style={{ width: 148, aspectRatio: "210/297" }}>
-                    <PdfThumbnail key={formato} generate={generateCvBlob} fallback={<DocumentSkeleton type="cv" />} />
-                  </div>
                 </div>
                 <div className="px-5 pt-4 pb-5 flex flex-col gap-4">
                   <div>
@@ -493,9 +514,9 @@ export default function ResultadoPage() {
 
               {/* Carta card */}
               <div className="bg-[#141414] border border-[#1e1e1e] rounded-2xl overflow-hidden flex flex-col">
-                <div className="py-7 px-5 bg-[#111] flex justify-center border-b border-[#1e1e1e]">
+                <div className="flex-1 pt-7 px-5 pb-5 bg-[#111] flex justify-center items-start border-b border-[#1e1e1e]">
                   <div className="shadow-2xl rounded-sm overflow-hidden" style={{ width: 148, aspectRatio: "210/297" }}>
-                    <PdfThumbnail generate={generateCartaBlob} fallback={<DocumentSkeleton type="carta" />} />
+                    <PdfThumbnail generate={generateCartaThumb} fallback={<DocumentSkeleton type="carta" />} />
                   </div>
                 </div>
                 <div className="px-5 pt-4 pb-5 flex flex-col gap-4">

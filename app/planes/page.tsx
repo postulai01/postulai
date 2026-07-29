@@ -18,13 +18,13 @@ const proFeatures = [
 
 const anualFeatures = [
   ...proFeatures,
-  "2 meses gratis incluidos",
+  "Equivale a más de 5 meses gratis",
 ];
 
 const faqs = [
   {
-    q: "¿Cómo funciona la prueba gratuita?",
-    a: "Al crear tu cuenta puedes activar 7 días de acceso ilimitado sin necesidad de tarjeta de crédito. Cuando terminen los 7 días puedes elegir el plan que más te acomode.",
+    q: "¿Cómo funcionan los usos gratis?",
+    a: "Al crear tu cuenta accedes a 5 usos gratis para adaptar tu CV y generar cartas de presentación, sin necesidad de tarjeta de crédito. Cuando los uses, puedes elegir el plan que más te acomode.",
   },
   {
     q: "¿Puedo cancelar cuando quiera?",
@@ -89,7 +89,7 @@ export default function PlanesPage() {
             Simple y sin sorpresas
           </h1>
           <p className="text-[#A0A0A0] text-base sm:text-lg max-w-sm">
-            Empieza gratis por 7 días. Sin tarjeta de crédito.
+            Empieza con 5 usos gratis. Sin tarjeta de crédito.
           </p>
         </section>
 
@@ -106,7 +106,7 @@ export default function PlanesPage() {
                 <div>
                   <p className="text-lg font-black tracking-tight">Pro</p>
                   <div className="flex items-baseline gap-1.5 mt-2">
-                    <span className="text-4xl font-black tracking-tight">$7.990</span>
+                    <span className="text-4xl font-black tracking-tight">$8.990</span>
                     <span className="text-sm text-[#A0A0A0] font-medium">/mes</span>
                   </div>
                 </div>
@@ -127,7 +127,7 @@ export default function PlanesPage() {
                   href="/registro"
                   className="w-full py-3 bg-white text-black font-bold text-sm rounded-xl text-center hover:bg-gray-100 active:bg-gray-200 transition-colors duration-150"
                 >
-                  Empezar 7 días gratis
+                  Empezar gratis
                 </a>
                 <p className="text-xs text-[#555] text-center">Sin tarjeta de crédito</p>
               </div>
@@ -137,15 +137,15 @@ export default function PlanesPage() {
             <div className="bg-[#111] border border-[#333] rounded-2xl p-8 flex flex-col gap-6">
               <div className="flex flex-col gap-4">
                 <span className="text-[10px] font-bold tracking-[0.2em] text-white/60 bg-white/5 border border-white/10 px-2.5 py-1 rounded-md w-fit">
-                  AHORRA 20%
+                  AHORRA 44%
                 </span>
                 <div>
                   <p className="text-lg font-black tracking-tight">Anual</p>
                   <div className="flex items-baseline gap-1.5 mt-2">
-                    <span className="text-4xl font-black tracking-tight">$75.990</span>
-                    <span className="text-sm text-[#A0A0A0] font-medium">/año</span>
+                    <span className="text-4xl font-black tracking-tight">$60.000</span>
+                    <span className="text-sm text-[#A0A0A0] font-medium">al año</span>
                   </div>
-                  <p className="text-xs text-[#555] mt-1">Equivale a $6.332/mes</p>
+                  <p className="text-xs text-[#555] mt-1">Equivale a $5.000/mes · pago único</p>
                 </div>
                 <p className="text-sm text-[#A0A0A0]">Para quienes quieren el mejor precio.</p>
               </div>
@@ -164,7 +164,7 @@ export default function PlanesPage() {
                   href="/registro"
                   className="w-full py-3 border border-white/30 text-white font-bold text-sm rounded-xl text-center hover:border-white/60 hover:bg-white/5 transition-colors duration-150"
                 >
-                  Empezar 7 días gratis
+                  Empezar gratis
                 </a>
                 <p className="text-xs text-[#555] text-center">Sin tarjeta de crédito</p>
               </div>

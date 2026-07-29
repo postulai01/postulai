@@ -13,12 +13,20 @@ function firstName(rawName: string): string {
 export default function AppPage() {
   const router = useRouter();
   const [userName, setUserName] = useState<string | null>(null);
+  const [usosRestantes, setUsosRestantes] = useState<number | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) return;
       setUserName(session.user.user_metadata?.full_name ?? session.user.email ?? null);
     });
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/usage")
+      .then(r => r.json())
+      .then(d => { if (typeof d.usos_gratis_restantes === "number") setUsosRestantes(d.usos_gratis_restantes); })
+      .catch(() => {});
   }, []);
 
   return (
@@ -183,6 +191,67 @@ export default function AppPage() {
 
               </div>
             </div>
+
+            {/* Card de usos gratis */}
+            {usosRestantes !== null && (
+              <button
+                type="button"
+                onClick={() => router.push("/planes")}
+                className="w-full text-left rounded-2xl px-6 py-5 transition-all duration-200"
+                style={{
+                  background: "#141414",
+                  border: `1px solid ${usosRestantes === 0 ? "rgba(34,197,94,0.45)" : "rgba(34,197,94,0.2)"}`,
+                }}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex flex-col gap-2.5">
+                    <div className="flex gap-1.5">
+                      {[...Array(5)].map((_, i) => (
+                        <span
+                          key={i}
+                          className="w-2 h-2 rounded-full"
+                          style={{
+                            background: i < usosRestantes ? "#22c55e" : "rgba(255,255,255,0.1)",
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <p
+                        style={{
+                          fontFamily: "var(--font-space-grotesk, inherit)",
+                          fontWeight: 700,
+                          fontSize: 14,
+                          color: usosRestantes === 0 ? "#22c55e" : "#fff",
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {usosRestantes === 0
+                          ? "Usaste tus 5 usos gratis · Mejora tu plan"
+                          : `Te quedan ${usosRestantes} de 5 usos gratis`}
+                      </p>
+                      <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.38)", lineHeight: 1.4 }}>
+                        {usosRestantes === 0
+                          ? "Mejora tu plan Pro para seguir adaptando tu CV sin límites"
+                          : "Adaptar CV y carta de presentación comparten el mismo contador"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="shrink-0">
+                    <span
+                      className="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap block"
+                      style={{
+                        background: usosRestantes === 0 ? "#22c55e" : "transparent",
+                        color: usosRestantes === 0 ? "#000" : "#22c55e",
+                        border: `1px solid ${usosRestantes === 0 ? "transparent" : "rgba(34,197,94,0.35)"}`,
+                      }}
+                    >
+                      Ver planes
+                    </span>
+                  </div>
+                </div>
+              </button>
+            )}
 
           </div>
         </div>

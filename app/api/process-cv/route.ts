@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -203,6 +205,27 @@ function calcularMatch(keywords: string[], cvText: string): { keywords_totales: 
 
 export async function POST(request: NextRequest) {
   try {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll(); },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { modo, cv, oferta, datos_personales, instrucciones } = body;
 
@@ -232,6 +255,17 @@ export async function POST(request: NextRequest) {
         { error: "En modo 'crear' el campo 'datos_personales' es requerido." },
         { status: 400 }
       );
+    }
+
+    if (modo === "adaptar") {
+      const { data: usage } = await supabase
+        .from("user_usage")
+        .select("usos_gratis_restantes")
+        .eq("user_id", user.id)
+        .single();
+      if (usage !== null && usage.usos_gratis_restantes <= 0) {
+        return NextResponse.json({ error: "sin_usos" }, { status: 403 });
+      }
     }
 
     let userMessage = "";
@@ -281,6 +315,10 @@ export async function POST(request: NextRequest) {
     const matchData = keywords.length > 0
       ? calcularMatch(keywords, result.cv_adaptado ?? "")
       : { keywords_totales: 0, keywords_encontradas: 0 };
+
+    if (modo === "adaptar") {
+      await supabase.rpc("decrementar_uso_gratis", { p_user_id: user.id });
+    }
 
     return NextResponse.json({ ...result, ...matchData });
   } catch (error) {

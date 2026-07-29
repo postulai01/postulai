@@ -43,7 +43,7 @@ export default function TerminosPage() {
             </Section>
 
             <Section title="4. Prueba gratuita y suscripción">
-              Al crear una cuenta el usuario puede activar una prueba gratuita de 7 días de acceso ilimitado al servicio, sin necesidad de proporcionar datos de pago. La prueba se activa manualmente por el usuario y no se renueva automáticamente. Una vez finalizada la prueba gratuita, el acceso al servicio requiere la contratación de una suscripción de pago. Los planes disponibles y sus precios se detallan en la página de planes de Postulai. Los pagos son procesados a través de plataformas de pago seguras. Las suscripciones se renuevan automáticamente salvo que el usuario las cancele antes de la fecha de renovación. No se realizan reembolsos una vez procesado el pago del período en curso, salvo casos excepcionales evaluados a criterio de Postulai.
+              Al crear una cuenta el usuario recibe 5 usos gratuitos para adaptar su CV y generar cartas de presentación, sin necesidad de proporcionar datos de pago. Los usos gratuitos no tienen fecha de vencimiento y se descuentan únicamente por uso efectivo del servicio. Una vez utilizados los usos gratuitos, el acceso al servicio requiere la contratación de una suscripción de pago. Los planes disponibles y sus precios se detallan en la página de planes de Postulai. Los pagos son procesados a través de plataformas de pago seguras. Las suscripciones se renuevan automáticamente salvo que el usuario las cancele antes de la fecha de renovación. No se realizan reembolsos una vez procesado el pago del período en curso, salvo casos excepcionales evaluados a criterio de Postulai.
             </Section>
 
             <Section title="5. Tratamiento de datos y privacidad">

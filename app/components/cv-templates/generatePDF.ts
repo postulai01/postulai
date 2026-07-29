@@ -57,6 +57,42 @@ export async function generateCVPDF(cvText: string, formato: string): Promise<Bl
   return pdf.output("blob");
 }
 
+export async function generateCVThumbnail(cvText: string, formato: string): Promise<string> {
+  const html2canvas = (await import("html2canvas")).default;
+  const container = document.createElement("div");
+  container.style.position = "absolute";
+  container.style.left = "-9999px";
+  container.style.top = "0";
+  container.style.width = "794px";
+  container.style.height = "1123px"; // A4 at 794px wide (794 × 297/210)
+  container.style.overflow = "hidden";
+  container.style.backgroundColor = "white";
+  document.body.appendChild(container);
+
+  const { createRoot } = await import("react-dom/client");
+  const root = createRoot(container);
+
+  const template = await getTemplate(formato, cvText);
+  root.render(template);
+
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 80)));
+  });
+
+  const canvas = await html2canvas(container, {
+    scale: 0.5,
+    useCORS: true,
+    backgroundColor: "#ffffff",
+    width: 794,
+    height: 1123,
+  });
+
+  root.unmount();
+  document.body.removeChild(container);
+
+  return canvas.toDataURL("image/jpeg", 0.85);
+}
+
 async function getTemplate(formato: string, cvText: string) {
   const React = (await import("react")).default;
   switch (formato) {
