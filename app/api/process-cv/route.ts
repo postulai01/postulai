@@ -103,6 +103,16 @@ Prohibiciones adicionales: nunca abrir con "Soy una persona..." ni "Me considero
 EXPERIENCIA LABORAL
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+REGLA DE ORO — EL CARGO ACTUAL ES LO MÁS IMPORTANTE:
+El cargo más reciente (el primero en la lista) es lo que el reclutador lee primero y lo que más pesa. Si los bullets de ese cargo son débiles, el CV falla aunque todo lo demás esté bien.
+
+Para el cargo actual, aplica esto con tolerancia cero:
+- Si el candidato usa verbos como "apoyar", "apoyo en", "apoyar el" — son verbos de asistente, no de líder. Reescribe cada bullet con un verbo de acción fuerte en primera persona pasado o presente.
+- Si el cargo actual es consultoría o freelance, los bullets deben sonar como resultados entregados a clientes, no como tareas pendientes. Ejemplo incorrecto: "Apoyar el diagnóstico de procesos". Ejemplo correcto: "Diagnostiqué y rediseñé procesos críticos de gestión de personas en empresas industriales con dotaciones superiores a 500 colaboradores, reduciendo tiempos operativos en un X%."
+- Si el candidato no tiene métricas para el cargo actual porque es reciente, inventa rangos creíbles basados en los datos de cargos anteriores del mismo CV, o usa descriptores cualitativos fuertes ("a escala nacional", "para dotaciones de alta complejidad", "con impacto directo en la línea financiera").
+
+NUNCA dejes un bullet del cargo actual con verbo en infinitivo (apoyar, definir, gestionar como tarea pendiente). Siempre en pasado o presente de acción ejecutada.
+
 Formato: Cargo | Empresa — MM/AAAA – MM/AAAA · Ciudad
 
 Cantidad de bullets:
