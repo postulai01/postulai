@@ -32,6 +32,15 @@ function truncateWords(text: string, maxChars: number): string {
   return cut.replace(/[\s·\-–—,;:.]+$/, "") + "…";
 }
 
+function timeAgo(dateStr: string): string {
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (diff < 60) return "hace un momento";
+  if (diff < 3600) return `hace ${Math.floor(diff / 60)} min`;
+  if (diff < 86400) return `hace ${Math.floor(diff / 3600)}h`;
+  if (diff < 604800) return `hace ${Math.floor(diff / 86400)}d`;
+  return `hace ${Math.floor(diff / 604800)} sem`;
+}
+
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
@@ -80,6 +89,7 @@ export default function Sidebar() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -168,7 +178,7 @@ export default function Sidebar() {
         />
         <a
           href={`/app/historial/${row.id}`}
-          className={`flex-1 flex items-center pl-3 pr-14 py-2.5 transition-colors duration-150 ${
+          className={`flex-1 flex flex-col justify-center pl-3 pr-14 py-2.5 transition-colors duration-150 ${
             isActive ? "bg-white/[0.04]" : "hover:bg-white/[0.03]"
           }`}
         >
@@ -180,6 +190,7 @@ export default function Sidebar() {
           >
             {displayTitle}
           </p>
+          <p className="text-[11px] text-[#444]">{timeAgo(row.created_at)}</p>
         </a>
         <button
           type="button"
@@ -256,7 +267,16 @@ export default function Sidebar() {
           {recentItems.length > 0 && (
             <>
               {sectionLabel("Recientes", pinnedItems.length > 0)}
-              {recentItems.map(renderRow)}
+              {(showAll ? recentItems : recentItems.slice(0, 8)).map(renderRow)}
+              {recentItems.length > 8 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAll((v) => !v)}
+                  className="text-[11px] text-[#444] hover:text-white px-4 py-2 transition-colors duration-150"
+                >
+                  {showAll ? "Mostrar menos" : `Mostrar todas (${recentItems.length})`}
+                </button>
+              )}
             </>
           )}
         </div>
