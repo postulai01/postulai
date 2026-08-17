@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -66,13 +66,7 @@ const IconPlus = () => (
 );
 
 const IconPin = ({ filled }: { filled: boolean }) => (
-  <svg
-    className="w-3.5 h-3.5"
-    viewBox="0 0 24 24"
-    fill="none"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 17v5" stroke="currentColor" strokeWidth={2} />
     <path
       d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78-.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1v3.76z"
@@ -83,6 +77,8 @@ const IconPin = ({ filled }: { filled: boolean }) => (
   </svg>
 );
 
+const VISIBLE_COUNT = 8;
+
 export default function Sidebar() {
   const [dbHistorial, setDbHistorial] = useState<PostulacionRow[] | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
@@ -90,6 +86,7 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const loadedRef = useRef(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -98,7 +95,11 @@ export default function Sidebar() {
     setIsAccountOpen(false);
   }, [pathname]);
 
+  // Carga inicial — solo una vez
   useEffect(() => {
+    if (loadedRef.current) return;
+    loadedRef.current = true;
+
     let channel: ReturnType<typeof supabase.channel> | null = null;
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -106,21 +107,30 @@ export default function Sidebar() {
         setDbHistorial([]);
         return;
       }
+
       setUserName(session.user.user_metadata?.full_name ?? session.user.email ?? null);
       setUserEmail(session.user.email ?? null);
+
       const { data } = await supabase
         .from("postulaciones")
         .select("id, tipo, cargo, empresa, titulo_postulacion, created_at, anclado")
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false })
-        .limit(30);
+        .limit(100);
+
       setDbHistorial(data ?? []);
 
+      // Escuchar inserts nuevos en tiempo real
       channel = supabase
-        .channel("postulaciones-changes")
+        .channel(`postulaciones-${session.user.id}`)
         .on(
           "postgres_changes",
-          { event: "INSERT", schema: "public", table: "postulaciones", filter: `user_id=eq.${session.user.id}` },
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "postulaciones",
+            filter: `user_id=eq.${session.user.id}`,
+          },
           (payload) => {
             setDbHistorial((prev) => {
               if (!prev) return [payload.new as PostulacionRow];
@@ -136,6 +146,23 @@ export default function Sidebar() {
     return () => {
       if (channel) supabase.removeChannel(channel);
     };
+  }, []);
+
+  // Recarga manual cuando el usuario vuelve a /app desde /app/resultado
+  useEffect(() => {
+    if (!loadedRef.current) return;
+    if (pathname !== "/app") return;
+
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) return;
+      const { data } = await supabase
+        .from("postulaciones")
+        .select("id, tipo, cargo, empresa, titulo_postulacion, created_at, anclado")
+        .eq("user_id", session.user.id)
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (data) setDbHistorial(data);
+    });
   }, [pathname]);
 
   async function handleDelete(id: string) {
@@ -160,6 +187,7 @@ export default function Sidebar() {
 
   const pinnedItems = dbHistorial?.filter((r) => r.anclado) ?? [];
   const recentItems = dbHistorial?.filter((r) => !r.anclado) ?? [];
+  const visibleRecent = showAll ? recentItems : recentItems.slice(0, VISIBLE_COUNT);
 
   function renderRow(row: PostulacionRow) {
     const isActive = pathname === `/app/historial/${row.id}`;
@@ -178,7 +206,7 @@ export default function Sidebar() {
         />
         <a
           href={`/app/historial/${row.id}`}
-          className={`flex-1 flex flex-col justify-center pl-3 pr-14 py-2.5 transition-colors duration-150 ${
+          className={`flex-1 flex flex-col justify-center pl-3 pr-14 py-2 transition-colors duration-150 ${
             isActive ? "bg-white/[0.04]" : "hover:bg-white/[0.03]"
           }`}
         >
@@ -190,7 +218,7 @@ export default function Sidebar() {
           >
             {displayTitle}
           </p>
-          <p className="text-[11px] text-[#444]">{timeAgo(row.created_at)}</p>
+          <p className="text-[11px] text-[#444] leading-snug mt-0.5">{timeAgo(row.created_at)}</p>
         </a>
         <button
           type="button"
@@ -267,14 +295,16 @@ export default function Sidebar() {
           {recentItems.length > 0 && (
             <>
               {sectionLabel("Recientes", pinnedItems.length > 0)}
-              {(showAll ? recentItems : recentItems.slice(0, 8)).map(renderRow)}
-              {recentItems.length > 8 && (
+              {visibleRecent.map(renderRow)}
+              {recentItems.length > VISIBLE_COUNT && (
                 <button
                   type="button"
                   onClick={() => setShowAll((v) => !v)}
-                  className="text-[11px] text-[#444] hover:text-white px-4 py-2 transition-colors duration-150"
+                  className="text-left text-[11px] text-[#444] hover:text-white px-4 py-2.5 transition-colors duration-150"
                 >
-                  {showAll ? "Mostrar menos" : `Mostrar todas (${recentItems.length})`}
+                  {showAll
+                    ? "Mostrar menos"
+                    : `Mostrar todas (${recentItems.length})`}
                 </button>
               )}
             </>
@@ -321,6 +351,7 @@ export default function Sidebar() {
                   setUserName(null);
                   setUserEmail(null);
                   setDbHistorial([]);
+                  loadedRef.current = false;
                 }}
                 className="text-left px-4 py-2 text-xs text-red-400 hover:bg-red-500/10 transition-colors duration-150"
               >
@@ -330,7 +361,6 @@ export default function Sidebar() {
           </div>
         </>
       )}
-
       {userName ? (
         <button
           type="button"
@@ -372,7 +402,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* ── Desktop sidebar ── */}
       <aside className="hidden md:flex flex-col w-[270px] shrink-0 bg-[#111] border-r border-[#1e1e1e]">
         <div className="px-4 pt-5 pb-4 border-b border-[#1e1e1e] shrink-0 flex flex-col gap-3">
           <a href="/" className="text-[18px] font-black text-white hover:opacity-70 transition-opacity duration-150 leading-none">
@@ -384,7 +413,6 @@ export default function Sidebar() {
         {footerSection}
       </aside>
 
-      {/* ── Mobile header bar ── */}
       <header className="md:hidden shrink-0 h-14 bg-[#111] border-b border-[#1e1e1e] flex items-center justify-between px-5 z-30">
         <a href="/" className="text-[18px] font-black text-white leading-none">
           Postulai
@@ -399,7 +427,6 @@ export default function Sidebar() {
         </button>
       </header>
 
-      {/* ── Mobile overlay ── */}
       <div
         className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-200 md:hidden ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -407,7 +434,6 @@ export default function Sidebar() {
         onClick={() => { setIsOpen(false); setIsAccountOpen(false); }}
       />
 
-      {/* ── Mobile drawer ── */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-[270px] bg-[#111] border-r border-[#1e1e1e] flex flex-col transition-transform duration-250 md:hidden ${
           isOpen ? "translate-x-0" : "-translate-x-full"
