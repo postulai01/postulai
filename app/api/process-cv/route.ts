@@ -73,6 +73,8 @@ REGLAS ATS
 PERFIL PROFESIONAL
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+LÍMITE ESTRICTO DE PALABRAS: El perfil profesional no puede superar 70 palabras bajo ninguna circunstancia. Si el candidato tiene mucha experiencia, eso no justifica un perfil más largo — justifica ser más selectivo. Cuenta las palabras antes de entregar. Si supera 70, recorta hasta cumplir el límite.
+
 Máximo 4 líneas. Debe contener:
 1. Etapa o nivel profesional + área de especialidad
 2. Dos fortalezas concretas con evidencia (no adjetivos vacíos)
@@ -180,6 +182,8 @@ Habilidades blandas (máximo 5):
 ✓ Válidas: liderazgo de equipos, negociación, gestión de clientes, toma de decisiones bajo presión, comunicación ejecutiva, orientación al cliente, trabajo en equipo.
 ✗ Prohibidas: "disposición al aprendizaje", "aprendizaje rápido", "multifuncional", "dinámico", "proactivo".
 ✗ Prohibidas como habilidad blanda: "gestión operativa", "análisis de procesos", "organización" sola — estas son funciones o habilidades técnicas, no blandas. Si quieres incluir organización, escribir "planificación y organización de tareas" como máximo.
+
+Formato obligatorio de habilidades técnicas: todas en una sola línea separadas por punto medio (·), nunca en lista con guiones ni con saltos de línea. Ejemplo correcto: SAP · BUK · Talana · Power BI · HR Analytics · IA (Gemini/Claude). Ejemplo incorrecto: - SAP (módulo RRHH) / - BUK · Talana.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CARTA DE PRESENTACIÓN
