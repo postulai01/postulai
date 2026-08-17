@@ -223,13 +223,17 @@ export default function ResultadoPage() {
     savedRef.current = true;
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) return;
-      const match = data.titulo_postulacion?.match(/CV para (.+?) · (.+)/);
+      const tituloRaw = data.titulo_postulacion ?? "";
+      const match = tituloRaw.match(/CV para (.+?)\s*[·\-–]\s*(.+)/i);
+      const empresaFinal = match?.[1]?.trim() ?? null;
+      const cargoFinal = match?.[2]?.trim() ?? null;
+
       const { data: inserted } = await supabase.from("postulaciones").insert({
         user_id: session.user.id,
         tipo: data.modo ?? "adaptar",
-        empresa: match?.[1] ?? null,
-        cargo: match?.[2] ?? null,
-        titulo_postulacion: data.titulo_postulacion ?? null,
+        empresa: empresaFinal,
+        cargo: cargoFinal,
+        titulo_postulacion: tituloRaw || null,
         cv_adaptado: data.cv_adaptado,
         carta_presentacion: data.carta_presentacion,
         principales_cambios: data.principales_cambios ?? null,

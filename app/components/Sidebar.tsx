@@ -126,7 +126,7 @@ export default function Sidebar() {
     return () => {
       if (channel) supabase.removeChannel(channel);
     };
-  }, []);
+  }, [pathname]);
 
   async function handleDelete(id: string) {
     if (!window.confirm("¿Eliminar esta postulación del historial?")) return;
