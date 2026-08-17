@@ -89,6 +89,8 @@ export default function Sidebar() {
   }, [pathname]);
 
   useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) {
         setDbHistorial([]);
@@ -103,7 +105,27 @@ export default function Sidebar() {
         .order("created_at", { ascending: false })
         .limit(30);
       setDbHistorial(data ?? []);
+
+      channel = supabase
+        .channel("postulaciones-changes")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "postulaciones", filter: `user_id=eq.${session.user.id}` },
+          (payload) => {
+            setDbHistorial((prev) => {
+              if (!prev) return [payload.new as PostulacionRow];
+              const exists = prev.find((r) => r.id === (payload.new as PostulacionRow).id);
+              if (exists) return prev;
+              return [payload.new as PostulacionRow, ...prev];
+            });
+          }
+        )
+        .subscribe();
     });
+
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   async function handleDelete(id: string) {
@@ -133,6 +155,7 @@ export default function Sidebar() {
     const isActive = pathname === `/app/historial/${row.id}`;
     const rawTitle =
       row.titulo_postulacion?.trim() ||
+      [row.cargo, row.empresa].filter(Boolean).join(" · ") ||
       (row.tipo === "adaptar" ? "CV Adaptado" : "CV Creado");
     const displayTitle = truncateWords(rawTitle, 30);
 
