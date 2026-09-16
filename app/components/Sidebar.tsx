@@ -100,9 +100,11 @@ export default function Sidebar() {
     if (loadedRef.current) return;
     loadedRef.current = true;
 
+    let cancelled = false;
     let channel: ReturnType<typeof supabase.channel> | null = null;
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (cancelled) return;
       if (!session) {
         setDbHistorial([]);
         return;
@@ -118,6 +120,7 @@ export default function Sidebar() {
         .order("created_at", { ascending: false })
         .limit(100);
 
+      if (cancelled) return;
       setDbHistorial(data ?? []);
 
       // Escuchar inserts nuevos en tiempo real
@@ -144,6 +147,8 @@ export default function Sidebar() {
     });
 
     return () => {
+      cancelled = true;
+      loadedRef.current = false;
       if (channel) supabase.removeChannel(channel);
     };
   }, []);

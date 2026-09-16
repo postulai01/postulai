@@ -39,7 +39,7 @@ Producción: https://www.postulai.cl
 
 app/page.tsx                    — Landing pública
 app/login/page.tsx              — Login (createBrowserClient de @supabase/ssr + window.location.href)
-app/registro/page.tsx           — Registro CERRADO ("Acceso cerrado, escríbenos a contacto@postulai.cl")
+app/registro/page.tsx           — Registro abierto y funcional (nombre + email + contraseña + Google, con confirmación por email)
 app/planes/page.tsx             — Precios
 app/terminos/page.tsx           — T&C
 app/privacidad/page.tsx         — Privacidad (Ley 19.628)
@@ -50,11 +50,18 @@ app/app/resultado/page.tsx      — Dashboard resultados
 app/app/historial/[id]/page.tsx — Postulación guardada
 app/api/process-cv/route.ts     — Cerebro IA (modos adaptar/crear) — NO TOCAR sin avisar a Pedro
 app/api/extract-text/route.ts   — Lee PDF (pdf-parse/lib/pdf-parse.js) y Word (mammoth)
-app/api/fetch-url/route.ts      — Lee link de oferta
+app/api/fetch-url/route.ts      — Lee link de oferta (API disponible, pero la UI de adaptar/page.tsx todavía no tiene campo para pegar link — solo acepta texto pegado)
 app/api/waitlist/route.ts       — Lista espera → Google Sheets + correo Resend
-app/components/CVDocument.tsx   — PDF con @react-pdf/renderer
-lib/supabase.ts                 — createBrowserClient
-middleware.ts                   — Sesión Supabase producción
+app/components/CVDocument.tsx             — Template PDF base con @react-pdf/renderer
+app/components/CVDocumentClasico.tsx      — Template Clásico
+app/components/CVDocumentMinimalista.tsx  — Template Minimalista
+app/components/CVDocumentModerno.tsx      — Template Moderno
+app/components/CVDocumentProfesional.tsx  — Template Profesional
+app/components/CVDocumentSimple.tsx       — Template Simple
+app/components/CVDocumentSelector.tsx     — Selector de template activo
+app/components/cv-templates/             — Lógica de generación de PDF (generatePDF.ts) y parseo (parseCvText.ts)
+lib/supabase.ts                           — createBrowserClient
+middleware.ts                             — Sesión Supabase: refresca cookies y protege rutas /app server-side
 
 ---
 
@@ -143,12 +150,12 @@ Nunca subir estas claves a GitHub. Pedirlas directamente a Pedro.
 ANTHROPIC_API_KEY=              # API de Anthropic para el cerebro IA
 NEXT_PUBLIC_SUPABASE_URL=       # URL del proyecto Supabase
 NEXT_PUBLIC_SUPABASE_ANON_KEY=  # Clave anon de Supabase
-SUPABASE_SERVICE_ROLE_KEY=      # Clave service role (solo backend)
+SUPABASE_SERVICE_ROLE_KEY=      # Clave service role — hoy no se usa en el código (todo corre con anon key + sesión). Necesaria si en el futuro se implementa RLS bypass o lógica server-side con más privilegios.
 RESEND_API_KEY=                 # API de Resend para correos transaccionales
 
 ---
 
-## Estado actual del producto (julio 2025)
+## Estado actual del producto (septiembre 2026)
 
 Funcionando:
 - Flujo completo: subir CV + pegar oferta → CV adaptado → descarga PDF y Word
@@ -156,12 +163,19 @@ Funcionando:
 - Auth con Supabase (login, sesión, middleware)
 - Historial de postulaciones por usuario
 - Landing pública + página de planes
+- Registro abierto al público (nombre + email + contraseña + Google, con confirmación por email)
 
 En desarrollo / pendiente:
 - Mejoras de formato visual del PDF generado
 - Optimización del cerebro (prompt en iteración activa)
 - Sistema de pagos / planes
-- Registro abierto al público (hoy está cerrado)
+
+---
+
+## Cambios recientes
+
+- **middleware.ts** (antes `proxy.ts`): Next.js no ejecutaba el middleware con el nombre anterior, dejando las rutas `/app` sin protección server-side y sin refresco automático de cookies de sesión. Se renombró el archivo y la función exportada (`proxy` → `middleware`). Ya corregido y verificado.
+- **app/components/Sidebar.tsx** — Race condition en la suscripción Realtime a `postulaciones`: el canal quedaba huérfano en el registro interno de Supabase cuando el cleanup del `useEffect` corría antes de que el `.then()` async resolviera, causando el error `"cannot add postgres_changes callbacks after subscribe()"` en Strict Mode / hot-reload. Se agregó un flag `cancelled` y se resetea `loadedRef.current` en cleanup. Ya corregido y verificado.
 
 ---
 
