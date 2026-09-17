@@ -85,16 +85,32 @@ function buildUserMessage(caso: Caso): string {
   );
 }
 
+function contarPalabrasPerfil(cvText: string): number {
+  const lines = cvText.split("\n");
+  let inPerfil = false;
+  const collected: string[] = [];
+  for (const line of lines) {
+    if (/PERFIL\s+PROFESIONAL/i.test(line)) { inPerfil = true; continue; }
+    if (inPerfil && /^[A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ\s]+[—─━\-]{3,}/.test(line)) break;
+    if (inPerfil) collected.push(line);
+  }
+  return collected.join(" ").trim().split(/\s+/).filter((w) => w.length > 0).length;
+}
+
 function buildEvaluatorMessage(caso: Caso, resultado: Record<string, unknown>, rubrica: string): string {
   const criterios = [...CRITERIOS_UNIVERSALES, ...caso.criterios_extra];
   const schemaLines = criterios
     .map((c) => `  "${c}": { "puntaje": <entero 1–10>, "razon": "<máximo 20 palabras>" }`)
     .join(",\n");
 
+  const perfilWordCount = contarPalabrasPerfil(resultado.cv_adaptado as string);
+  const perfilHint = `DATO PRE-CALCULADO PARA perfil_palabras: el perfil profesional del CV adaptado tiene exactamente ${perfilWordCount} palabras (contadas en código dividiendo el texto por espacios). Usa este número — no vuelvas a contar tú mismo.\n\n`;
+
   return (
     `Eres un evaluador experto en CVs y empleabilidad chilena. ` +
     `Evalúa el output generado por un sistema de IA según la rúbrica adjunta.\n\n` +
     `RÚBRICA:\n${rubrica}\n\n` +
+    perfilHint +
     `PERFIL DEL CASO: ${caso.perfil_descripcion}\n\n` +
     `CV ADAPTADO:\n${resultado.cv_adaptado}\n\n` +
     `CARTA DE PRESENTACIÓN:\n${resultado.carta_presentacion}\n\n` +
