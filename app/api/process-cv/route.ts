@@ -263,6 +263,19 @@ function calcularMatch(keywords: string[], cvText: string): { keywords_totales: 
   return { keywords_totales: keywords.length, keywords_encontradas: encontradas.length };
 }
 
+function extraerPerfilProfesional(cvText: string): string | null {
+  const lines = cvText.split("\n");
+  let inPerfil = false;
+  const collected: string[] = [];
+  for (const line of lines) {
+    if (/PERFIL\s+PROFESIONAL/i.test(line)) { inPerfil = true; continue; }
+    if (inPerfil && /^[A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ\s]+[—─━\-]{3,}/.test(line)) break;
+    if (inPerfil) collected.push(line);
+  }
+  if (!inPerfil) return null;
+  return collected.join("\n").trim();
+}
+
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
@@ -368,6 +381,28 @@ export async function POST(request: NextRequest) {
     }
 
     const result = JSON.parse(jsonMatch[0]);
+
+    if (typeof result.cv_adaptado === "string") {
+      const perfilOriginal = extraerPerfilProfesional(result.cv_adaptado);
+      if (perfilOriginal) {
+        const palabrasPerfil = perfilOriginal.trim().split(/\s+/).filter(Boolean).length;
+        if (palabrasPerfil > 70) {
+          const trimResponse = await client.messages.create({
+            model: "claude-sonnet-4-6",
+            max_tokens: 300,
+            temperature: 0,
+            messages: [{
+              role: "user",
+              content: `Recorta el siguiente texto a máximo 70 palabras sin perder la idea principal. Devuelve ÚNICAMENTE el texto recortado, sin comillas, sin explicaciones, sin JSON.\n\nTEXTO:\n${perfilOriginal}`,
+            }],
+          });
+          const perfilRecortado = trimResponse.content[0].type === "text"
+            ? trimResponse.content[0].text.trim()
+            : perfilOriginal;
+          result.cv_adaptado = result.cv_adaptado.replace(perfilOriginal, perfilRecortado);
+        }
+      }
+    }
 
     const keywords: string[] = Array.isArray(result.palabras_clave_oferta)
       ? result.palabras_clave_oferta
