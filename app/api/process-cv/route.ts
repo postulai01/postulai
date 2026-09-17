@@ -144,9 +144,11 @@ TEST FINAL DE CADA BULLET antes de incluirlo:
 "¿Este bullet está en primera persona singular pasado y muestra algo concreto con resultado claro?"
 Si la respuesta es no → reescribir.
 
+DETECCIÓN OBLIGATORIA DE BRECHAS: antes de escribir el CV, ordena cronológicamente todos los cargos por sus fechas de inicio y fin. Calcula la diferencia en meses entre el fin de un cargo y el inicio del siguiente. Si esa diferencia es de 3 meses o más, es una brecha laboral y DEBE tratarse según las reglas de BRECHAS LABORALES más abajo, exista o no una mención explícita de desempleo en el CV original. No asumas que no hay brecha solo porque el candidato no la mencionó — el cálculo de fechas es la única fuente de verdad.
+
 BRECHAS LABORALES — manejo obligatorio:
 - Brecha menor a 3 meses: no mencionar, es normal en cualquier mercado laboral.
-- Brecha de 3 a 12 meses: agregar una línea honesta en la sección de experiencia: "Período de búsqueda laboral y desarrollo profesional (mes año – mes año)". Si hubo cursos, freelance o voluntariado en ese período, mencionarlos brevemente.
+- Brecha de 3 a 12 meses: agregar como una entrada cronológica más dentro del array de experiencia laboral (mismo formato que un cargo: con su propio rango de fechas), ubicada en el orden cronológico correcto entre los dos cargos que la rodean — no como una nota al pie ni al final de la lista. El título de esa entrada debe ser exactamente: "Período de búsqueda laboral y desarrollo profesional (mes año – mes año)". Si hubo cursos, freelance o voluntariado en ese período, mencionarlos brevemente como si fuera la descripción de ese "cargo".
 - Brecha mayor a 12 meses: en el Perfil Profesional agregar una frase que reencuadre positivamente: "Profesional con experiencia en [área] que ha dedicado el último período a [actualización técnica / cuidado familiar / emprendimiento / proyecto propio]" — usar lo más honesto y coherente según el contexto del CV.
 
 Nunca inventar fechas ni comprimir períodos para ocultar brechas. La honestidad bien presentada es mejor que una mentira que se detecta en la entrevista.
@@ -229,6 +231,7 @@ CHECKLIST — ejecutar antes de entregar
 □ 6. ¿El 70% de palabras clave de la oferta están en el CV?
 □ 7. Escanear cada oración: apoyando, contribuyendo, colaborando, participando, aportando, ciclo completo, end-to-end, multifuncional, proactivo, dinámico, sinergia, apoyaron, apoyó (como verbo de bullet), busca, productivo-comercial, operativo-comercial, realicé, ha liderado, ha desarrollado, ha gestionado (tercera persona en perfil), coordiné mi desempeño, asumiendo responsabilidad en (variante de ciclo completo), demostré producto, cubriendo todas las etapas, cubriendo etapas, todas las etapas operativas, etapas operativas y comerciales — si aparece alguna → reescribir.
 □ 8. ¿Tono y extensión corresponden al nivel del candidato?
+□ 9. Perfil profesional: cuenta las palabras exactas del texto que vas a entregar en el campo cv_adaptado correspondiente al perfil. Si son más de 70, recórtalo ahora mismo antes de continuar. No entregues el resultado sin haber hecho este conteo explícitamente.
 
 Si cualquier punto falla → corregir antes de entregar. Sin excepciones.
 
