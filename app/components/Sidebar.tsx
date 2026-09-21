@@ -83,6 +83,7 @@ export default function Sidebar() {
   const [dbHistorial, setDbHistorial] = useState<PostulacionRow[] | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [ilimitado, setIlimitado] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
@@ -122,6 +123,13 @@ export default function Sidebar() {
 
       if (cancelled) return;
       setDbHistorial(data ?? []);
+
+      const { data: usageData } = await supabase
+        .from("user_usage")
+        .select("ilimitado")
+        .eq("user_id", session.user.id)
+        .single();
+      if (!cancelled) setIlimitado(usageData?.ilimitado === true);
 
       // Escuchar inserts nuevos en tiempo real
       channel = supabase
@@ -333,7 +341,7 @@ export default function Sidebar() {
               <div className="flex items-center justify-between px-4 py-2">
                 <span className="text-xs text-[#888]">Mi plan</span>
                 <span className="text-[10px] text-[#555] bg-white/5 border border-white/10 px-2 py-0.5 rounded-full">
-                  Plan gratuito · 5 usos
+                  {ilimitado ? "Uso ilimitado" : "Plan gratuito · 5 usos"}
                 </span>
               </div>
               <a href="/terminos" className="px-4 py-2 text-xs text-[#888] hover:text-white hover:bg-white/5 transition-colors duration-150">
@@ -377,7 +385,7 @@ export default function Sidebar() {
           </div>
           <div className="flex-1 text-left min-w-0">
             <p className="text-xs font-medium text-white truncate leading-snug">{userName}</p>
-            <p className="text-[10px] text-[#555] leading-snug">Plan gratuito · 5 usos</p>
+            <p className="text-[10px] text-[#555] leading-snug">{ilimitado ? "Uso ilimitado" : "Plan gratuito · 5 usos"}</p>
           </div>
           <svg
             className={`w-3 h-3 text-[#444] shrink-0 transition-transform duration-150 ${isAccountOpen ? "rotate-180" : ""}`}

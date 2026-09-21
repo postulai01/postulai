@@ -14,6 +14,7 @@ export default function AppPage() {
   const router = useRouter();
   const [userName, setUserName] = useState<string | null>(null);
   const [usosRestantes, setUsosRestantes] = useState<number | null>(null);
+  const [ilimitado, setIlimitado] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -25,7 +26,10 @@ export default function AppPage() {
   useEffect(() => {
     fetch("/api/usage")
       .then(r => r.json())
-      .then(d => { if (typeof d.usos_gratis_restantes === "number") setUsosRestantes(d.usos_gratis_restantes); })
+      .then(d => {
+        if (typeof d.usos_gratis_restantes === "number") setUsosRestantes(d.usos_gratis_restantes);
+        if (d.ilimitado === true) setIlimitado(true);
+      })
       .catch(() => {});
   }, []);
 
@@ -193,7 +197,7 @@ export default function AppPage() {
             </div>
 
             {/* Card de usos gratis */}
-            {usosRestantes !== null && (
+            {usosRestantes !== null && !ilimitado && (
               <button
                 type="button"
                 onClick={() => router.push("/planes")}

@@ -330,13 +330,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let isIlimitado = false;
     if (modo === "adaptar") {
       const { data: usage } = await supabase
         .from("user_usage")
-        .select("usos_gratis_restantes")
+        .select("usos_gratis_restantes, ilimitado")
         .eq("user_id", user.id)
         .single();
-      if (usage !== null && usage.usos_gratis_restantes <= 0) {
+      isIlimitado = usage?.ilimitado === true;
+      if (!isIlimitado && usage !== null && usage.usos_gratis_restantes <= 0) {
         return NextResponse.json({ error: "sin_usos" }, { status: 403 });
       }
     }
@@ -358,7 +360,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (instrucciones) {
-      userMessage += `\n\nINSTRUCCIONES ADICIONALES DEL USUARIO:\n${instrucciones}`;
+      const instruccionesSafe = String(instrucciones).slice(0, 500);
+      userMessage += `\n\nINSTRUCCIONES ADICIONALES DEL USUARIO:\n${instruccionesSafe}`;
     }
 
     const response = await client.messages.create({
@@ -411,7 +414,7 @@ export async function POST(request: NextRequest) {
       ? calcularMatch(keywords, result.cv_adaptado ?? "")
       : { keywords_totales: 0, keywords_encontradas: 0 };
 
-    if (modo === "adaptar") {
+    if (modo === "adaptar" && !isIlimitado) {
       await supabase.rpc("decrementar_uso_gratis", { p_user_id: user.id });
     }
 

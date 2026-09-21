@@ -26,11 +26,12 @@ export async function GET() {
 
   const { data } = await supabase
     .from("user_usage")
-    .select("usos_gratis_restantes")
+    .select("usos_gratis_restantes, ilimitado")
     .eq("user_id", user.id)
     .single();
 
   return NextResponse.json({
     usos_gratis_restantes: data?.usos_gratis_restantes ?? 5,
+    ilimitado: data?.ilimitado === true,
   });
 }
