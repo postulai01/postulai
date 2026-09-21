@@ -77,7 +77,7 @@ REGLAS ATS
 PERFIL PROFESIONAL
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-LÍMITE ESTRICTO DE PALABRAS: El perfil profesional no puede superar 70 palabras bajo ninguna circunstancia. Si el candidato tiene mucha experiencia, eso no justifica un perfil más largo — justifica ser más selectivo. Cuenta las palabras antes de entregar. Si supera 70, recorta hasta cumplir el límite.
+LÍMITE DE PALABRAS: El perfil profesional debe tener entre 50 y 100 palabras. Cuenta las palabras antes de entregar — si están fuera del rango, ajusta. El perfil NUNCA debe intentar listar o resumir todos los cargos de la trayectoria del candidato — esa información vive en la sección de Experiencia Laboral, que sí escala en extensión según el nivel del candidato. El perfil comprime la propuesta de valor central en 2-4 líneas: quién es, su especialización, y un logro o diferenciador concreto. Un perfil largo no es una ventaja para candidatos senior — sigue siendo una señal de falta de edición.
 
 Máximo 4 líneas. Debe contener:
 1. Etapa o nivel profesional + área de especialidad
@@ -99,7 +99,7 @@ PROHIBIDO en el perfil (sin excepción):
 ✗ Tercera persona en cualquier forma: "ha liderado", "ha desarrollado", "ha gestionado". El perfil es impersonal pero nunca en tercera persona — usar sustantivos y frases nominales: "Experiencia en liderazgo de...", "Formación en...", "Trayectoria en..."
 ✗ Frases-resumen que listan varias competencias en cadena (ej: "experiencia en X, Y y Z") cuando alguno de los elementos no tiene respaldo directo en el CV original. Antes de escribir cualquier lista de este tipo, verifica que CADA elemento tenga su propia línea de evidencia en el CV — si uno no la tiene, elimínalo o cámbialo a "en formación". No es válido incluirlo porque los otros elementos sí tienen respaldo.
 
-Estructura obligatoria del perfil (máx 70 palabras, 3 líneas):
+Estructura obligatoria del perfil (50–100 palabras, 2-4 líneas):
 - Línea 1: [Título del cargo o similar] con [X años] de experiencia en [especialidad concreta].
 - Línea 2: Especializado en [2-3 competencias clave usando las palabras exactas de la oferta].
 - Línea 3: Historial de [logro concreto y verificable del CV]. Si el candidato está desempleado y la oferta no menciona fecha de inicio específica, agregar al final: "Disponible para incorporación inmediata."
@@ -248,7 +248,7 @@ CHECKLIST — ejecutar antes de entregar
 □ 6. ¿Las palabras clave de la oferta con evidencia real en el CV están todas integradas?
 □ 7. Escanear cada oración: apoyando, contribuyendo, colaborando, participando, aportando, ciclo completo, end-to-end, multifuncional, proactivo, dinámico, sinergia, apoyaron, apoyó (como verbo de bullet), busca, productivo-comercial, operativo-comercial, realicé, ha liderado, ha desarrollado, ha gestionado (tercera persona en perfil), coordiné mi desempeño, asumiendo responsabilidad en (variante de ciclo completo), demostré producto, cubriendo todas las etapas, cubriendo etapas, todas las etapas operativas, etapas operativas y comerciales — si aparece alguna → reescribir.
 □ 8. ¿Tono y extensión corresponden al nivel del candidato?
-□ 9. Perfil profesional: cuenta las palabras exactas del texto que vas a entregar en el campo cv_adaptado correspondiente al perfil. Si son más de 70, recórtalo ahora mismo antes de continuar. No entregues el resultado sin haber hecho este conteo explícitamente.
+□ 9. Perfil profesional: cuenta las palabras exactas del texto que vas a entregar en el campo cv_adaptado correspondiente al perfil. Debe estar entre 50 y 100 palabras — si está fuera de ese rango, ajústalo antes de continuar. No entregues el resultado sin haber hecho este conteo explícitamente.
 □ 10. Cuantificación de bullets: Cuenta cuántos bullets de la sección de experiencia más reciente tienen un número real (cantidad, porcentaje, monto, tiempo, cantidad de personas). Si son menos del 50% del total, revisa el CV original en busca de cualquier cifra aprovechable — cantidad de clientes, de campañas, de días, de productos, de reuniones — y reescribe el bullet para incluirla. Si genuinamente no existe ninguna cifra rescatable en el CV original, describe el alcance, la escala o el nivel de la función en términos cualitativos verificables (ej: 'a nivel de tienda', 'reportando directamente al encargado', 'en todas las campañas del período'), nunca un número inventado. Cero cifras fabricadas, sin excepción — ni siquiera como estimación.
 □ 11. Integridad de afirmaciones: antes de entregar, revisa cada habilidad, competencia o afirmación de formación que aparece en el perfil profesional y en los bullets. Por cada una, señala mentalmente la línea exacta del CV original que la respalda. Si no existe esa línea → elimínala o reformúlala únicamente como algo en desarrollo activo (solo si el CV original menciona cursos, ramos o experiencia directamente relacionada). Nunca afirmar competencias ya consolidadas sin evidencia directa en el CV original. Ejemplo de lo que NO está permitido: si el CV dice "Mención en Finanzas Cuantitativas" pero no menciona cursos, proyectos o herramientas específicas de modelado financiero, NO puedes escribir "formación sólida en modelado financiero" — eso es inferencia, no evidencia. Solo puedes mencionar lo que está escrito literalmente en el CV original, nunca lo que "probablemente" sabe alguien con esa mención. Una mención de carrera o especialización académica (ej. 'Mención en Finanzas Cuantitativas', 'Ingeniería con mención en X') NO es, por sí sola, evidencia suficiente de dominio de una herramienta, metodología o competencia técnica específica. Solo cuentan como evidencia suficiente: un curso o ramo nombrado explícitamente en el CV original, un proyecto descrito con detalle, una herramienta mencionada por su nombre, o experiencia laboral directa relacionada. Si la única evidencia disponible es el nombre de la carrera o mención, el perfil profesional debe decir algo como 'formación en [área general]' sin especificar competencias técnicas puntuales que no están acreditadas en el CV original. Cuidado especial con frases-resumen que listan varias competencias juntas (ej: 'experiencia en X, Y y Z'): cada elemento de esa lista debe pasar individualmente la prueba de evidencia de □11 — no basta con que uno o dos de la lista tengan respaldo real. Si una lista mezcla elementos con evidencia y sin evidencia, separa: menciona explícitamente solo los que tienen base real, y si quieres mencionar los demás, usa 'en desarrollo' o simplemente omítelos.
 
@@ -408,14 +408,14 @@ export async function POST(request: NextRequest) {
       const perfilOriginal = extraerPerfilProfesional(result.cv_adaptado);
       if (perfilOriginal) {
         const palabrasPerfil = perfilOriginal.trim().split(/\s+/).filter(Boolean).length;
-        if (palabrasPerfil > 70) {
+        if (palabrasPerfil > 100) {
           const trimResponse = await client.messages.create({
             model: "claude-sonnet-4-6",
             max_tokens: 300,
             temperature: 0,
             messages: [{
               role: "user",
-              content: `Recorta el siguiente texto a máximo 70 palabras sin perder la idea principal. Devuelve ÚNICAMENTE el texto recortado, sin comillas, sin explicaciones, sin JSON.\n\nTEXTO:\n${perfilOriginal}`,
+              content: `Recorta el siguiente texto a máximo 100 palabras sin perder la idea principal. Devuelve ÚNICAMENTE el texto recortado, sin comillas, sin explicaciones, sin JSON.\n\nTEXTO:\n${perfilOriginal}`,
             }],
           });
           const perfilRecortado = trimResponse.content[0].type === "text"
