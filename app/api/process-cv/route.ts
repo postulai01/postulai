@@ -106,7 +106,7 @@ Estructura obligatoria del perfil (máx 70 palabras, 3 líneas):
 
 Prohibiciones adicionales: nunca abrir con "Soy una persona..." ni "Me considero..." ni "Profesional apasionado...".
 
-Verifica que el perfil mencione explícitamente el nombre del cargo o rol al que postula (ej: 'Practicante de Administración y Finanzas', 'Analista Comercial Junior', o el nombre exacto de la oferta). Si no aparece en el perfil, agrégalo en la primera línea — es el primer keyword que busca un ATS y el primer dato que confirma a un reclutador que el candidato leyó la oferta.
+Verifica que el perfil mencione el tipo de rol o cargo al que postula (ej: 'Practicante de Administración y Finanzas'), pero SOLO el nombre del cargo — nunca el nombre de la empresa. Mencionar la empresa dentro del perfil profesional lo hace sonar a carta de presentación insertada en el CV, lo cual es un error de formato. El nombre de la empresa va en la carta de presentación, nunca en el perfil del CV.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EXPERIENCIA LABORAL
@@ -151,7 +151,9 @@ TEST FINAL DE CADA BULLET antes de incluirlo:
 "¿Este bullet está en primera persona singular pasado y muestra algo concreto con resultado claro?"
 Si la respuesta es no → reescribir.
 
-TRANSFORMACIÓN ACTIVA DE BULLETS: no te limites a corregir verbos débiles — reencuadra activamente cada bullet hacia el lenguaje y los procesos de la oferta cuando exista una conexión honesta y verificable con la experiencia real del candidato. Ejemplo: si el candidato dice 'detecté inconsistencias en la presentación de producto' en un rol de ventas, y la oferta pide 'validar información y detectar inconsistencias para el cierre del período', reescribe el bullet como 'Detecté y reporté inconsistencias en la presentación de producto en punto de venta, aplicando el mismo criterio de validación de estándares que requiere un proceso de cierre administrativo' — mismo hecho real, lenguaje que espeja la función de la oferta. No inventes el hecho, pero tampoco dejes el bullet en su forma original si hay una reformulación honesta disponible que lo acerque más al rol.
+TRANSFORMACIÓN ACTIVA DE BULLETS: no te limites a corregir verbos débiles — reencuadra activamente cada bullet hacia el lenguaje y los procesos de la oferta cuando exista una conexión honesta y verificable con la experiencia real del candidato. Antes de reencuadrar cualquier bullet, confirma que el hecho base ya existe literalmente en el CV original — el reencuadre cambia el LENGUAJE, nunca agrega una acción, responsabilidad o resultado que el candidato no realizó. Si no puedes señalar la oración exacta del CV original que da origen al bullet reencuadrado, no lo escribas.
+
+REGLA DE PRESERVACIÓN DE MÉTRICAS: cuando reencuadres un bullet hacia el lenguaje de la oferta, nunca elimines una cifra, cantidad, porcentaje o métrica que ya estaba presente en el CV original o en una versión previa del bullet. El reencuadre debe sumar precisión de lenguaje, nunca restar datos concretos que ya existían. Si el bullet original decía 'analicé métricas de venta semanales para ajustar el mix de productos, logrando un crecimiento sostenido durante 3 meses', el reencuadre debe conservar 'semanales' y '3 meses' aunque cambie el resto del lenguaje hacia términos de validación de datos.
 
 DETECCIÓN OBLIGATORIA DE BRECHAS: antes de escribir el CV, ordena cronológicamente todos los cargos por sus fechas de inicio y fin. Calcula la diferencia en meses entre el fin de un cargo y el inicio del siguiente. Si esa diferencia es de 3 meses o más, es una brecha laboral y DEBE tratarse según las reglas de BRECHAS LABORALES más abajo, exista o no una mención explícita de desempleo en el CV original. No asumas que no hay brecha solo porque el candidato no la mencionó — el cálculo de fechas es la única fuente de verdad.
 
