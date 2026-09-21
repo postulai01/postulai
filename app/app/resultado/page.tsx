@@ -228,7 +228,7 @@ export default function ResultadoPage() {
       const empresaFinal = match?.[1]?.trim() ?? null;
       const cargoFinal = match?.[2]?.trim() ?? null;
 
-      const { data: inserted } = await supabase.from("postulaciones").insert({
+      const { data: inserted, error: insertError } = await supabase.from("postulaciones").insert({
         user_id: session.user.id,
         tipo: data.modo ?? "adaptar",
         empresa: empresaFinal,
@@ -242,6 +242,7 @@ export default function ResultadoPage() {
         keywords_encontradas: data.keywords_encontradas ?? null,
         formato: formato,
       }).select("id").single();
+      if (insertError) console.error("[postulai] Error guardando postulación:", insertError);
       if (inserted) setPostulacionId(inserted.id);
     });
   }, [data]);
