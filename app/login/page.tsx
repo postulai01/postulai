@@ -35,7 +35,6 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
-      console.log("Login exitoso", data.session);
       window.location.href = "/app";
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error inesperado al iniciar sesión.");

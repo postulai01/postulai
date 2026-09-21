@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const SHEETS_URL =
-  "https://script.google.com/macros/s/AKfycbziB8y220lhLxDWFUthEZ2k1t_AiMOPhOI6dSpyawSCDaCLHLz6ufU46rpSbA9aAvP8/exec";
-
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const welcomeHtml = () => `<!DOCTYPE html>
@@ -68,15 +65,13 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const email = (body.email ?? "").trim().toLowerCase();
 
-  console.log("RESEND KEY EXISTS:", !!process.env.RESEND_API_KEY);
-
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Email inválido." }, { status: 400 });
   }
 
   // Guardar en Google Sheets
   try {
-    const sheetsRes = await fetch(SHEETS_URL, {
+    const sheetsRes = await fetch(process.env.GOOGLE_SHEETS_WEBHOOK_URL!, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
