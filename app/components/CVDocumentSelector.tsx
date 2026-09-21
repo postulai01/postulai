@@ -1,19 +1,30 @@
 import React from "react";
 import type { DocumentProps } from "@react-pdf/renderer";
-import CVDocumentMinimalista from "./CVDocumentMinimalista";
-import CVDocumentClasico from "./CVDocumentClasico";
+import CVDocumentTradicional from "./CVDocumentTradicional";
 import CVDocumentModerno from "./CVDocumentModerno";
-import CVDocumentProfesional from "./CVDocumentProfesional";
-import CVDocumentSimple from "./CVDocumentSimple";
+import CVDocumentEjecutivo from "./CVDocumentEjecutivo";
 
 type PdfElement = React.ReactElement<DocumentProps>;
 
-export function getCVDocument(formato: string, cvText: string): PdfElement {
+// Maps legacy formato values to the new 3-template system
+function resolveFormato(formato: string): "tradicional" | "moderno" | "ejecutivo" {
   switch (formato) {
-    case "clasico":     return <CVDocumentClasico cvText={cvText} />     as unknown as PdfElement;
-    case "moderno":     return <CVDocumentModerno cvText={cvText} />     as unknown as PdfElement;
-    case "profesional": return <CVDocumentProfesional cvText={cvText} /> as unknown as PdfElement;
-    case "simple":      return <CVDocumentSimple cvText={cvText} />      as unknown as PdfElement;
-    default:            return <CVDocumentMinimalista cvText={cvText} /> as unknown as PdfElement;
+    case "tradicional": return "tradicional";
+    case "ejecutivo":   return "ejecutivo";
+    case "clasico":     return "tradicional";
+    case "profesional": return "ejecutivo";
+    case "simple":
+    case "minimalista":
+    case "moderno":
+    default:            return "moderno";
+  }
+}
+
+export function getCVDocument(formato: string, cvText: string): PdfElement {
+  const resolved = resolveFormato(formato);
+  switch (resolved) {
+    case "tradicional": return <CVDocumentTradicional cvText={cvText} /> as unknown as PdfElement;
+    case "ejecutivo":   return <CVDocumentEjecutivo cvText={cvText} />  as unknown as PdfElement;
+    default:            return <CVDocumentModerno cvText={cvText} />    as unknown as PdfElement;
   }
 }

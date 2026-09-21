@@ -1,86 +1,83 @@
 import React from "react";
 import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
+import { parseCvText, splitJobLine, type Role } from "./cvParser";
 
-type Role = "name" | "title" | "contact" | "section" | "bullet" | "body" | "blank";
-interface ParsedLine { role: Role; text: string; }
+const ACCENT = "#1B4B5A";
 
-function parseCvText(cvText: string): ParsedLine[] {
-  const isSep = (t: string) => t.length > 1 && /^[%\-=_*~─━]+$/.test(t.trim());
-  const parsed: ParsedLine[] = [];
-  let state: "name" | "title" | "contact" | "body" = "name";
-
-  for (const raw of cvText.split("\n")) {
-    if (isSep(raw)) continue;
-    const t = raw.replace(/%%%/g, "").replace(/[─━]+/g, "").trim();
-    if (t === "") { parsed.push({ role: "blank", text: "" }); continue; }
-    const allCaps =
-      t.length > 1 && t.length < 60 && t === t.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(t);
-
-    if (state === "name") {
-      parsed.push({ role: "name", text: t }); state = "title";
-    } else if (state === "title") {
-      if (allCaps) { state = "body"; parsed.push({ role: "section", text: t }); }
-      else { parsed.push({ role: "title", text: t }); state = "contact"; }
-    } else if (state === "contact") {
-      if (allCaps) { state = "body"; parsed.push({ role: "section", text: t }); }
-      else { parsed.push({ role: "contact", text: t }); state = "body"; }
-    } else {
-      if (allCaps) parsed.push({ role: "section", text: t });
-      else if (/^•/.test(t)) parsed.push({ role: "bullet", text: t.replace(/^•\s*/, "") });
-      else parsed.push({ role: "body", text: t });
-    }
-  }
-  return parsed;
-}
-
-const styles = StyleSheet.create({
+const S = StyleSheet.create({
   page: {
     fontFamily: "Helvetica",
     fontSize: 10,
-    color: "#111111",
-    paddingTop: 40,
+    color: "#222222",
+    paddingTop: 42,
     paddingBottom: 50,
-    paddingLeft: 40,
-    paddingRight: 40,
+    paddingLeft: 48,
+    paddingRight: 48,
   },
   name: {
-    fontSize: 18,
     fontFamily: "Helvetica-Bold",
-    textAlign: "left",
-    color: "#000000",
+    fontSize: 22,
+    color: ACCENT,
     marginBottom: 3,
   },
   title: {
+    fontFamily: "Helvetica",
+    fontSize: 11,
+    color: "#666666",
+    marginBottom: 3,
+  },
+  contact: {
+    fontFamily: "Helvetica",
+    fontSize: 9,
+    color: "#555555",
+    marginBottom: 12,
+  },
+  sectionRow: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    marginTop: 14,
+    marginBottom: 6,
+  },
+  sectionBar: {
+    width: 3,
+    backgroundColor: ACCENT,
+    marginRight: 7,
+    borderRadius: 1,
+  },
+  sectionText: {
+    fontFamily: "Helvetica-Bold",
     fontSize: 10,
-    textAlign: "left",
+    textTransform: "uppercase",
+    color: "#111111",
+    paddingTop: 1,
+  },
+  jobRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 1,
+  },
+  jobLeft: {
+    fontFamily: "Helvetica-Bold",
+    fontSize: 10,
+    color: "#111111",
+    flex: 1,
+  },
+  jobRight: {
+    fontFamily: "Helvetica",
+    fontSize: 9,
+    color: "#666666",
+    textAlign: "right",
+  },
+  jobTitle: {
+    fontFamily: "Helvetica-Oblique",
+    fontSize: 10,
     color: "#444444",
     marginBottom: 2,
   },
-  contact: {
-    fontSize: 9,
-    textAlign: "left",
-    color: "#666666",
-    marginBottom: 6,
-  },
-  ruleBlack: {
-    borderBottomWidth: 0.75,
-    borderBottomColor: "#cccccc",
-    marginBottom: 8,
-  },
-  section: {
-    fontSize: 9.5,
-    fontFamily: "Helvetica-Bold",
-    textTransform: "uppercase",
-    color: "#000000",
-    borderBottomWidth: 0.75,
-    borderBottomColor: "#0a0a0a",
-    paddingBottom: 2,
-    marginTop: 12,
-    marginBottom: 5,
-  },
   body: {
-    fontSize: 9,
-    color: "#111111",
+    fontFamily: "Helvetica",
+    fontSize: 10,
+    color: "#222222",
     lineHeight: 1.45,
     marginBottom: 2,
   },
@@ -89,70 +86,89 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     paddingLeft: 8,
   },
-  bulletDot: {
-    fontSize: 9,
-    color: "#111111",
-    width: 10,
+  bulletDash: {
+    fontFamily: "Helvetica",
+    fontSize: 10,
+    color: "#444444",
+    width: 11,
   },
   bulletText: {
-    fontSize: 9,
-    color: "#111111",
+    fontFamily: "Helvetica",
+    fontSize: 10,
+    color: "#222222",
     lineHeight: 1.45,
     flex: 1,
   },
-  blank: {
-    height: 6,
-  },
+  blank: { height: 6 },
 });
 
 export default function CVDocumentModerno({ cvText }: { cvText: string }) {
   const lines = parseCvText(cvText);
-  let ruleDone = false;
   const elements: React.ReactNode[] = [];
+  let lastRole: Role | null = null;
 
   for (let i = 0; i < lines.length; i++) {
     const { role, text } = lines[i];
+
     switch (role) {
       case "name":
-        elements.push(<Text key={i} style={styles.name}>{text}</Text>);
+        elements.push(<Text key={i} style={S.name}>{text}</Text>);
         break;
+
       case "title":
-        elements.push(<Text key={i} style={styles.title}>{text}</Text>);
+        elements.push(<Text key={i} style={S.title}>{text}</Text>);
         break;
+
       case "contact":
-        elements.push(<Text key={i} style={styles.contact}>{text}</Text>);
-        if (!ruleDone) {
-          elements.push(<View key={`rule-${i}`} style={styles.ruleBlack} />);
-          ruleDone = true;
-        }
+        elements.push(<Text key={i} style={S.contact}>{text}</Text>);
         break;
+
       case "section":
-        if (!ruleDone) {
-          elements.push(<View key={`rule-${i}`} style={styles.ruleBlack} />);
-          ruleDone = true;
-        }
-        elements.push(<Text key={i} style={styles.section}>{text}</Text>);
-        break;
-      case "bullet":
         elements.push(
-          <View key={i} style={styles.bulletRow}>
-            <Text style={styles.bulletDot}>{"–"}</Text>
-            <Text style={styles.bulletText}>{text}</Text>
+          <View key={i} style={S.sectionRow}>
+            <View style={S.sectionBar} />
+            <Text style={S.sectionText}>{text}</Text>
           </View>
         );
         break;
-      case "body":
-        elements.push(<Text key={i} style={styles.body}>{text}</Text>);
+
+      case "body": {
+        const job = splitJobLine(text);
+        if (job) {
+          elements.push(
+            <View key={i} style={S.jobRow}>
+              <Text style={S.jobLeft}>{job.left}</Text>
+              <Text style={S.jobRight}>{job.right}</Text>
+            </View>
+          );
+        } else if (lastRole === "body" || lastRole === "section") {
+          elements.push(<Text key={i} style={S.jobTitle}>{text}</Text>);
+        } else {
+          elements.push(<Text key={i} style={S.body}>{text}</Text>);
+        }
         break;
+      }
+
+      case "bullet":
+        elements.push(
+          <View key={i} style={S.bulletRow}>
+            <Text style={S.bulletDash}>{"–"}</Text>
+            <Text style={S.bulletText}>{text}</Text>
+          </View>
+        );
+        break;
+
       case "blank":
-        elements.push(<View key={i} style={styles.blank} />);
+        elements.push(<View key={i} style={S.blank} />);
         break;
     }
+
+    if (role !== "blank") lastRole = role;
   }
 
   return (
     <Document>
-      <Page size="LETTER" style={styles.page}>
+      <Page size="A4" style={S.page}>
         {elements}
       </Page>
     </Document>

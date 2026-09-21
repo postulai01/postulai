@@ -207,7 +207,7 @@ export default function ResultadoPage() {
   const [data, setData] = useState<ResultData | null>(null);
   const [downloading, setDownloading] = useState<"cv-pdf" | "cv-word" | "carta-pdf" | "carta-word" | null>(null);
   const [cambiosExpanded, setCambiosExpanded] = useState(false);
-  const [formato, setFormato] = useState<string>("minimalista");
+  const [formato, setFormato] = useState<string>("moderno");
   const [postulacionId, setPostulacionId] = useState<string | null>(null);
   const savedRef = useRef(false);
 
@@ -463,10 +463,9 @@ export default function ResultadoPage() {
                   </div>
                 </div>
                 <div className="px-5 pt-3 pb-3 flex gap-1.5 overflow-hidden border-b border-[#1e1e1e]">
-                  {(["minimalista", "clasico", "moderno", "profesional", "simple"] as const).map(f => {
+                  {(["tradicional", "moderno", "ejecutivo"] as const).map(f => {
                     const label: Record<string, string> = {
-                      minimalista: "Minimalista", clasico: "Clásico", moderno: "Moderno",
-                      profesional: "Profesional", simple: "Simple",
+                      tradicional: "Tradicional", moderno: "Moderno", ejecutivo: "Ejecutivo",
                     };
                     return (
                       <button

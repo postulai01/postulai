@@ -11,6 +11,7 @@ export function parseCvText(cvText: string): ParsedLine[] {
     const t = raw.replace(/%%%/g, "").replace(/[─━]+/g, "").replace(/—{2,}/g, "").replace(/\s+/g, " ").trim();
     if (t === "") { raw_parsed.push({ role: "blank", text: "" }); continue; }
 
+    // Lines with " — " followed by digits are job entries, never section headers
     const hasJobDate = /—\s*.+\d/.test(t);
     const allCaps = !hasJobDate && t.length > 1 && t.length < 60 && t === t.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(t);
 
@@ -29,6 +30,7 @@ export function parseCvText(cvText: string): ParsedLine[] {
   }
 
   // Merge consecutive title/contact lines into one contact line separated by " · "
+  // e.g. "Móvil: +56 9 ..." and "email@..." → "Móvil: +56 9 ... · email@..."
   const merged: ParsedLine[] = [];
   for (const line of raw_parsed) {
     if ((line.role === "title" || line.role === "contact") && merged.length > 0) {
@@ -41,4 +43,14 @@ export function parseCvText(cvText: string): ParsedLine[] {
     merged.push(line);
   }
   return merged;
+}
+
+// Splits "Company Name — 05/2020 – Presente" into { left, right }
+// Returns null if line doesn't look like a job entry
+export function splitJobLine(text: string): { left: string; right: string } | null {
+  const match = text.match(/^(.+?)\s*—\s*(.+)$/);
+  if (!match) return null;
+  const right = match[2].trim();
+  if (!/\d/.test(right)) return null;
+  return { left: match[1].trim(), right };
 }

@@ -215,7 +215,7 @@ export default function HistorialIdPage() {
   const [notFound, setNotFound] = useState(false);
   const [downloading, setDownloading] = useState<"cv-pdf" | "cv-word" | "carta-pdf" | "carta-word" | null>(null);
   const [cambiosExpanded, setCambiosExpanded] = useState(false);
-  const [formato, setFormato] = useState<string>("minimalista");
+  const [formato, setFormato] = useState<string>("moderno");
   const loadedRef = useRef(false);
 
   useEffect(() => {
@@ -230,7 +230,10 @@ export default function HistorialIdPage() {
         .single();
       if (error || !data || data.user_id !== session.user.id) { setNotFound(true); return; }
       setPost(data as Postulacion);
-      setFormato(data.formato || "minimalista");
+      // Map legacy formato values to the new 3-template system
+      const legacyMap: Record<string, string> = { clasico: "tradicional", profesional: "ejecutivo", simple: "moderno", minimalista: "moderno" };
+      const savedFormato = data.formato || "moderno";
+      setFormato(legacyMap[savedFormato] ?? savedFormato);
     });
   }, [id]);
 
@@ -446,10 +449,9 @@ export default function HistorialIdPage() {
                   </div>
                 </div>
                 <div className="px-5 pt-3 pb-3 flex gap-1.5 overflow-hidden border-b border-[#1e1e1e]">
-                  {(["minimalista", "clasico", "moderno", "profesional", "simple"] as const).map(f => {
+                  {(["tradicional", "moderno", "ejecutivo"] as const).map(f => {
                     const label: Record<string, string> = {
-                      minimalista: "Minimalista", clasico: "Clásico", moderno: "Moderno",
-                      profesional: "Profesional", simple: "Simple",
+                      tradicional: "Tradicional", moderno: "Moderno", ejecutivo: "Ejecutivo",
                     };
                     return (
                       <button
