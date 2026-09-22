@@ -4,12 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-export type HistorialEntry = {
-  titulo: string;
-  fecha: string;
-  tipo: "adaptado" | "creado";
-};
-
 type PostulacionRow = {
   id: string;
   tipo: string;
@@ -19,8 +13,6 @@ type PostulacionRow = {
   created_at: string;
   anclado: boolean;
 };
-
-export function saveHistorialEntry(_entry: HistorialEntry) {}
 
 function truncateWords(text: string, maxChars: number): string {
   if (text.length <= maxChars) return text;

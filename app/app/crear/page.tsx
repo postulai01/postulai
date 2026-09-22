@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Sidebar, { saveHistorialEntry } from "@/app/components/Sidebar";
+import Sidebar from "@/app/components/Sidebar";
 
 const inputClass =
   "w-full bg-[#111] border border-[#222] rounded-xl px-4 py-3.5 text-base text-white placeholder-white/20 focus:outline-none focus:border-white/20 transition-colors duration-150";
@@ -234,7 +234,6 @@ export default function CrearPage() {
         data.titulo_postulacion ??
         oferta.split("\n").find((l) => l.trim().length > 3)?.trim().slice(0, 60) ??
         "CV profesional";
-      saveHistorialEntry({ titulo, fecha: new Date().toISOString(), tipo: "creado" });
       router.push("/app/resultado");
     } catch {
       setError("Algo salió mal, intenta de nuevo.");
