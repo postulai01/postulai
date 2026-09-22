@@ -352,7 +352,7 @@ export default function Sidebar() {
                 onClick={async () => {
                   setIsAccountOpen(false);
                   await supabase.auth.signOut();
-                  sessionStorage.removeItem("postulai_historial");
+                  sessionStorage.removeItem("postulai_resultado");
                   setUserName(null);
                   setUserEmail(null);
                   setDbHistorial([]);
