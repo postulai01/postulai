@@ -88,11 +88,24 @@ function buildUserMessage(caso: Caso): string {
 function contarPalabrasPerfil(cvText: string): number {
   const lines = cvText.split("\n");
   let inPerfil = false;
+  let skippedFirstSep = false;
   const collected: string[] = [];
+
+  const isSepOnly = (l: string) => l.trim().length > 1 && /^[─━—\-=_*~%]+$/.test(l.trim());
+  const isNextSectionHeader = (l: string) => {
+    const t = l.replace(/[—─━\-=_*~%\s]+$/, "").trim();
+    return t.length > 1 && t.length < 60 && t === t.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(t);
+  };
+
   for (const line of lines) {
     if (/PERFIL\s+PROFESIONAL/i.test(line)) { inPerfil = true; continue; }
-    if (inPerfil && /^[A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ\s]+[—─━\-]{3,}/.test(line)) break;
-    if (inPerfil) collected.push(line);
+    if (!inPerfil) continue;
+    if (!skippedFirstSep) {
+      if (isSepOnly(line)) { skippedFirstSep = true; continue; }
+      skippedFirstSep = true;
+    }
+    if (isNextSectionHeader(line)) break;
+    collected.push(line);
   }
   return collected.join(" ").trim().split(/\s+/).filter((w) => w.length > 0).length;
 }
