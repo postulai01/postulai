@@ -285,12 +285,36 @@ function calcularMatch(keywords: string[], cvText: string): { keywords_totales: 
 function extraerPerfilProfesional(cvText: string): string | null {
   const lines = cvText.split("\n");
   let inPerfil = false;
+  let skippedFirstSep = false;
   const collected: string[] = [];
+
+  // A line that is purely separator characters (em-dash, box-drawing, hyphens, etc.)
+  const isSepOnly = (l: string) => l.trim().length > 1 && /^[─━—\-=_*~%]+$/.test(l.trim());
+
+  // Detects the next section header in BOTH formats:
+  //   new: "EXPERIENCIA LABORAL"              (all-caps alone)
+  //   old: "EXPERIENCIA LABORAL ———————————"  (all-caps + trailing separators)
+  const isNextSectionHeader = (l: string) => {
+    const t = l.replace(/[—─━\-=_*~%\s]+$/, "").trim(); // strip trailing separators
+    return t.length > 1 && t.length < 60 && t === t.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(t);
+  };
+
   for (const line of lines) {
     if (/PERFIL\s+PROFESIONAL/i.test(line)) { inPerfil = true; continue; }
-    if (inPerfil && /^[A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ\s]+[—─━\-]{3,}/.test(line)) break;
-    if (inPerfil) collected.push(line);
+    if (!inPerfil) continue;
+
+    // Skip the first separator line that follows the section title (new format)
+    if (!skippedFirstSep) {
+      if (isSepOnly(line)) { skippedFirstSep = true; continue; }
+      skippedFirstSep = true; // no separator after title — content starts immediately
+    }
+
+    // Stop as soon as we reach the next section header (handles both formats)
+    if (isNextSectionHeader(line)) break;
+
+    collected.push(line);
   }
+
   if (!inPerfil) return null;
   return collected.join("\n").trim();
 }
@@ -408,7 +432,14 @@ export async function POST(request: NextRequest) {
       const perfilOriginal = extraerPerfilProfesional(result.cv_adaptado);
       if (perfilOriginal) {
         const palabrasPerfil = perfilOriginal.trim().split(/\s+/).filter(Boolean).length;
-        if (palabrasPerfil > 100) {
+        if (palabrasPerfil > 300) {
+          // Extraction failed — captured far more than a real profile (≤100 words).
+          // Abort to protect the full CV; the profile will simply not be trimmed.
+          console.error(
+            `[postulai] extraerPerfilProfesional capturó ${palabrasPerfil} palabras — ` +
+            `extracción fallida, se omite el recorte para no destruir el CV.`
+          );
+        } else if (palabrasPerfil > 100) {
           const trimResponse = await client.messages.create({
             model: "claude-sonnet-4-6",
             max_tokens: 300,
