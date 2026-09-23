@@ -224,6 +224,11 @@ export default function CrearPage() {
         }),
       });
       const data = await res.json();
+      if (res.status === 403 && data.error === "nombre_no_coincide") {
+        setError(data.message);
+        setLoading(false);
+        return;
+      }
       if (!res.ok || data.error) throw new Error(data.error || "Error desconocido");
 
       sessionStorage.setItem(

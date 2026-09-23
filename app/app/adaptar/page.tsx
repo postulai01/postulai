@@ -87,6 +87,11 @@ export default function AdaptarPage() {
         setLoading(false);
         return;
       }
+      if (res.status === 403 && data.error === "nombre_no_coincide") {
+        setError(data.message);
+        setLoading(false);
+        return;
+      }
       if (!res.ok || data.error) throw new Error(data.error || "Error desconocido");
 
       sessionStorage.setItem(

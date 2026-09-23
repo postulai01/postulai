@@ -319,6 +319,28 @@ function extraerPerfilProfesional(cvText: string): string | null {
   return collected.join("\n").trim();
 }
 
+function normalizarNombre(nombre: string): string[] {
+  return nombre
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z\s]/g, "")
+    .trim()
+    .split(/\s+/)
+    .filter(t => t.length > 1);
+}
+
+function nombresCoinciden(referencia: string, candidato: string): boolean {
+  const refTokens = normalizarNombre(referencia);
+  const candTokens = normalizarNombre(candidato);
+  if (refTokens.length === 0 || candTokens.length === 0) return true;
+  // Apellidos = últimos tokens del nombre (convención chilena: nombre(s) apellido1 apellido2)
+  // Para nombres de 2 tokens: último 1; para 3+ tokens: últimos 2
+  const numApellidos = Math.min(2, Math.max(1, refTokens.length - 1));
+  const refApellidos = refTokens.slice(-numApellidos);
+  return refApellidos.some(a => candTokens.includes(a));
+}
+
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
@@ -374,12 +396,13 @@ export async function POST(request: NextRequest) {
     }
 
     let isIlimitado = false;
+    const { data: usage } = await supabase
+      .from("user_usage")
+      .select("usos_gratis_restantes, ilimitado, nombre_referencia")
+      .eq("user_id", user.id)
+      .single();
+
     if (modo === "adaptar") {
-      const { data: usage } = await supabase
-        .from("user_usage")
-        .select("usos_gratis_restantes, ilimitado")
-        .eq("user_id", user.id)
-        .single();
       isIlimitado = usage?.ilimitado === true;
       if (!isIlimitado && usage !== null && usage.usos_gratis_restantes <= 0) {
         return NextResponse.json({ error: "sin_usos" }, { status: 403 });
@@ -453,6 +476,35 @@ export async function POST(request: NextRequest) {
             ? trimResponse.content[0].text.trim()
             : perfilOriginal;
           result.cv_adaptado = result.cv_adaptado.replace(perfilOriginal, perfilRecortado);
+        }
+      }
+    }
+
+    // ── verificación de identidad ─────────────────────────────────────────
+    if (typeof result.cv_adaptado === "string") {
+      const nombreCandidato = (result.cv_adaptado as string)
+        .split("\n")
+        .find((l: string) => l.trim().length > 0)
+        ?.trim() ?? "";
+      const nombreRef: string | null = usage?.nombre_referencia ?? null;
+
+      if (nombreCandidato) {
+        if (!nombreRef) {
+          if (usage !== null) {
+            await supabase
+              .from("user_usage")
+              .update({ nombre_referencia: nombreCandidato })
+              .eq("user_id", user.id);
+          } else {
+            await supabase
+              .from("user_usage")
+              .insert({ user_id: user.id, nombre_referencia: nombreCandidato, usos_gratis_restantes: 5 });
+          }
+        } else if (!nombresCoinciden(nombreRef, nombreCandidato)) {
+          return NextResponse.json({
+            error: "nombre_no_coincide",
+            message: "Esta cuenta está registrada para uso personal de un solo candidato. Si este CV es para otra persona, esa persona debe crear su propia cuenta. Si crees que esto es un error (por ejemplo, tu nombre registrado no coincide con cómo firmas tus CVs), puedes actualizarlo en tu perfil.",
+          }, { status: 403 });
         }
       }
     }
