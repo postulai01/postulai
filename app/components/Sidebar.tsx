@@ -77,9 +77,6 @@ export default function Sidebar() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [ilimitado, setIlimitado] = useState(false);
   const [nombreRef, setNombreRef] = useState<string | null>(null);
-  const [editandoNombre, setEditandoNombre] = useState(false);
-  const [nombreInput, setNombreInput] = useState("");
-  const [guardandoNombre, setGuardandoNombre] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
@@ -354,69 +351,15 @@ export default function Sidebar() {
                 <span className="text-[11px] text-[#555]">contacto@postulai.cl</span>
               </div>
               <div className="border-t border-[#2a2a2a] mt-1.5 mb-1" />
-              {editandoNombre ? (
-                <div className="px-4 py-2 flex flex-col gap-2">
-                  <p className="text-[10px] text-[#555] leading-snug">
-                    Este nombre verifica que la cuenta sea de uso personal.
-                  </p>
-                  <input
-                    type="text"
-                    value={nombreInput}
-                    onChange={e => setNombreInput(e.target.value)}
-                    className="w-full bg-[#0d0d0d] border border-[#333] rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-white/30"
-                    placeholder="Tu nombre completo"
-                    autoFocus
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      disabled={guardandoNombre || nombreInput.trim().length < 2}
-                      onClick={async () => {
-                        setGuardandoNombre(true);
-                        try {
-                          const res = await fetch("/api/perfil", {
-                            method: "PATCH",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ nombre_referencia: nombreInput.trim() }),
-                          });
-                          if (res.ok) {
-                            setNombreRef(nombreInput.trim());
-                            setEditandoNombre(false);
-                          }
-                        } finally {
-                          setGuardandoNombre(false);
-                        }
-                      }}
-                      className="flex-1 py-1.5 bg-white text-black text-xs font-semibold rounded-lg hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                    >
-                      {guardandoNombre ? "Guardando…" : "Guardar"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setEditandoNombre(false); setNombreInput(nombreRef ?? ""); }}
-                      className="flex-1 py-1.5 text-xs text-[#888] border border-[#333] rounded-lg hover:text-white hover:border-[#555] transition-colors"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between px-4 py-2">
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-xs text-[#888]">Nombre registrado</span>
-                    <span className="text-[11px] text-[#555] truncate max-w-[150px]">
-                      {nombreRef ?? "No definido aún"}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => { setEditandoNombre(true); setNombreInput(nombreRef ?? ""); }}
-                    className="text-[11px] text-[#555] hover:text-white transition-colors"
-                  >
-                    Editar
-                  </button>
-                </div>
-              )}
+              <div className="px-4 py-2 flex flex-col gap-1">
+                <span className="text-xs text-[#888]">Usuario registrado</span>
+                <span className="text-[11px] text-[#555] truncate">
+                  {nombreRef ?? "No definido aún"}
+                </span>
+                <p className="text-[10px] text-[#444] leading-snug mt-0.5">
+                  ¿Este nombre no es correcto? Escríbenos a contacto@postulai.cl
+                </p>
+              </div>
               <div className="border-t border-[#2a2a2a] mt-1.5 mb-1" />
               <button
                 type="button"
