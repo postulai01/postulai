@@ -341,6 +341,72 @@ function nombresCoinciden(referencia: string, candidato: string): boolean {
   return refApellidos.some(a => candTokens.includes(a));
 }
 
+// ── red de seguridad anti-fabricación: Conocimientos en desarrollo ────────────
+
+function normalizarParaComparar(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Prefijos de marca que se ignoran en el fallback para que "Microsoft Excel"
+// pase si el CV dice solo "Excel".
+const PREFIJOS_MARCA = new Set(["microsoft", "google", "adobe"]);
+
+function herramientaTieneRespaldo(herramienta: string, fuenteNorm: string): boolean {
+  const hNorm = normalizarParaComparar(herramienta);
+  if (!hNorm) return true;
+  if (fuenteNorm.includes(hNorm)) return true;
+  // Fallback: TODAS las palabras significativas (≥4 chars, excluyendo prefijos de marca)
+  // deben aparecer como palabra completa en la fuente.
+  // Exige coincidencia total para evitar que "procesos" de "Automatización de procesos"
+  // haga match con un CV que dice "optimización de procesos comerciales".
+  const palabras = hNorm.split(" ").filter(w => w.length >= 4 && !PREFIJOS_MARCA.has(w));
+  if (palabras.length === 0) return false; // solo prefijo de marca sin producto → rechazar
+  return palabras.every(w => new RegExp(`\\b${w}\\b`).test(fuenteNorm));
+}
+
+function limpiarConocimientosEnDesarrollo(cvText: string, fuenteOriginal: string): string {
+  const fuenteNorm = normalizarParaComparar(fuenteOriginal);
+  const lines = cvText.split("\n");
+  const out: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!/^Conocimientos en desarrollo\s*:/i.test(trimmed)) {
+      out.push(line);
+      continue;
+    }
+
+    const colonIdx = trimmed.indexOf(":");
+    const toolsPart = trimmed.slice(colonIdx + 1).trim();
+    const tools = toolsPart
+      .split(/\s*·\s*|\s*,\s*/)
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
+
+    const validas = tools.filter(tool => {
+      const ok = herramientaTieneRespaldo(tool, fuenteNorm);
+      if (!ok) {
+        console.warn(`[postulai] Conocimientos en desarrollo: eliminando "${tool}" — sin respaldo en CV original`);
+      }
+      return ok;
+    });
+
+    if (validas.length > 0) {
+      const indent = line.slice(0, line.length - trimmed.length);
+      out.push(`${indent}Conocimientos en desarrollo: ${validas.join(" · ")}`);
+    }
+    // Si no quedan herramientas válidas, la línea se omite completamente
+  }
+
+  return out.join("\n");
+}
+
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
@@ -431,9 +497,9 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
+      model: "claude-sonnet-5",
       max_tokens: 8000,
-      temperature: 0.3,
+      thinking: { type: "disabled" },
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
     });
@@ -464,9 +530,9 @@ export async function POST(request: NextRequest) {
           );
         } else if (palabrasPerfil > 100) {
           const trimResponse = await client.messages.create({
-            model: "claude-sonnet-4-6",
+            model: "claude-sonnet-5",
             max_tokens: 300,
-            temperature: 0,
+            thinking: { type: "disabled" },
             messages: [{
               role: "user",
               content: `Recorta el siguiente texto a máximo 100 palabras sin perder la idea principal. Devuelve ÚNICAMENTE el texto recortado, sin comillas, sin explicaciones, sin JSON.\n\nTEXTO:\n${perfilOriginal}`,
@@ -478,6 +544,19 @@ export async function POST(request: NextRequest) {
           result.cv_adaptado = result.cv_adaptado.replace(perfilOriginal, perfilRecortado);
         }
       }
+    }
+
+    // ── filtro anti-fabricación: Conocimientos en desarrollo ─────────────
+    if (typeof result.cv_adaptado === "string") {
+      const fuenteOriginal = modo === "adaptar"
+        ? (typeof cv === "string" ? cv : "")
+        : (typeof datos_personales === "string"
+            ? datos_personales
+            : JSON.stringify(datos_personales ?? ""));
+      result.cv_adaptado = limpiarConocimientosEnDesarrollo(
+        result.cv_adaptado as string,
+        fuenteOriginal
+      );
     }
 
     // ── verificación de identidad ─────────────────────────────────────────

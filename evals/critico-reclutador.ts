@@ -10,7 +10,7 @@
  *
  * Flags:
  *   --template=<moderno|tradicional|ejecutivo>  Evalúa solo ese template (default: los 3)
- *   --modelo-completo                           Usa claude-sonnet-4-6 para el crítico (default: haiku)
+ *   --modelo-completo                           Usa claude-sonnet-5 para el crítico (default: haiku)
  *   --forzar-regen                              Fuerza regenerar cv_adaptado aunque SYSTEM_PROMPT no cambió
  */
 
@@ -24,13 +24,13 @@ import { pdf } from "@react-pdf/renderer";
 // ─── modelos y costos ─────────────────────────────────────────────────────────
 
 const MODELO_ITERACION = "claude-haiku-4-5-20251001";
-const MODELO_COMPLETO = "claude-sonnet-4-6";
+const MODELO_COMPLETO = "claude-sonnet-5";
 
 // Precio por millón de tokens [input, output]
 const PRECIOS: Record<string, [number, number]> = {
   [MODELO_ITERACION]: [0.8, 4],
-  [MODELO_COMPLETO]: [3, 15],
-  "claude-sonnet-4-6-regen": [3, 15], // adaptación siempre usa sonnet
+  [MODELO_COMPLETO]: [2, 10],
+  "claude-sonnet-5-regen": [2, 10], // adaptación siempre usa sonnet
 };
 
 function estimarCosto(
@@ -44,7 +44,7 @@ function estimarCosto(
 
   // Adaptación (siempre sonnet): ~7000 input, ~2000 output
   const costoRegen = regenAdaptacion
-    ? (7000 * PRECIOS["claude-sonnet-4-6-regen"][0] + 2000 * PRECIOS["claude-sonnet-4-6-regen"][1]) / 1_000_000
+    ? (7000 * PRECIOS["claude-sonnet-5-regen"][0] + 2000 * PRECIOS["claude-sonnet-5-regen"][1]) / 1_000_000
     : 0;
 
   const total = costoCritico + costoRegen;
@@ -148,11 +148,12 @@ async function generateAdaptacion(
   caso: string,
   resultadosDir: string
 ): Promise<string> {
-  console.log(`  🔄  Generando nueva adaptación con claude-sonnet-4-6...`);
+  console.log(`  🔄  Generando nueva adaptación con claude-sonnet-5...`);
 
   const res = await client.messages.create({
     model: MODELO_COMPLETO,
     max_tokens: 4000,
+    thinking: { type: "disabled" },
     system: systemPrompt,
     messages: [
       {
@@ -279,6 +280,8 @@ async function criticarTemplate(
   const res = await client.messages.create({
     model: modelo,
     max_tokens: 8000,
+    // thinking:disabled requerido para sonnet-5 (adaptive thinking activado por defecto)
+    ...(modelo === MODELO_COMPLETO ? { thinking: { type: "disabled" as const } } : {}),
     system: systemPrompt,
     messages: [{ role: "user", content: userContent }],
   });

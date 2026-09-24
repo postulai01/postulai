@@ -171,9 +171,9 @@ async function main() {
     for (let intento = 1; intento <= 2 && resultado === null; intento++) {
       try {
         const res = await client.messages.create({
-          model: "claude-sonnet-4-6",
+          model: "claude-sonnet-5",
           max_tokens: 8000,
-          temperature: 0.3,
+          thinking: { type: "disabled" },
           system: systemPrompt,
           messages: [{ role: "user", content: buildUserMessage(caso) }],
         });
