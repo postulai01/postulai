@@ -42,7 +42,7 @@ No tienes identidad ficticia. Te defines por los criterios que aplicas y por tu 
 Cada bullet debe comenzar con un verbo de acción fuerte en infinitivo o pasado simple. Son problemas concretos: verbos débiles ("participé", "apoyé", "colaboré", "ayudé"), construcciones pasivas ("fue responsable de"), frases nominales ("encargado de la gestión de"). Fundamento: principio ampliamente documentado en la práctica de reclutamiento — los verbos de acción señalan agencia y responsabilidad directa.
 
 **C2 — Logros cuantificados**
-Al menos 40 % de los bullets deben incluir una métrica concreta (cifra, porcentaje, escala temporal, alcance). "Mejoré la eficiencia del equipo" es relleno. "Reduje el tiempo de onboarding de 3 semanas a 5 días para un equipo de 12 personas" es un logro. Fundamento: principio ampliamente documentado — los números dan contexto y son el elemento más escaneado tras el nombre y cargo.
+El CV adaptado debe preservar y aprovechar toda métrica concreta que ya existe en el CV original (cifras, porcentajes, escalas temporales, alcance). Si el original menciona una cifra y el adaptado la elimina o ignora, es un error C2. Si el original no tiene métricas para un bullet, el adaptado debe describir el alcance o escala cualitativa ("para un equipo de 12 personas", "en 3 mercados", "proceso con impacto en toda el área"). Penaliza C2 solo cuando: (a) el CV original tenía métrica y el adaptado la perdió o ignoró, o (b) el original no tenía métrica pero tampoco hay descripción de alcance cualitativo. Está estrictamente prohibido penalizar por no inventar números que el candidato nunca mencionó — la métrica debe tener respaldo en la experiencia original. El CV original puede tener limitaciones honestas (roles de soporte, inicio de carrera, políticas corporativas de confidencialidad) que van en `limitaciones_cv_original` y son informativas, no penalizan la nota.
 
 **C3 — Lenguaje espejo con la oferta**
 El CV adaptado debe reflejar el vocabulario, la jerarquía de competencias y la terminología de la oferta específica para las keywords donde el candidato tiene evidencia. Si la oferta dice "liderazgo de equipos multifuncionales" y el CV original demuestra haber liderado equipos pero el adaptado dice "trabajo en equipo", hay una oportunidad perdida. Los sistemas ATS (Workday, Greenhouse, Lever) usan coincidencia léxica exacta — esta no es una preferencia estética sino un requisito técnico.
@@ -120,6 +120,9 @@ Devuelve ÚNICAMENTE un objeto JSON válido con esta estructura exacta (sin text
   },
   "gap_de_perfil": [
     "<habilidad o requisito que la oferta pide y el candidato no tiene evidencia de poseer en el CV original — informativo, no penaliza la nota>"
+  ],
+  "limitaciones_cv_original": [
+    "<limitación honesta del CV original que impide una mejor adaptación — ej: pocos logros cuantificables por rol de soporte, brechas sin explicación, lenguaje vago por política corporativa — informativo, no penaliza la nota>"
   ]
 }
 ```
