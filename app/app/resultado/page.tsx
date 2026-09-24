@@ -36,11 +36,8 @@ function HeroBlock({ data }: { data: ResultData }) {
   // Post-migración: usa integradas/no_usadas/gap. Pre-migración: usa keywords_encontradas/totales.
   const isNewMetrics = Array.isArray(data.integradas);
   const numIntegradas = isNewMetrics ? data.integradas!.length : (data.keywords_encontradas ?? 0);
-  const numEvidencia = isNewMetrics
-    ? data.integradas!.length + (data.no_usadas_con_evidencia?.length ?? 0)
-    : (data.keywords_totales ?? 0);
-  const showKeywordsCircle = isNewMetrics ? numEvidencia > 0 : hasKeywords;
-  const dashOffset = CIRCLE_C * (1 - (showKeywordsCircle && numEvidencia > 0 ? numIntegradas / numEvidencia : 0));
+  const kvTotal = data.keywords_totales ?? 0;
+  const dashOffset = CIRCLE_C * (1 - (hasKeywords && kvTotal > 0 ? numIntegradas / kvTotal : 0));
 
   const subtituloLegacy = cargo && empresa
     ? `Coincidencias con la oferta de ${cargo} en ${empresa}`
@@ -56,7 +53,7 @@ function HeroBlock({ data }: { data: ResultData }) {
         style={{ border: "0.5px solid rgba(255,255,255,0.05)" }} />
 
       <div className="relative z-10 px-8 py-7 flex flex-col sm:flex-row gap-8 items-start sm:items-center">
-        {showKeywordsCircle ? (
+        {hasKeywords ? (
           <div className="shrink-0">
             <svg width="120" height="120" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r={CIRCLE_R} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="7" />
@@ -64,7 +61,7 @@ function HeroBlock({ data }: { data: ResultData }) {
                 strokeDasharray={CIRCLE_C} strokeDashoffset={dashOffset} transform="rotate(-90 50 50)"
                 style={{ transition: "stroke-dashoffset 0.8s ease" }} />
               <text x="50" y="45" textAnchor="middle" fill="white" fontSize="22" fontWeight="900" fontFamily="inherit">{numIntegradas}</text>
-              <text x="50" y="62" textAnchor="middle" fill="rgba(255,255,255,0.38)" fontSize="10" fontFamily="inherit">de {numEvidencia}</text>
+              <text x="50" y="62" textAnchor="middle" fill="rgba(255,255,255,0.38)" fontSize="10" fontFamily="inherit">de {kvTotal}</text>
             </svg>
           </div>
         ) : (
@@ -76,19 +73,19 @@ function HeroBlock({ data }: { data: ResultData }) {
         )}
 
         <div className="flex-1 flex flex-col gap-4">
-          {showKeywordsCircle ? (
+          {hasKeywords ? (
             <>
               <div>
                 <h2 className="text-[28px] sm:text-[34px] leading-tight text-white" style={{ fontWeight: 900 }}>
                   {isNewMetrics ? (
-                    <>Aprovechaste <span className="text-[#22c55e]">{numIntegradas} de {numEvidencia}</span> palabras clave que respalda tu experiencia</>
+                    <>Tu CV incluye <span className="text-[#22c55e]">{numIntegradas} de las {kvTotal}</span> palabras clave de la oferta</>
                   ) : (
-                    <>Tu CV cubre <span className="text-[#22c55e]">{numIntegradas} de {numEvidencia}</span> palabras clave</>
+                    <>Tu CV cubre <span className="text-[#22c55e]">{numIntegradas} de {kvTotal}</span> palabras clave</>
                   )}
                 </h2>
                 <p className="mt-1.5 text-sm text-white/50">
                   {isNewMetrics
-                    ? `La oferta menciona ${data.keywords_totales ?? numEvidencia} palabras clave en total`
+                    ? "Todo lo que dice tu CV lo puedes respaldar en una entrevista."
                     : subtituloLegacy}
                 </p>
               </div>
@@ -473,23 +470,6 @@ export default function ResultadoPage() {
             {/* Hero */}
             <HeroBlock data={data} />
 
-            {/* Gap block */}
-            {Array.isArray(data.gap) && data.gap.length > 0 && (
-              <div className="flex flex-col gap-3">
-                <div>
-                  <p className="text-xs font-bold text-white/35 uppercase tracking-widest">Requisitos que podrías desarrollar</p>
-                  <p className="text-xs text-white/40 mt-1">La oferta pide estas habilidades que tu CV no incluye actualmente</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {data.gap.map((kw, i) => (
-                    <span key={i} className="px-3 py-1 text-xs text-white/55 bg-white/[0.04] border border-white/[0.1] rounded-full">
-                      {kw}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Document cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
@@ -618,20 +598,44 @@ export default function ResultadoPage() {
               </div>
             )}
 
-            {/* Sugerencias */}
+            {/* Para llegar aún más preparado */}
             {data.sugerencias.length > 0 && (
               <div className="flex flex-col gap-4">
-                <p className="text-xs font-bold text-white/35 uppercase tracking-widest">Sugerencias</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {data.sugerencias.map((s, i) => (
-                    <div key={i} className="relative rounded-2xl px-5 pt-10 pb-6 bg-[#111] border border-[#222]">
-                      <span className="absolute top-4 left-4 w-6 h-6 rounded-full bg-[#22c55e]/15 border border-[#22c55e]/30 flex items-center justify-center text-[10px] font-bold text-[#22c55e] leading-none">
-                        {i + 1}
-                      </span>
-                      <p className="text-sm text-white/75 leading-relaxed">{s}</p>
-                    </div>
-                  ))}
+                <div>
+                  <p className="text-xs font-bold text-white/35 uppercase tracking-widest">Para llegar aún más preparado</p>
+                  <p className="text-xs text-white/40 mt-1">Es normal no cumplir todos los puntos de una oferta; varios suelen ser deseables.</p>
                 </div>
+                <div className="flex flex-col">
+                  {data.sugerencias.map((s, i) => {
+                    const ci = s.indexOf(":");
+                    if (ci > 0 && ci < s.length - 1) {
+                      return (
+                        <div key={i} className="py-2.5 border-b border-white/[0.06] last:border-0">
+                          <span className="text-sm font-semibold text-white/90">{s.slice(0, ci)}:</span>
+                          <span className="text-sm text-white/60"> {s.slice(ci + 1).trim()}</span>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div key={i} className="py-2.5 border-b border-white/[0.06] last:border-0">
+                        <span className="text-sm text-white/60">{s}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                {Array.isArray(data.gap) && data.gap.length > 0 && (
+                  <div className="flex flex-col gap-2 pt-1">
+                    <p className="text-xs font-semibold text-white/40">Áreas que puedes desarrollar</p>
+                    <div className="flex flex-wrap gap-2">
+                      {data.gap.map((kw, i) => (
+                        <span key={i} className="px-3 py-1 text-xs text-white/50 bg-white/[0.04] border border-white/[0.08] rounded-full">
+                          {kw}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-xs text-white/30">Si ya tienes experiencia en alguna, agrégala a tu CV original y vuelve a adaptarlo.</p>
+                  </div>
+                )}
               </div>
             )}
 
