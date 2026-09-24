@@ -16,6 +16,9 @@ interface ResultData {
   modo?: string;
   keywords_totales?: number;
   keywords_encontradas?: number;
+  integradas?: string[];
+  no_usadas_con_evidencia?: string[];
+  gap?: string[];
   formato?: string;
 }
 
@@ -25,13 +28,25 @@ const ATS_CHECKS = ["Formato de columna única", "Sin tablas ni gráficos", "Má
 
 // ── Hero ───────────────────────────────────────────────────────────────
 function HeroBlock({ data }: { data: ResultData }) {
-  const hasKeywords = (data.keywords_totales ?? 0) > 0;
-  const found = data.keywords_encontradas ?? 0;
-  const total = data.keywords_totales ?? 0;
-  const dashOffset = CIRCLE_C * (1 - (hasKeywords ? found / total : 0));
   const tituloMatch = data.titulo_postulacion?.match(/CV para (.+?) · (.+)/);
   const empresa = tituloMatch?.[1];
   const cargo = tituloMatch?.[2];
+  const hasKeywords = (data.keywords_totales ?? 0) > 0;
+
+  // Post-migración: usa integradas/no_usadas/gap. Pre-migración: usa keywords_encontradas/totales.
+  const isNewMetrics = Array.isArray(data.integradas);
+  const numIntegradas = isNewMetrics ? data.integradas!.length : (data.keywords_encontradas ?? 0);
+  const numEvidencia = isNewMetrics
+    ? data.integradas!.length + (data.no_usadas_con_evidencia?.length ?? 0)
+    : (data.keywords_totales ?? 0);
+  const showKeywordsCircle = isNewMetrics ? numEvidencia > 0 : hasKeywords;
+  const dashOffset = CIRCLE_C * (1 - (showKeywordsCircle && numEvidencia > 0 ? numIntegradas / numEvidencia : 0));
+
+  const subtituloLegacy = cargo && empresa
+    ? `Coincidencias con la oferta de ${cargo} en ${empresa}`
+    : cargo
+    ? `Coincidencias con la oferta de ${cargo}`
+    : "Coincidencias detectadas en la oferta de trabajo";
 
   return (
     <div className="relative bg-[#111] border border-[#222] rounded-2xl overflow-hidden">
@@ -41,15 +56,15 @@ function HeroBlock({ data }: { data: ResultData }) {
         style={{ border: "0.5px solid rgba(255,255,255,0.05)" }} />
 
       <div className="relative z-10 px-8 py-7 flex flex-col sm:flex-row gap-8 items-start sm:items-center">
-        {hasKeywords ? (
+        {showKeywordsCircle ? (
           <div className="shrink-0">
             <svg width="120" height="120" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r={CIRCLE_R} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="7" />
               <circle cx="50" cy="50" r={CIRCLE_R} fill="none" stroke="#22c55e" strokeWidth="7" strokeLinecap="round"
                 strokeDasharray={CIRCLE_C} strokeDashoffset={dashOffset} transform="rotate(-90 50 50)"
                 style={{ transition: "stroke-dashoffset 0.8s ease" }} />
-              <text x="50" y="45" textAnchor="middle" fill="white" fontSize="22" fontWeight="900" fontFamily="inherit">{found}</text>
-              <text x="50" y="62" textAnchor="middle" fill="rgba(255,255,255,0.38)" fontSize="10" fontFamily="inherit">de {total}</text>
+              <text x="50" y="45" textAnchor="middle" fill="white" fontSize="22" fontWeight="900" fontFamily="inherit">{numIntegradas}</text>
+              <text x="50" y="62" textAnchor="middle" fill="rgba(255,255,255,0.38)" fontSize="10" fontFamily="inherit">de {numEvidencia}</text>
             </svg>
           </div>
         ) : (
@@ -61,18 +76,20 @@ function HeroBlock({ data }: { data: ResultData }) {
         )}
 
         <div className="flex-1 flex flex-col gap-4">
-          {hasKeywords ? (
+          {showKeywordsCircle ? (
             <>
               <div>
                 <h2 className="text-[28px] sm:text-[34px] leading-tight text-white" style={{ fontWeight: 900 }}>
-                  Tu CV cubre{" "}
-                  <span className="text-[#22c55e]">{found} de {total}</span>{" "}
-                  palabras clave
+                  {isNewMetrics ? (
+                    <>Aprovechaste <span className="text-[#22c55e]">{numIntegradas} de {numEvidencia}</span> palabras clave que respalda tu experiencia</>
+                  ) : (
+                    <>Tu CV cubre <span className="text-[#22c55e]">{numIntegradas} de {numEvidencia}</span> palabras clave</>
+                  )}
                 </h2>
                 <p className="mt-1.5 text-sm text-white/50">
-                  {cargo && empresa ? `Coincidencias con la oferta de ${cargo} en ${empresa}`
-                    : cargo ? `Coincidencias con la oferta de ${cargo}`
-                    : "Coincidencias detectadas en la oferta de trabajo"}
+                  {isNewMetrics
+                    ? `La oferta menciona ${data.keywords_totales ?? numEvidencia} palabras clave en total`
+                    : subtituloLegacy}
                 </p>
               </div>
               <div className="flex flex-wrap gap-x-6 gap-y-1.5">
@@ -240,6 +257,9 @@ export default function ResultadoPage() {
         sugerencias: data.sugerencias ?? null,
         keywords_totales: data.keywords_totales ?? null,
         keywords_encontradas: data.keywords_encontradas ?? null,
+        keywords_integradas: data.integradas ?? null,
+        keywords_no_usadas: data.no_usadas_con_evidencia ?? null,
+        keywords_gap: data.gap ?? null,
         formato: formato,
       }).select("id").single();
       if (insertError) console.error("[postulai] Error guardando postulación:", insertError);
@@ -452,6 +472,23 @@ export default function ResultadoPage() {
 
             {/* Hero */}
             <HeroBlock data={data} />
+
+            {/* Gap block */}
+            {Array.isArray(data.gap) && data.gap.length > 0 && (
+              <div className="flex flex-col gap-3">
+                <div>
+                  <p className="text-xs font-bold text-white/35 uppercase tracking-widest">Requisitos que podrías desarrollar</p>
+                  <p className="text-xs text-white/40 mt-1">La oferta pide estas habilidades que tu CV no incluye actualmente</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {data.gap.map((kw, i) => (
+                    <span key={i} className="px-3 py-1 text-xs text-white/55 bg-white/[0.04] border border-white/[0.1] rounded-full">
+                      {kw}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Document cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">

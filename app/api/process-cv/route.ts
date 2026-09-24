@@ -260,26 +260,51 @@ Responde ÚNICAMENTE con un JSON válido con estos campos:
 - sugerencias: array de exactamente 3 strings con acciones concretas que el candidato puede hacer FUERA del CV para mejorar sus chances
 - principales_cambios: array de exactamente 5 strings en formato "qué había → qué hay ahora"
 - titulo_postulacion: string con el título de la postulación. En MODO ADAPTAR o MODO CREAR CON OFERTA: formato exacto "CV para [Empresa] · [Cargo]" (ej: "CV para Banco de Chile · Analista Financiero"); si no se identifica la empresa usar "CV para [Cargo]". En MODO CREAR SIN OFERTA: formato "CV Profesional · [Título profesional del candidato]" (ej: "CV Profesional · Ingeniero Civil Industrial", "CV Profesional · Estudiante de Administración de Empresas").
-- palabras_clave_oferta: string[] — SOLO en MODO ADAPTAR o MODO CREAR CON OFERTA. Lista de palabras clave, habilidades, herramientas y requisitos extraídos de la oferta de trabajo. REGLAS: (1) cada item: 1 a 3 palabras máximo; (2) separar habilidades compuestas en items distintos; (3) incluir entre 8 y 15 items; (4) solo términos que aparezcan o se infieran directamente de la oferta. En MODO CREAR SIN OFERTA: array vacío [].`;
+- palabras_clave_oferta: string[] — SOLO en MODO ADAPTAR o MODO CREAR CON OFERTA. Lista de palabras clave, habilidades, herramientas y requisitos extraídos de la oferta de trabajo. REGLAS: (1) cada item: 1 a 3 palabras máximo; (2) separar habilidades compuestas en items distintos; (3) incluir entre 8 y 10 items; (4) solo términos que aparezcan o se infieran directamente de la oferta. En MODO CREAR SIN OFERTA: array vacío [].`;
 
-function calcularMatch(keywords: string[], cvText: string): { keywords_totales: number; keywords_encontradas: number } {
-  const cv = cvText.toLowerCase();
-  const encontradas = keywords.filter(kw => {
-    const palabras = kw.toLowerCase().trim().split(/\s+/);
-    if (palabras.length === 1) {
-      const base = palabras[0];
-      const sinS = base.endsWith("s") ? base.slice(0, -1) : base + "s";
-      return cv.includes(base) || cv.includes(sinS);
+// Palabras vacías excluidas del match de frases; "de" no cuenta como evidencia de "cartera de clientes".
+const STOP_WORDS_MATCH = new Set(["de", "del", "en", "con", "por", "para", "a", "al", "el", "la", "los", "las", "y", "e", "o", "u"]);
+
+function matcheaPalabra(palabra: string, textoNorm: string): boolean {
+  // normalizarParaComparar (definida abajo) garantiza que textoNorm y palabra solo tengan a-z0-9,
+  // por lo que no hay riesgo de inyección de caracteres especiales en la regex.
+  if (new RegExp(`\\b${palabra}\\b`).test(textoNorm)) return true;
+  const altS = palabra.endsWith("s") ? palabra.slice(0, -1) : palabra + "s";
+  return new RegExp(`\\b${altS}\\b`).test(textoNorm);
+}
+
+function calcularMatch(
+  keywords: string[],
+  cvAdaptado: string,
+  cvOriginal: string = ""
+): { keywords_totales: number; keywords_encontradas: number; integradas: string[]; no_usadas_con_evidencia: string[]; gap: string[] } {
+  const cvAdaptNorm = normalizarParaComparar(cvAdaptado);
+  const cvOrigNorm = normalizarParaComparar(cvOriginal);
+
+  const integradas: string[] = [];
+  const no_usadas_con_evidencia: string[] = [];
+  const gap: string[] = [];
+
+  for (const kw of keywords) {
+    const kwNorm = normalizarParaComparar(kw);
+    const palabras = kwNorm.split(/\s+/).filter(p => p.length > 0);
+    const significativas = palabras.filter(p => !STOP_WORDS_MATCH.has(p));
+    const toCheck = significativas.length > 0 ? significativas : palabras;
+
+    if (toCheck.every(p => matcheaPalabra(p, cvAdaptNorm))) {
+      integradas.push(kw);
+    } else if (cvOrigNorm && toCheck.every(p => matcheaPalabra(p, cvOrigNorm))) {
+      no_usadas_con_evidencia.push(kw);
+    } else {
+      gap.push(kw);
     }
-    // Multi-word: match si al menos la mitad de las palabras individuales aparecen en el CV
-    const minMatch = Math.ceil(palabras.length / 2);
-    const hits = palabras.filter(p => {
-      const sinS = p.endsWith("s") ? p.slice(0, -1) : p + "s";
-      return cv.includes(p) || cv.includes(sinS);
-    }).length;
-    return hits >= minMatch;
-  });
-  return { keywords_totales: keywords.length, keywords_encontradas: encontradas.length };
+  }
+
+  if (no_usadas_con_evidencia.length > 0) {
+    console.warn(`[postulai] keywords con evidencia en original pero no integradas al CV adaptado: ${no_usadas_con_evidencia.join(", ")}`);
+  }
+
+  return { keywords_totales: keywords.length, keywords_encontradas: integradas.length, integradas, no_usadas_con_evidencia, gap };
 }
 
 function extraerPerfilProfesional(cvText: string): string | null {
@@ -591,9 +616,12 @@ export async function POST(request: NextRequest) {
     const keywords: string[] = Array.isArray(result.palabras_clave_oferta)
       ? result.palabras_clave_oferta
       : [];
+    const cvOriginalText = modo === "adaptar"
+      ? (typeof cv === "string" ? cv : "")
+      : (typeof datos_personales === "string" ? datos_personales : JSON.stringify(datos_personales ?? ""));
     const matchData = keywords.length > 0
-      ? calcularMatch(keywords, result.cv_adaptado ?? "")
-      : { keywords_totales: 0, keywords_encontradas: 0 };
+      ? calcularMatch(keywords, result.cv_adaptado ?? "", cvOriginalText)
+      : { keywords_totales: 0, keywords_encontradas: 0, integradas: [], no_usadas_con_evidencia: [], gap: [] };
 
     if (modo === "adaptar" && !isIlimitado) {
       await supabase.rpc("decrementar_uso_gratis", { p_user_id: user.id });
