@@ -260,7 +260,7 @@ Responde ÚNICAMENTE con un JSON válido con estos campos:
 - sugerencias: array de exactamente 3 strings, cada una con el formato "Título breve: acción concreta", donde el título tiene 2 a 4 palabras y el total (título + descripción) no supera 20 palabras. Al menos una debe referirse al aspecto más relevante de la oferta que el candidato no tiene actualmente, formulada como una acción concreta que el candidato puede empezar a hacer (por ejemplo, un curso introductorio o un proyecto personal). Nunca le sugieras decir en la entrevista que ya sabe o que está aprendiendo algo; solo puede mencionarlo después de haber empezado de verdad
 - principales_cambios: array de exactamente 5 strings en formato "qué había → qué hay ahora"
 - titulo_postulacion: string con el título de la postulación. En MODO ADAPTAR o MODO CREAR CON OFERTA: formato exacto "CV para [Empresa] · [Cargo]" (ej: "CV para Banco de Chile · Analista Financiero"); si no se identifica la empresa usar "CV para [Cargo]". En MODO CREAR SIN OFERTA: formato "CV Profesional · [Título profesional del candidato]" (ej: "CV Profesional · Ingeniero Civil Industrial", "CV Profesional · Estudiante de Administración de Empresas").
-- palabras_clave_oferta: string[] — SOLO en MODO ADAPTAR o MODO CREAR CON OFERTA. Lista de palabras clave, habilidades, herramientas y requisitos extraídos de la oferta de trabajo. REGLAS: (1) cada item: 1 a 3 palabras máximo; (2) separar habilidades compuestas en items distintos; (3) incluir entre 8 y 10 items; (4) solo términos que aparezcan o se infieran directamente de la oferta. En MODO CREAR SIN OFERTA: array vacío [].`;
+- palabras_clave_oferta: string[] — SOLO en MODO ADAPTAR o MODO CREAR CON OFERTA. Lista de palabras clave, habilidades, herramientas y requisitos extraídos de la oferta de trabajo. REGLAS: (1) cada item: 1 a 3 palabras máximo; (2) separar habilidades compuestas en items distintos; (3) incluir entre 8 y 10 items; (4) SOLO términos mencionados literalmente en la oferta — nunca inferidos, generalizados ni parafraseados; (5) incluir habilidades, herramientas, conocimientos y carreras requeridas; excluir el tipo de cargo o modalidad ("Práctica profesional", "part-time", "híbrido" y similares); (6) tomarlos en el orden en que aparecen en la oferta, priorizando las secciones de requisitos, conocimientos y funciones. En MODO CREAR SIN OFERTA: array vacío [].`;
 
 // Palabras vacías excluidas del match de frases; "de" no cuenta como evidencia de "cartera de clientes".
 const STOP_WORDS_MATCH = new Set(["de", "del", "en", "con", "por", "para", "a", "al", "el", "la", "los", "las", "y", "e", "o", "u"]);
@@ -393,6 +393,43 @@ function herramientaTieneRespaldo(herramienta: string, fuenteNorm: string): bool
   const palabras = hNorm.split(" ").filter(w => w.length >= 4 && !PREFIJOS_MARCA.has(w));
   if (palabras.length === 0) return false; // solo prefijo de marca sin producto → rechazar
   return palabras.every(w => new RegExp(`\\b${w}\\b`).test(fuenteNorm));
+}
+
+function limpiarHabilidadesTecnicas(cvText: string, fuenteOriginal: string): string {
+  const fuenteNorm = normalizarParaComparar(fuenteOriginal);
+  const lines = cvText.split("\n");
+  const out: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!/^(Habilidades|Herramientas) técnicas\s*:/i.test(trimmed)) {
+      out.push(line);
+      continue;
+    }
+
+    const colonIdx = trimmed.indexOf(":");
+    const prefix = trimmed.slice(0, colonIdx + 1);
+    const toolsPart = trimmed.slice(colonIdx + 1).trim();
+    const tools = toolsPart
+      .split(/\s*·\s*|\s*,\s*/)
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
+
+    const validas = tools.filter(tool => {
+      const ok = herramientaTieneRespaldo(tool, fuenteNorm);
+      if (!ok) {
+        console.warn(`[postulai] Habilidades técnicas: eliminando "${tool}" — sin respaldo en CV original`);
+      }
+      return ok;
+    });
+
+    if (validas.length > 0) {
+      const indent = line.slice(0, line.length - trimmed.length);
+      out.push(`${indent}${prefix} ${validas.join(" · ")}`);
+    }
+  }
+
+  return out.join("\n");
 }
 
 function limpiarConocimientosEnDesarrollo(cvText: string, fuenteOriginal: string): string {
@@ -571,7 +608,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // ── filtro anti-fabricación: Conocimientos en desarrollo ─────────────
+    // ── filtro anti-fabricación: Conocimientos en desarrollo y Habilidades técnicas ─────────────
     if (typeof result.cv_adaptado === "string") {
       const fuenteOriginal = modo === "adaptar"
         ? (typeof cv === "string" ? cv : "")
@@ -579,6 +616,10 @@ export async function POST(request: NextRequest) {
             ? datos_personales
             : JSON.stringify(datos_personales ?? ""));
       result.cv_adaptado = limpiarConocimientosEnDesarrollo(
+        result.cv_adaptado as string,
+        fuenteOriginal
+      );
+      result.cv_adaptado = limpiarHabilidadesTecnicas(
         result.cv_adaptado as string,
         fuenteOriginal
       );
