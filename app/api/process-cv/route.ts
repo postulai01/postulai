@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import {
+  normalizarParaComparar,
+  calcularMatch,
+  extraerPerfilProfesional,
+  limpiarConocimientosEnDesarrollo,
+  limpiarHabilidadesTecnicas,
+} from "../../lib/cv-postprocess";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -262,87 +269,7 @@ Responde ÚNICAMENTE con un JSON válido con estos campos:
 - titulo_postulacion: string con el título de la postulación. En MODO ADAPTAR o MODO CREAR CON OFERTA: formato exacto "CV para [Empresa] · [Cargo]" (ej: "CV para Banco de Chile · Analista Financiero"); si no se identifica la empresa usar "CV para [Cargo]". En MODO CREAR SIN OFERTA: formato "CV Profesional · [Título profesional del candidato]" (ej: "CV Profesional · Ingeniero Civil Industrial", "CV Profesional · Estudiante de Administración de Empresas").
 - palabras_clave_oferta: string[] — SOLO en MODO ADAPTAR o MODO CREAR CON OFERTA. Lista de palabras clave, habilidades, herramientas y requisitos extraídos de la oferta de trabajo. REGLAS: (1) cada item: 1 a 3 palabras máximo; (2) separar habilidades compuestas en items distintos; (3) incluir entre 8 y 10 items; (4) SOLO términos mencionados literalmente en la oferta — nunca inferidos, generalizados ni parafraseados; (5) incluir habilidades, herramientas, conocimientos y carreras requeridas; excluir el tipo de cargo o modalidad ("Práctica profesional", "part-time", "híbrido" y similares); (6) tomarlos en el orden en que aparecen en la oferta, priorizando las secciones de requisitos, conocimientos y funciones. En MODO CREAR SIN OFERTA: array vacío [].`;
 
-// Palabras vacías excluidas del match de frases; "de" no cuenta como evidencia de "cartera de clientes".
-const STOP_WORDS_MATCH = new Set(["de", "del", "en", "con", "por", "para", "a", "al", "el", "la", "los", "las", "y", "e", "o", "u"]);
-
-function matcheaPalabra(palabra: string, textoNorm: string): boolean {
-  // normalizarParaComparar (definida abajo) garantiza que textoNorm y palabra solo tengan a-z0-9,
-  // por lo que no hay riesgo de inyección de caracteres especiales en la regex.
-  if (new RegExp(`\\b${palabra}\\b`).test(textoNorm)) return true;
-  const altS = palabra.endsWith("s") ? palabra.slice(0, -1) : palabra + "s";
-  return new RegExp(`\\b${altS}\\b`).test(textoNorm);
-}
-
-function calcularMatch(
-  keywords: string[],
-  cvAdaptado: string,
-  cvOriginal: string = ""
-): { keywords_totales: number; keywords_encontradas: number; integradas: string[]; no_usadas_con_evidencia: string[]; gap: string[] } {
-  const cvAdaptNorm = normalizarParaComparar(cvAdaptado);
-  const cvOrigNorm = normalizarParaComparar(cvOriginal);
-
-  const integradas: string[] = [];
-  const no_usadas_con_evidencia: string[] = [];
-  const gap: string[] = [];
-
-  for (const kw of keywords) {
-    const kwNorm = normalizarParaComparar(kw);
-    const palabras = kwNorm.split(/\s+/).filter(p => p.length > 0);
-    const significativas = palabras.filter(p => !STOP_WORDS_MATCH.has(p));
-    const toCheck = significativas.length > 0 ? significativas : palabras;
-
-    if (toCheck.every(p => matcheaPalabra(p, cvAdaptNorm))) {
-      integradas.push(kw);
-    } else if (cvOrigNorm && toCheck.every(p => matcheaPalabra(p, cvOrigNorm))) {
-      no_usadas_con_evidencia.push(kw);
-    } else {
-      gap.push(kw);
-    }
-  }
-
-  if (no_usadas_con_evidencia.length > 0) {
-    console.warn(`[postulai] keywords con evidencia en original pero no integradas al CV adaptado: ${no_usadas_con_evidencia.join(", ")}`);
-  }
-
-  return { keywords_totales: keywords.length, keywords_encontradas: integradas.length, integradas, no_usadas_con_evidencia, gap };
-}
-
-function extraerPerfilProfesional(cvText: string): string | null {
-  const lines = cvText.split("\n");
-  let inPerfil = false;
-  let skippedFirstSep = false;
-  const collected: string[] = [];
-
-  // A line that is purely separator characters (em-dash, box-drawing, hyphens, etc.)
-  const isSepOnly = (l: string) => l.trim().length > 1 && /^[─━—\-=_*~%]+$/.test(l.trim());
-
-  // Detects the next section header in BOTH formats:
-  //   new: "EXPERIENCIA LABORAL"              (all-caps alone)
-  //   old: "EXPERIENCIA LABORAL ———————————"  (all-caps + trailing separators)
-  const isNextSectionHeader = (l: string) => {
-    const t = l.replace(/[—─━\-=_*~%\s]+$/, "").trim(); // strip trailing separators
-    return t.length > 1 && t.length < 60 && t === t.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(t);
-  };
-
-  for (const line of lines) {
-    if (/PERFIL\s+PROFESIONAL/i.test(line)) { inPerfil = true; continue; }
-    if (!inPerfil) continue;
-
-    // Skip the first separator line that follows the section title (new format)
-    if (!skippedFirstSep) {
-      if (isSepOnly(line)) { skippedFirstSep = true; continue; }
-      skippedFirstSep = true; // no separator after title — content starts immediately
-    }
-
-    // Stop as soon as we reach the next section header (handles both formats)
-    if (isNextSectionHeader(line)) break;
-
-    collected.push(line);
-  }
-
-  if (!inPerfil) return null;
-  return collected.join("\n").trim();
-}
+// ─── identity helpers (permanecen en route.ts) ──────────────────────────────
 
 function normalizarNombre(nombre: string): string[] {
   return nombre
@@ -364,109 +291,6 @@ function nombresCoinciden(referencia: string, candidato: string): boolean {
   const numApellidos = Math.min(2, Math.max(1, refTokens.length - 1));
   const refApellidos = refTokens.slice(-numApellidos);
   return refApellidos.some(a => candTokens.includes(a));
-}
-
-// ── red de seguridad anti-fabricación: Conocimientos en desarrollo ────────────
-
-function normalizarParaComparar(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-// Prefijos de marca que se ignoran en el fallback para que "Microsoft Excel"
-// pase si el CV dice solo "Excel".
-const PREFIJOS_MARCA = new Set(["microsoft", "google", "adobe"]);
-
-function herramientaTieneRespaldo(herramienta: string, fuenteNorm: string): boolean {
-  const hNorm = normalizarParaComparar(herramienta);
-  if (!hNorm) return true;
-  if (fuenteNorm.includes(hNorm)) return true;
-  // Fallback: TODAS las palabras significativas (≥4 chars, excluyendo prefijos de marca)
-  // deben aparecer como palabra completa en la fuente.
-  // Exige coincidencia total para evitar que "procesos" de "Automatización de procesos"
-  // haga match con un CV que dice "optimización de procesos comerciales".
-  const palabras = hNorm.split(" ").filter(w => w.length >= 4 && !PREFIJOS_MARCA.has(w));
-  if (palabras.length === 0) return false; // solo prefijo de marca sin producto → rechazar
-  return palabras.every(w => new RegExp(`\\b${w}\\b`).test(fuenteNorm));
-}
-
-function limpiarHabilidadesTecnicas(cvText: string, fuenteOriginal: string): string {
-  const fuenteNorm = normalizarParaComparar(fuenteOriginal);
-  const lines = cvText.split("\n");
-  const out: string[] = [];
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!/^(Habilidades|Herramientas) técnicas\s*:/i.test(trimmed)) {
-      out.push(line);
-      continue;
-    }
-
-    const colonIdx = trimmed.indexOf(":");
-    const prefix = trimmed.slice(0, colonIdx + 1);
-    const toolsPart = trimmed.slice(colonIdx + 1).trim();
-    const tools = toolsPart
-      .split(/\s*·\s*|\s*,\s*/)
-      .map(t => t.trim())
-      .filter(t => t.length > 0);
-
-    const validas = tools.filter(tool => {
-      const ok = herramientaTieneRespaldo(tool, fuenteNorm);
-      if (!ok) {
-        console.warn(`[postulai] Habilidades técnicas: eliminando "${tool}" — sin respaldo en CV original`);
-      }
-      return ok;
-    });
-
-    if (validas.length > 0) {
-      const indent = line.slice(0, line.length - trimmed.length);
-      out.push(`${indent}${prefix} ${validas.join(" · ")}`);
-    }
-  }
-
-  return out.join("\n");
-}
-
-function limpiarConocimientosEnDesarrollo(cvText: string, fuenteOriginal: string): string {
-  const fuenteNorm = normalizarParaComparar(fuenteOriginal);
-  const lines = cvText.split("\n");
-  const out: string[] = [];
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!/^Conocimientos en desarrollo\s*:/i.test(trimmed)) {
-      out.push(line);
-      continue;
-    }
-
-    const colonIdx = trimmed.indexOf(":");
-    const toolsPart = trimmed.slice(colonIdx + 1).trim();
-    const tools = toolsPart
-      .split(/\s*·\s*|\s*,\s*/)
-      .map(t => t.trim())
-      .filter(t => t.length > 0);
-
-    const validas = tools.filter(tool => {
-      const ok = herramientaTieneRespaldo(tool, fuenteNorm);
-      if (!ok) {
-        console.warn(`[postulai] Conocimientos en desarrollo: eliminando "${tool}" — sin respaldo en CV original`);
-      }
-      return ok;
-    });
-
-    if (validas.length > 0) {
-      const indent = line.slice(0, line.length - trimmed.length);
-      out.push(`${indent}Conocimientos en desarrollo: ${validas.join(" · ")}`);
-    }
-    // Si no quedan herramientas válidas, la línea se omite completamente
-  }
-
-  return out.join("\n");
 }
 
 export async function POST(request: NextRequest) {

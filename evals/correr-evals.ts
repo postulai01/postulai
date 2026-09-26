@@ -2,6 +2,11 @@ import Anthropic from "@anthropic-ai/sdk";
 import { jsonrepair } from "jsonrepair";
 import * as fs from "fs";
 import * as path from "path";
+import {
+  extraerPerfilProfesional,
+  limpiarConocimientosEnDesarrollo,
+  limpiarHabilidadesTecnicas,
+} from "../app/lib/cv-postprocess";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -36,7 +41,7 @@ function extractSystemPrompt(): string {
   const file = path.join(process.cwd(), "app/api/process-cv/route.ts");
   const src = fs.readFileSync(file, "utf-8");
   const START = "const SYSTEM_PROMPT = `";
-  const END = "`;\n\nfunction calcularMatch";
+  const END = "`;\n\n// ─── identity helpers";
   const s = src.indexOf(START);
   const e = src.indexOf(END);
   if (s === -1 || e === -1) throw new Error("No se pudo extraer SYSTEM_PROMPT de route.ts");
@@ -86,28 +91,9 @@ function buildUserMessage(caso: Caso): string {
 }
 
 function contarPalabrasPerfil(cvText: string): number {
-  const lines = cvText.split("\n");
-  let inPerfil = false;
-  let skippedFirstSep = false;
-  const collected: string[] = [];
-
-  const isSepOnly = (l: string) => l.trim().length > 1 && /^[─━—\-=_*~%]+$/.test(l.trim());
-  const isNextSectionHeader = (l: string) => {
-    const t = l.replace(/[—─━\-=_*~%\s]+$/, "").trim();
-    return t.length > 1 && t.length < 60 && t === t.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(t);
-  };
-
-  for (const line of lines) {
-    if (/PERFIL\s+PROFESIONAL/i.test(line)) { inPerfil = true; continue; }
-    if (!inPerfil) continue;
-    if (!skippedFirstSep) {
-      if (isSepOnly(line)) { skippedFirstSep = true; continue; }
-      skippedFirstSep = true;
-    }
-    if (isNextSectionHeader(line)) break;
-    collected.push(line);
-  }
-  return collected.join(" ").trim().split(/\s+/).filter((w) => w.length > 0).length;
+  const perfil = extraerPerfilProfesional(cvText);
+  if (!perfil) return 0;
+  return perfil.trim().split(/\s+/).filter((w) => w.length > 0).length;
 }
 
 function buildEvaluatorMessage(caso: Caso, resultado: Record<string, unknown>, rubrica: string): string {
@@ -179,6 +165,12 @@ async function main() {
         });
         const raw = res.content[0].type === "text" ? res.content[0].text : "";
         resultado = parseJsonFromText(raw);
+        if (typeof resultado.cv_adaptado === "string") {
+          let cvAdaptado = resultado.cv_adaptado as string;
+          cvAdaptado = limpiarConocimientosEnDesarrollo(cvAdaptado, caso.cv_texto);
+          cvAdaptado = limpiarHabilidadesTecnicas(cvAdaptado, caso.cv_texto);
+          resultado.cv_adaptado = cvAdaptado;
+        }
       } catch (err) {
         if (intento < 2) {
           process.stdout.write(`(reintentando) `);
