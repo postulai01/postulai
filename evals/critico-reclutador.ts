@@ -30,11 +30,11 @@ import {
 const MODELO_ITERACION = "claude-haiku-4-5-20251001";
 const MODELO_COMPLETO  = "claude-sonnet-5";
 
-// [input $/MTok, output $/MTok]  — precios base
+// [input $/MTok, output $/MTok]  — precios base (fuente: platform.claude.com/docs/en/about-claude/models/all-models)
 const PRECIOS: Record<string, [number, number]> = {
-  [MODELO_ITERACION]: [0.8, 4],
-  [MODELO_COMPLETO]:  [3, 15],
-  "claude-sonnet-5-regen": [3, 15],
+  [MODELO_ITERACION]: [1, 5],    // haiku-4-5: $1/$5
+  [MODELO_COMPLETO]:  [2, 10],   // sonnet-5:  $2/$10
+  "claude-sonnet-5-regen": [2, 10],
 };
 const CACHE_WRITE_MULT = 1.25;
 const CACHE_READ_MULT  = 0.10;
@@ -64,10 +64,9 @@ function estimarCostoTotal(args: Args): string {
   const [inC, outC] = PRECIOS[modC];
   const [inS, outS] = PRECIOS[MODELO_COMPLETO];
 
-  // Adaptación (sonnet-5): ~7000 sys (cached) + ~1200 user + ~2500 output
-  // Con cache: primera llamada paga write (~7000 × inS × 1.25), resto paga read (~7000 × inS × 0.10)
+  // Adaptación (sonnet-5): ~7000 sys (cached) + ~7000 user + ~2500 output (total ~14k input observado)
   const sysAdapt   = 7000;
-  const varAdapt   = 1200;
+  const varAdapt   = 7000;
   const outAdapt   = 2500;
   const costoAdaptPrimera = (sysAdapt * inS * CACHE_WRITE_MULT + varAdapt * inS + outAdapt * outS) / 1e6;
   // Si hay regen necesaria eso se calcula al correr; estimamos 1 regen
