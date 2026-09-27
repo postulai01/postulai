@@ -12,18 +12,25 @@
  *
  * Revisa:
  *   cifras+    cifras del CV adaptado que no están en el original (P2)
- *   cifras-    cifras del original que no aparecen en el CV adaptado (P3; revisar relevancia a mano)
- *   verbos>2   verbo inicial (verbo base, sin importar el tiempo) en más de dos bullets (R-31)
+ *   cifras-    cifras del original que no aparecen en el CV adaptado (P3). Las que se revisaron a mano y no son
+ *              relevantes para la oferta se declaran en "cifras_no_relevantes" del caso y no se cuentan.
+ *   verbos     verbo inicial (verbo base, sin importar el tiempo) repetido dentro de un cargo o en más de
+ *              3 bullets de todo el CV (R-31)
  *   prohib     bullet que empieza con verbo prohibido, tercera persona, infinitivo o frase nominal (R-33)
  *   frases     frases prohibidas en el perfil (R-24, R-25) y en todo el CV (R-39)
  *   orden      orden de secciones según el nivel del caso y encabezados no estándar (R-10, R-11, R-75)
+ *   brechas    brecha de 3+ meses entre dos cargos sin entrada cronológica (R-41, R-42); entrada de búsqueda
+ *              en una brecha abierta hasta hoy, o perfil sin disponibilidad cuando no hay cargo actual (R-44, R-23;
+ *              no se verifica si la oferta fija fecha de inicio). Solo líneas de cargo con fechas MM/AAAA.
  *   etiquetas  líneas de HABILIDADES sin etiqueta exacta y funciones en Habilidades técnicas (R-60, R-61)
  *   perfil     largo del perfil fuera de 50–100 palabras (R-21)
  *   ≈orig      bullet casi idéntico a una línea débil del original que conserva la debilidad (R-37)
  *              (verbo prohibido o frase prohibida; ese bullet también cuenta en prohib o frases)
  *   ≈info      bullets casi idénticos a una línea del original, débil o no (informativo, no suma al total)
  *
- * El nivel sale del campo "nivel" de evals/casos/<caso>.json.
+ * El nivel sale del campo "nivel" de evals/casos/<caso>.json: "practicante" (estudiante, practicante o
+ * recién egresado con menos de 1 año de experiencia) va con EDUCACIÓN primero; junior, mid y senior, con
+ * EXPERIENCIA LABORAL primero.
  */
 
 import * as fs from "fs";
@@ -71,8 +78,8 @@ function cifraPresente(cifra: string, texto: string, cifrasTexto: Set<string>): 
 const ENCABEZADOS = [
   "PERFIL PROFESIONAL", "EXPERIENCIA LABORAL", "EDUCACIÓN", "HABILIDADES", "IDIOMAS", "CERTIFICACIONES",
 ];
-const ORDEN_MID_SENIOR = ENCABEZADOS;
-const ORDEN_PRACTICANTE_JUNIOR = [
+const ORDEN_EXPERIENCIA_PRIMERO = ENCABEZADOS;
+const ORDEN_EDUCACION_PRIMERO = [
   "PERFIL PROFESIONAL", "EDUCACIÓN", "EXPERIENCIA LABORAL", "HABILIDADES", "IDIOMAS", "CERTIFICACIONES",
 ];
 
@@ -98,6 +105,31 @@ function seccionar(cv: string): Seccion[] {
 
 const esBullet = (l: string) => /^\s*[-•]\s+/.test(l);
 const textoBullet = (l: string) => l.replace(/^\s*[-•]\s+/, "").trim();
+
+// ─── cargos y fechas ──────────────────────────────────────────────────────────
+
+interface Cargo { titulo: string; bullets: string[] }
+
+function cargos(secciones: Seccion[]): Cargo[] {
+  const exp = secciones.find(s => s.titulo === "EXPERIENCIA LABORAL");
+  const out: Cargo[] = [];
+  for (const l of exp?.lineas ?? []) {
+    if (esBullet(l)) { if (out.length > 0) out[out.length - 1].bullets.push(textoBullet(l)); }
+    else if (/—\s*.+\d/.test(l) || /per[ií]odo de b[uú]squeda/i.test(l)) out.push({ titulo: l.trim(), bullets: [] });
+  }
+  return out;
+}
+
+// Mes absoluto (año*12 + mes) de inicio y fin; fin null = Presente. null si la línea no tiene MM/AAAA.
+function fechasCargo(linea: string): { inicio: number; fin: number | null } | null {
+  const m = linea.match(/(\d{1,2})\/(\d{4})\s*[–-]\s*(?:(\d{1,2})\/(\d{4})|(presente|actualidad))/i);
+  if (!m) return null;
+  const inicio = Number(m[2]) * 12 + Number(m[1]);
+  const fin = m[5] ? null : Number(m[4]) * 12 + Number(m[3]);
+  return { inicio, fin };
+}
+
+const mesTexto = (abs: number) => { const y = Math.floor((abs - 1) / 12); const mm = abs - y * 12; return `${String(mm).padStart(2, "0")}/${y}`; };
 
 // ─── verbos ───────────────────────────────────────────────────────────────────
 
@@ -201,7 +233,7 @@ interface Reporte {
   v: Record<string, string[]>;
 }
 
-const TIPOS = ["cifras+", "cifras-", "verbos>2", "prohib", "frases", "orden", "etiquetas", "perfil", "≈orig"] as const;
+const TIPOS = ["cifras+", "cifras-", "verbos", "prohib", "frases", "orden", "brechas", "etiquetas", "perfil", "≈orig"] as const;
 const INFORMATIVOS = ["≈info"] as const;
 
 const esDebil = (linea: string) =>
@@ -223,17 +255,31 @@ function verificar(archivo: string): Reporte {
   const cifrasOrig = extraerCifras(original);
   const cifrasCv = extraerCifras(cv);
   for (const c of cifrasCv) if (!cifraPresente(c, original, cifrasOrig)) v["cifras+"].push(c);
-  for (const c of cifrasOrig) if (!cifraPresente(c, cv, cifrasCv)) v["cifras-"].push(c);
+  const noRelevantes = new Set<string>(casoJson.cifras_no_relevantes ?? []);
+  for (const c of cifrasOrig) if (!noRelevantes.has(c) && !cifraPresente(c, cv, cifrasCv)) v["cifras-"].push(c);
 
-  // verbos iniciales repetidos
+  // verbos iniciales repetidos: dentro de un cargo, y más de 3 en todo el CV
+  const primeraPalabra = (b: string) => b.split(/\s+/)[0].replace(/[^\p{L}]/gu, "");
   const porRaiz = new Map<string, string[]>();
   for (const b of bullets) {
-    const primera = b.split(/\s+/)[0].replace(/[^\p{L}]/gu, "");
+    const primera = primeraPalabra(b);
     if (!primera) continue;
     const raiz = raizVerbo(primera);
     porRaiz.set(raiz, [...(porRaiz.get(raiz) ?? []), primera]);
   }
-  for (const usos of porRaiz.values()) if (usos.length > 2) v["verbos>2"].push(`${usos.join("/")} (×${usos.length})`);
+  for (const usos of porRaiz.values()) if (usos.length > 3) v["verbos"].push(`CV: ${usos.join("/")} (×${usos.length})`);
+  for (const cargo of cargos(secciones)) {
+    const vistos = new Map<string, string[]>();
+    for (const b of cargo.bullets) {
+      const primera = primeraPalabra(b);
+      if (!primera) continue;
+      const raiz = raizVerbo(primera);
+      vistos.set(raiz, [...(vistos.get(raiz) ?? []), primera]);
+    }
+    for (const usos of vistos.values()) {
+      if (usos.length > 1) v["verbos"].push(`cargo "${cargo.titulo.slice(0, 40)}": ${usos.join("/")}`);
+    }
+  }
 
   // verbos prohibidos al inicio
   for (const b of bullets) {
@@ -261,12 +307,36 @@ function verificar(archivo: string): Reporte {
   for (const t of titulos) if (!ENCABEZADOS.includes(t)) v["orden"].push(`encabezado no estándar: ${t}`);
   if (!titulos.includes("PERFIL PROFESIONAL")) v["orden"].push("falta PERFIL PROFESIONAL");
   if (nivel !== "?") {
-    const esperado = nivel === "practicante" || nivel === "junior" ? ORDEN_PRACTICANTE_JUNIOR : ORDEN_MID_SENIOR;
+    const esperado = nivel === "practicante" ? ORDEN_EDUCACION_PRIMERO : ORDEN_EXPERIENCIA_PRIMERO;
     const presentes = titulos.filter(t => esperado.includes(t));
     const ordenEsperado = esperado.filter(t => presentes.includes(t));
     if (presentes.join("|") !== ordenEsperado.join("|")) {
       v["orden"].push(`${nivel}: ${presentes.join(" → ")} (esperado ${ordenEsperado.join(" → ")})`);
     }
+  }
+
+  // brechas
+  const entradas = cargos(secciones).map(c => ({ ...c, fechas: fechasCargo(c.titulo) }));
+  const esBusqueda = (t: string) => /per[ií]odo de b[uú]squeda/i.test(t);
+  const reales = entradas.filter(e => !esBusqueda(e.titulo) && e.fechas).sort((a, b) => a.fechas!.inicio - b.fechas!.inicio);
+  const busquedas = entradas.filter(e => esBusqueda(e.titulo));
+  for (let i = 1; i < reales.length; i++) {
+    const fin = reales[i - 1].fechas!.fin, inicio = reales[i].fechas!.inicio;
+    if (fin === null) continue;
+    const meses = inicio - fin - 1;
+    if (meses < 3) continue;
+    const cubierta = busquedas.some(b => b.fechas && b.fechas.inicio > fin && b.fechas.inicio < inicio);
+    if (!cubierta) v["brechas"].push(`brecha de ${meses} meses entre cargos (${mesTexto(fin)} → ${mesTexto(inicio)}) sin entrada cronológica`);
+  }
+  const hayActual = entradas.some(e => !esBusqueda(e.titulo) && /presente|actualidad/i.test(e.titulo));
+  if (!hayActual && reales.length > 0) {
+    const ultimoFin = Math.max(...reales.map(r => r.fechas!.fin ?? r.fechas!.inicio));
+    for (const b of busquedas) {
+      if (!b.fechas || b.fechas.fin === null || b.fechas.inicio > ultimoFin) {
+        v["brechas"].push(`entrada de búsqueda en brecha abierta hasta hoy: "${b.titulo.slice(0, 60)}"`);
+      }
+    }
+    if (!/disponib/i.test(perfil)) v["brechas"].push("sin cargo actual y el perfil no indica disponibilidad");
   }
 
   // etiquetas de habilidades

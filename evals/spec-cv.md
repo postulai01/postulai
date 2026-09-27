@@ -1,6 +1,6 @@
-# Especificación del CV adaptado — Postulai (spec-cv v10.1)
+# Especificación del CV adaptado — Postulai (spec-cv v10.2)
 
-**Fecha:** 2026-09-26 (v10.1: ver §13)
+**Fecha:** 2026-09-26 (v10.1 y v10.2: ver §13)
 **Base:** auditoría `evals/auditoria-v9.md` + decisiones de diseño de la Fase 2
 **Fuente única de verdad.** El SYSTEM_PROMPT v10 (`app/api/process-cv/route.ts`), el mensaje de usuario que arma la misma ruta y la rúbrica del crítico (`evals/critico-reclutador.md`) se derivan de este documento. Si alguno de ellos contradice esta spec, el error está en ese archivo, no aquí.
 
@@ -43,7 +43,7 @@ Restricciones de redacción del prompt (decisión 8):
 
 | ID | Regla | Prompt | Rúbrica | Código |
 |---|---|---|---|---|
-| R-01 | Determinar el nivel del candidato: practicante/recién egresado (<1 año), junior (1–4), mid (5–10), senior/ejecutivo (>10). | Sí | Base de C7 | — |
+| R-01 | Determinar el nivel del candidato: estudiante/practicante/recién egresado (<1 año de experiencia laboral), junior (1–4), mid (5–10), senior/ejecutivo (>10). | Sí | Base de C7 | — |
 | R-02 | Determinar el sector y el tono de la oferta (corporativo, técnico, comercial, startup, ejecutivo). | Sí | Base de C7 y C8 | — |
 | R-03 | Extraer de la oferta 8–10 palabras clave (herramientas, metodologías, certificaciones, conocimientos, carreras requeridas, términos técnicos). Solo términos mencionados literalmente en la oferta, nunca inferidos, generalizados ni parafraseados; cada uno de 1 a 3 palabras, separando habilidades compuestas; tomados en el orden en que aparecen, priorizando las secciones de requisitos, conocimientos y funciones; excluyendo el tipo de cargo o modalidad ("Práctica profesional", "part-time", "híbrido" y similares). Es la misma lista que se entrega en `palabras_clave_oferta`. | Sí | — | `calcularMatch` las usa |
 | R-04 | Clasificar cada palabra clave: **con respaldo** en el CV original o **sin respaldo**. Solo las con respaldo se integran al CV. No hay cuota mínima de integración. | Sí (una sola vez, aquí) | Base de C3 | `calcularMatch` reporta integradas / no usadas con evidencia / gap |
@@ -56,8 +56,8 @@ Restricciones de redacción del prompt (decisión 8):
 
 | ID | Regla | Prompt | Rúbrica | Código |
 |---|---|---|---|---|
-| R-10 | Orden mid/senior/ejecutivo: Contacto → Perfil profesional → Experiencia laboral → Educación → Habilidades → Idiomas → Certificaciones (si aplica). | Sí | C7 / D2 | — |
-| R-11 | Orden practicante/junior: Contacto → Perfil profesional → Educación → Experiencia laboral → Habilidades → Idiomas. **EDUCACIÓN va antes que EXPERIENCIA LABORAL.** | Sí, destacada al inicio de FORMATO y en la revisión final | C7 / D2 | `verificar.ts` (orden) |
+| R-10 | Orden junior/mid/senior/ejecutivo (experiencia primero): Contacto → Perfil profesional → Experiencia laboral → Educación → Habilidades → Idiomas → Certificaciones (si aplica). | Sí | C7 / D2 | — |
+| R-11 | Orden estudiante/practicante/recién egresado con menos de 1 año de experiencia laboral: Contacto → Perfil profesional → Educación → Experiencia laboral → Habilidades → Idiomas. **EDUCACIÓN va antes que EXPERIENCIA LABORAL solo en este nivel;** un junior con 1–4 años de experiencia va con experiencia primero (R-10). | Sí, destacada al inicio de FORMATO y en la revisión final | C7 / D2 | `verificar.ts` (orden) |
 | R-12 | Cada título de sección en MAYÚSCULAS seguido de una línea de `———`. El título del perfil es exactamente `PERFIL PROFESIONAL`. | Sí | — | `extraerPerfilProfesional` depende de esto |
 | R-13 | Sin tablas, columnas múltiples, íconos, gráficos, encabezados ni pies de página. | Sí | D1 | — |
 | R-14 | Fechas `MM/AAAA – MM/AAAA`; cargo actual `MM/AAAA – Presente`. Si el original solo da el año, se usa `AAAA` (no se inventan meses, P1). | Sí | D2 | — |
@@ -91,7 +91,7 @@ Orden de las reglas en el prompt: R-20 va primero.
 | ID | Regla | Prompt | Rúbrica | Código |
 |---|---|---|---|---|
 | R-30 | Cada bullet empieza con un verbo de acción en primera persona singular: **presente** para el cargo actual (el que termina en "Presente"), **pasado** para los anteriores. | Sí | C1: acepta ambos tiempos según el caso; tiempo cambiado entre cargo actual y anterior = menor | — |
-| R-31 | Se cuentan los verbos con que empiezan **todos** los bullets del CV, sumando todos los cargos. Un mismo verbo puede iniciar como máximo 2 bullets en total. Cuenta el verbo base: el presente y el pasado del mismo verbo son el mismo verbo; un verbo con prefijo (rediseñar frente a diseñar) es otro verbo. Si un verbo aparece una tercera vez, ese bullet cambia a otro verbo de la lista R-32. | Sí, con el procedimiento de conteo |  C1: tercera aparición o más = menor por cada verbo repetido | — |
+| R-31 | Ningún verbo inicial se repite dentro del mismo cargo, y ninguno inicia más de 3 bullets en todo el CV. Cuenta el verbo base: el presente y el pasado del mismo verbo son el mismo verbo; un verbo con prefijo (rediseñar frente a diseñar) es otro verbo. | Sí | C1: repetición dentro de un cargo o más de 3 en el CV = menor por cada verbo | `verificar.ts` (verbos) |
 | R-32 | Verbos recomendados (lista de palabras, en infinitivo para que el modelo conjugue): gestionar, liderar, implementar, reducir, aumentar, coordinar, desarrollar, ejecutar, diseñar, negociar, optimizar, construir, lanzar, estructurar, analizar, capacitar, supervisar, dirigir, administrar, establecer, generar, lograr, impulsar, consolidar, transformar, reestructurar, proponer, pilotear, escalar, comercializar, identificar, evaluar. Se prefiere el verbo más específico a la acción. | Sí, como lista | C1 no penaliza como "débil" un verbo de esta lista | — |
 | R-33 | Prohibido como verbo inicial: realizar, participar, apoyar, contribuir, colaborar, ayudar, asistir, estar a cargo de, ser responsable de. Prohibido en cualquier parte: infinitivo como tarea pendiente, tercera persona (gestionó, coordinó, ejecutó), gerundios de soporte (apoyando, contribuyendo, colaborando, aportando, participando), construcciones pasivas y frases nominales ("encargado de…"). | Sí, como lista | C1: importante si afecta al cargo actual; menor en cargos anteriores | — |
 
@@ -112,9 +112,10 @@ Orden de las reglas en el prompt: R-20 va primero.
 | ID | Regla | Prompt | Rúbrica | Código |
 |---|---|---|---|---|
 | R-40 | Brecha menor a 3 meses: no se menciona. | Sí | C5: no se penaliza su omisión | — |
-| R-41 | Brecha de 3 a 12 meses: **entrada cronológica** dentro de la experiencia laboral, con el mismo formato de fechas que un cargo, ubicada entre los dos cargos que la rodean. Título: "Período de búsqueda laboral"; se agrega "y desarrollo profesional" y una descripción breve solo si el original menciona cursos, freelance o voluntariado en ese período. | Sí | C5: brecha de 3–12 meses sin entrada cronológica = importante; tratarla en el perfil en lugar de como entrada = menor | — |
-| R-42 | Brecha mayor a 12 meses: misma entrada cronológica que R-41, y además el perfil puede incluir una frase nominal breve sobre a qué se dedicó el período, solo con respaldo en el original. | Sí | C5: brecha >12 meses sin entrada cronológica = importante | — |
+| R-41 | Brecha de 3 a 12 meses **entre dos cargos**: **entrada cronológica** dentro de la experiencia laboral, con el mismo formato de fechas que un cargo, ubicada entre los dos cargos que la rodean. Título: "Período de búsqueda laboral"; se agrega "y desarrollo profesional" y una descripción breve solo si el original menciona cursos, freelance o voluntariado en ese período. | Sí | C5: brecha de 3–12 meses sin entrada cronológica = importante; tratarla en el perfil en lugar de como entrada = menor | `verificar.ts` (brechas) |
+| R-42 | Brecha mayor a 12 meses **entre dos cargos**: misma entrada cronológica que R-41, y además el perfil puede incluir una frase nominal breve sobre a qué se dedicó el período, solo con respaldo en el original. | Sí | C5: brecha >12 meses sin entrada cronológica = importante | — |
 | R-43 | Nunca se inventan ni se comprimen fechas para ocultar una brecha. | Sí | C5: crítico | — |
+| R-44 | **Brecha abierta hasta hoy** (el último cargo terminó y no hay cargo posterior): no se agrega ninguna entrada por ese período, porque destacaría la cesantía como si fuera el cargo más reciente. El perfil indica disponibilidad inmediata (R-23). Si la brecha abierta supera 12 meses y la fuente menciona cursos, freelance u otra actividad en ese período, el perfil puede mencionarlo en una frase nominal breve. | Sí | C5: entrada de búsqueda para una brecha abierta = menor; no se penaliza la ausencia de entrada | `verificar.ts` (brechas) |
 
 ---
 
@@ -161,7 +162,7 @@ La rúbrica conserva su estructura (Reglas 1–8, C1–C8, D1–D4, formato JSON
 
 **Proceso obligatorio antes de evaluar C3 (decisión 6).** El crítico primero lista las palabras clave de la oferta y separa las que tienen respaldo en el CV original de las que no. Esa lista se entrega en un campo nuevo del JSON: `keywords_con_respaldo: string[]`. C3 se evalúa **solo** sobre esa lista. Las palabras clave sin respaldo van a `gap_de_perfil` y nunca generan un problema ni bajan la nota.
 
-**C1 — Verbos.** Cambia "infinitivo o pasado simple" por: primera persona, presente en el cargo actual y pasado en los anteriores (R-30). Incorpora R-31 (repetición) y R-33 (prohibidos). No penaliza como débil un verbo de la lista R-32.
+**C1 — Verbos.** Cambia "infinitivo o pasado simple" por: primera persona, presente en el cargo actual y pasado en los anteriores (R-30). Incorpora R-31 (repetición: dentro de un cargo o más de 3 en el CV) y R-33 (prohibidos). No penaliza como débil un verbo de la lista R-32.
 
 **C2 — Cifras.** Tres penalizaciones, en este orden de severidad:
 - Cifra en el adaptado que no está en el original (P2): **crítico**.
@@ -173,7 +174,7 @@ Se mantiene la prohibición de penalizar por no inventar números.
 
 **C4 — Perfil.** (a) 50–100 palabras (antes 50–70); (b) nombra el cargo al que se postula y no la empresa; (c) 2–3 diferenciadores con respaldo; (d) sin frases genéricas. Se elimina toda exigencia de transparentar limitaciones, nivel o brechas frente a la oferta (R-28).
 
-**C5 — Coherencia y brechas.** Reemplaza "brechas de más de 6 meses abordadas en el perfil" por R-40 a R-43. Mantiene: fechas consistentes, sin información inventada ni contradictoria. Afirmación sin respaldo en el original (P1) = crítico.
+**C5 — Coherencia y brechas.** Reemplaza "brechas de más de 6 meses abordadas en el perfil" por R-40 a R-44. Mantiene: fechas consistentes, sin información inventada ni contradictoria. Afirmación sin respaldo en el original (P1) = crítico.
 
 **Regla 6.** Se mantiene la aclaración de que la nota mide ejecución, no fit (P5).
 
@@ -184,10 +185,10 @@ Se mantiene la prohibición de penalizar por no inventar números.
 Solo lo que el código no verifica. Cuatro ítems, sin repetir reglas con otras palabras:
 
 1. **Respaldo.** Cada afirmación del perfil y de los bullets —incluidas cifras y descriptores de alcance— se puede señalar en una línea del CV original. Si no, se elimina.
-2. **Verbos.** Presente en el cargo actual, pasado en los anteriores; ningún verbo inicial aparece más de dos veces en todo el CV.
+2. **Verbos.** Presente en el cargo actual, pasado en los anteriores; ningún bullet empieza con un verbo prohibido; ningún verbo inicial se repite dentro de un cargo ni aparece más de 3 veces en todo el CV.
 3. **Cargo en el perfil.** El perfil nombra el cargo al que se postula y no nombra la empresa.
 4. **Cifras del original.** Ninguna cifra relevante del CV original se perdió al reescribir.
-5. **Orden de secciones (v10.1).** Practicante y junior: EDUCACIÓN antes que EXPERIENCIA LABORAL.
+5. **Orden de secciones (v10.1, corregido en v10.2).** EDUCACIÓN antes que EXPERIENCIA LABORAL solo para estudiante, practicante o recién egresado con menos de 1 año de experiencia laboral.
 
 En v10.1 el ítem 2 también exige que ningún bullet empiece con un verbo prohibido, y se agrega el ítem 5. Es una excepción a la decisión 9 (solo lo que el código no verifica): `verificar.ts` es una herramienta de evals, no corrige nada en producción, y la Fase 4 mostró que el modelo no aplica estas reglas si solo están en su sección.
 
@@ -246,3 +247,14 @@ Motivados por la Fase 4: el crítico Haiku no fue confiable, y la vara principal
 | "en búsqueda de" agregado a la primera persona implícita del perfil | R-24 |
 
 **Verificación automática (`evals/verificar.ts`):** P2 (cifras+), P3 (cifras−), R-31 (verbos>2), R-33 (prohib), R-24/R-25/R-39 (frases), R-10/R-11/R-75 (orden), R-60/R-61 (etiquetas), R-21 (perfil) y R-37b (≈orig). El nivel de cada caso sale del campo `nivel` de `evals/casos/<caso>.json`.
+
+### Cambios v10.2 (2026-09-26)
+
+| Cambio | Reglas |
+|---|---|
+| Repetición de verbos: ninguno se repite dentro de un cargo y ninguno inicia más de 3 bullets en todo el CV (reemplaza el límite de 2 en todo el CV) | R-31 |
+| Educación primero solo para estudiante, practicante o recién egresado con menos de 1 año de experiencia; junior pasa a experiencia primero (corrige un error de la spec) | R-01, R-10, R-11, §10 ítem 5 |
+| Brecha abierta hasta hoy: sin entrada de búsqueda; el perfil indica disponibilidad; mención breve en el perfil solo si supera 12 meses y hay actividad con respaldo | R-41, R-42, R-44 (nueva) |
+| P3 exige conservar solo las cifras relevantes para la oferta. `verificar.ts` acepta en `evals/casos/<caso>.json` un campo `cifras_no_relevantes`, que se revisa a mano (ej. el "45" de valentina, reemplazado por el "240" del mismo original) | P3 |
+
+`verificar.ts` agrega la columna **brechas**: brecha de 3 meses o más entre dos cargos sin entrada cronológica, entrada de búsqueda en una brecha abierta hasta hoy, y perfil sin disponibilidad cuando el candidato no tiene cargo actual.

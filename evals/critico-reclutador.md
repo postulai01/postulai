@@ -60,7 +60,7 @@ Cada bullet empieza con un verbo de acción en primera persona singular: present
 - Gerundios de soporte (apoyando, contribuyendo, colaborando, aportando, participando): **menor**.
 - Bullet débil del original que quedó casi idéntico, conservando la debilidad: **menor**.
 - Tiempo verbal cambiado (pasado en el cargo actual o presente en uno anterior): **menor**.
-- Un mismo verbo inicial más de dos veces en todo el CV (cuenta el verbo base, sin importar el tiempo): **menor** por cada verbo repetido.
+- Repetición de verbos iniciales (cuenta el verbo base, sin importar el tiempo): el mismo verbo en dos bullets de un mismo cargo, o en más de 3 bullets en todo el CV: **menor** por cada verbo repetido.
 - No penalices como débil un verbo de esta lista: gestionar, liderar, implementar, reducir, aumentar, coordinar, desarrollar, ejecutar, diseñar, negociar, optimizar, construir, lanzar, estructurar, analizar, capacitar, supervisar, dirigir, administrar, establecer, generar, lograr, impulsar, consolidar, transformar, reestructurar, proponer, pilotear, escalar, comercializar, identificar, evaluar.
 
 **C2 — Cifras**
@@ -86,14 +86,14 @@ Un perfil que podría pertenecer a cualquier candidato en cualquier oferta es un
 - Fechas consistentes. Fechas inventadas o comprimidas para ocultar una brecha: **crítico**.
 - Brechas entre cargos (calcula los meses entre el fin de uno y el inicio del siguiente):
   - Menor a 3 meses: no se menciona; no penalices su omisión.
-  - De 3 meses o más: debe aparecer como entrada cronológica dentro de la experiencia laboral, entre los dos cargos que la rodean. Sin entrada cronológica: **importante**. Tratada solo en el perfil en lugar de como entrada: **menor**.
-  - Mayor a 12 meses: además de la entrada, el perfil puede mencionar brevemente a qué se dedicó el período, solo con respaldo.
+  - De 3 meses o más entre dos cargos: debe aparecer como entrada cronológica dentro de la experiencia laboral, entre los dos cargos que la rodean. Sin entrada cronológica: **importante**. Tratada solo en el perfil en lugar de como entrada: **menor**. Si supera 12 meses, el perfil puede además mencionar brevemente a qué se dedicó el período, solo con respaldo.
+  - Brecha abierta hasta hoy (el último cargo terminó y no hay cargo posterior): no debe haber una entrada de "Período de búsqueda laboral" para ese período; si la hay: **menor**. El perfil debe indicar disponibilidad inmediata. No penalices la ausencia de entrada.
 
 **C6 — Eliminación de relleno**
 El CV no debe contener: frases genéricas sin respaldo ("excelentes habilidades de comunicación"), listas de competencias sin evidencia, funciones listadas como habilidades técnicas, texto que repite la descripción del cargo en lugar de lo que hizo el candidato, ni palabras vacías (multifuncional, proactivo, dinámico, sinergia, gestión integral, ciclo completo, end-to-end, de principio a fin, desde X hasta Y).
 
 **C7 — Adecuación al nivel**
-El lenguaje, la densidad de logros, el orden de secciones (educación antes de experiencia para practicante/junior) y la extensión deben coincidir con el nivel del candidato. Un CV senior con bullets que describen tareas rutinarias suena a semi-senior. Un CV junior con lenguaje de director suena falso.
+El lenguaje, la densidad de logros, el orden de secciones (educación antes de experiencia solo para estudiante, practicante o recién egresado con menos de 1 año de experiencia laboral; experiencia primero desde junior) y la extensión deben coincidir con el nivel del candidato. Un CV senior con bullets que describen tareas rutinarias suena a semi-senior. Un CV junior con lenguaje de director suena falso.
 
 **C8 — Carta de presentación**
 Debe: (a) mencionar la empresa por nombre, (b) conectar un logro específico del candidato con una necesidad específica de la oferta, (c) tener un tono apropiado al rubro, (d) no repetir verbatim el texto del CV, (e) no incluir cifras que no estén en el CV original. Una carta que podría enviarse a cualquier empresa es una carta fallida.
