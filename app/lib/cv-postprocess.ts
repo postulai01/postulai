@@ -205,3 +205,89 @@ export function limpiarConocimientosEnDesarrollo(
 
   return out.join("\n");
 }
+
+// ─── cifras sin respaldo ─────────────────────────────────────────────────────
+// Compartido con evals/verificar.ts. Ignora fechas (MM/AAAA), años y líneas de contacto.
+
+const LINEA_CONTACTO = /@|\+\s?56|m[oó]vil|tel[eé]fono|linkedin\.com/i;
+
+const NUMEROS_EN_PALABRAS: Record<string, string> = {
+  uno: "1", una: "1", dos: "2", tres: "3", cuatro: "4", cinco: "5", seis: "6", siete: "7",
+  ocho: "8", nueve: "9", diez: "10", once: "11", doce: "12", veinte: "20", cien: "100",
+  primer: "1", primero: "1", segundo: "2", tercer: "3", tercero: "3", cuarto: "4",
+  quinto: "5", sexto: "6", septimo: "7", octavo: "8", noveno: "9", decimo: "10",
+};
+
+export function extraerCifras(texto: string): Set<string> {
+  const cifras = new Set<string>();
+  for (const linea of texto.split("\n")) {
+    if (LINEA_CONTACTO.test(linea)) continue;
+    const limpia = linea
+      .replace(/\b\d{1,2}\/\d{4}\b/g, " ")        // fechas MM/AAAA
+      .replace(/\b(19|20)\d{2}\b/g, " ");          // años
+    for (const m of limpia.match(/\d+(?:[.,]\d+)*/g) ?? []) {
+      cifras.add(/^\d{1,3}(\.\d{3})+$/.test(m) ? m.replace(/\./g, "") : m);
+    }
+  }
+  return cifras;
+}
+
+export function cifraPresente(cifra: string, texto: string, cifrasTexto: Set<string>): boolean {
+  if (cifrasTexto.has(cifra)) return true;
+  const n = texto.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  return Object.entries(NUMEROS_EN_PALABRAS).some(
+    ([palabra, valor]) => valor === cifra && new RegExp(`\\b${palabra}\\b`).test(n)
+  );
+}
+
+export function cifrasSinRespaldo(cvAdaptado: string, fuenteOriginal: string): string[] {
+  const cifrasFuente = extraerCifras(fuenteOriginal);
+  return [...extraerCifras(cvAdaptado)].filter(c => !cifraPresente(c, fuenteOriginal, cifrasFuente));
+}
+
+// ─── disponibilidad inmediata ────────────────────────────────────────────────
+// Si ningún cargo de EXPERIENCIA LABORAL dice "Presente" y el perfil no menciona
+// disponibilidad, agrega la frase al final del perfil. No revisa si la oferta fija fecha de inicio.
+
+export const FRASE_DISPONIBILIDAD = "Disponible para incorporación inmediata.";
+
+const esEncabezadoSeccion = (l: string) => {
+  const t = l.replace(/[—─━\-=_*~%\s]+$/, "").trim();
+  return t.length > 1 && t.length < 60 && t === t.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(t) && !/—\s*.+\d/.test(t);
+};
+const esSoloSeparador = (l: string) => l.trim().length > 1 && /^[─━—\-=_*~%]+$/.test(l.trim());
+
+export function agregarDisponibilidad(cvText: string): string {
+  const lines = cvText.split("\n");
+
+  // ¿Hay algún cargo actual en EXPERIENCIA LABORAL?
+  const iExp = lines.findIndex(l => /EXPERIENCIA\s+LABORAL/i.test(l) && esEncabezadoSeccion(l));
+  if (iExp === -1) return cvText;
+  let hayCargo = false;
+  for (const l of lines.slice(iExp + 1)) {
+    if (esSoloSeparador(l)) continue;
+    if (esEncabezadoSeccion(l)) break;
+    if (/—\s*.+\d/.test(l)) {
+      hayCargo = true;
+      if (/presente|actualidad/i.test(l)) return cvText;
+    }
+  }
+  if (!hayCargo) return cvText;
+
+  // Última línea no vacía del perfil
+  const iPerfil = lines.findIndex(l => /PERFIL\s+PROFESIONAL/i.test(l));
+  if (iPerfil === -1) return cvText;
+  let ultima = -1;
+  for (let i = iPerfil + 1; i < lines.length; i++) {
+    if (esSoloSeparador(lines[i])) continue;
+    if (esEncabezadoSeccion(lines[i])) break;
+    if (lines[i].trim()) ultima = i;
+  }
+  if (ultima === -1) return cvText;
+  const perfil = lines.slice(iPerfil + 1, ultima + 1).join(" ");
+  if (/disponib/i.test(perfil)) return cvText;
+
+  const linea = lines[ultima].replace(/\s+$/, "");
+  lines[ultima] = /[.!?]$/.test(linea) ? `${linea} ${FRASE_DISPONIBILIDAD}` : `${linea}. ${FRASE_DISPONIBILIDAD}`;
+  return lines.join("\n");
+}

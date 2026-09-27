@@ -25,6 +25,8 @@ import * as path from "path";
 import {
   limpiarConocimientosEnDesarrollo,
   limpiarHabilidadesTecnicas,
+  agregarDisponibilidad,
+  cifrasSinRespaldo,
   calcularMatch,
 } from "../app/lib/cv-postprocess";
 import { construirMensajeUsuario } from "../app/lib/mensaje-usuario";
@@ -215,6 +217,9 @@ async function generateAdaptacion(
   let cvAdaptado = parsed.cv_adaptado as string;
   cvAdaptado = limpiarConocimientosEnDesarrollo(cvAdaptado, cvTexto);
   cvAdaptado = limpiarHabilidadesTecnicas(cvAdaptado, cvTexto);
+  cvAdaptado = agregarDisponibilidad(cvAdaptado);
+  const sinRespaldo = cifrasSinRespaldo(cvAdaptado, cvTexto);
+  if (sinRespaldo.length > 0) console.warn(`  ⚠️   Cifras sin respaldo en la fuente: ${sinRespaldo.join(", ")}`);
 
   const resultado: ResultadoAdaptacion = {
     cv_adaptado:          cvAdaptado,

@@ -1,6 +1,6 @@
-# Especificación del CV adaptado — Postulai (spec-cv v10.2)
+# Especificación del CV adaptado — Postulai (spec-cv v10.3)
 
-**Fecha:** 2026-09-26 (v10.1 y v10.2: ver §13)
+**Fecha:** 2026-09-26 (v10.1 a v10.3: ver §13)
 **Base:** auditoría `evals/auditoria-v9.md` + decisiones de diseño de la Fase 2
 **Fuente única de verdad.** El SYSTEM_PROMPT v10 (`app/api/process-cv/route.ts`), el mensaje de usuario que arma la misma ruta y la rúbrica del crítico (`evals/critico-reclutador.md`) se derivan de este documento. Si alguno de ellos contradice esta spec, el error está en ese archivo, no aquí.
 
@@ -27,7 +27,7 @@ Restricciones de redacción del prompt (decisión 8):
 
 **P1 — Respaldo.** Toda afirmación del CV adaptado (hecho, responsabilidad, resultado, cifra, herramienta, competencia, alcance) debe poder señalarse en una línea del CV original. Reescribir cambia el lenguaje, nunca los hechos. El nombre de una carrera o mención académica no respalda por sí solo competencias técnicas específicas; solo cuentan un curso o ramo nombrado, un proyecto descrito, una herramienta mencionada por su nombre o experiencia laboral directa.
 
-**P2 — Cero cifras inventadas, sin excepción.** Ninguna cifra (cantidad, porcentaje, monto, plazo, tamaño de equipo, rango) puede aparecer en el CV adaptado si no está en el CV original. No se inventa, no se estima, no se infiere, no se dan rangos. Si el original no tiene cifras para un cargo o bullet, se describe el alcance o la escala de forma cualitativa, y ese descriptor cualitativo también debe tener respaldo (P1).
+**P2 — Cero cifras inventadas, sin excepción.** Ninguna cifra (cantidad, porcentaje, monto, plazo, tamaño de equipo, rango) puede aparecer en el CV adaptado si no está en el CV original. No se inventa, no se estima, no se infiere, no se redondea (240 no puede pasar a "más de 200"), no se dan rangos. Si el original no tiene cifras para un cargo o bullet, se describe el alcance o la escala de forma cualitativa, y ese descriptor cualitativo también debe tener respaldo (P1).
 
 **P3 — Ninguna cifra se pierde.** Toda cifra presente en el CV original que sea relevante para la oferta se conserva en el CV adaptado al reescribir.
 
@@ -75,7 +75,7 @@ Orden de las reglas en el prompt: R-20 va primero.
 | R-20 | **Primera regla del perfil:** nombra el cargo al que se postula, tal como lo nombra la oferta. Nunca el nombre de la empresa. Sin oferta (modo crear sin oferta): nombra el título o rol profesional del candidato. | Sí, primera | C4 (b): no nombrar el cargo = importante; nombrar la empresa = importante | — |
 | R-21 | Entre 50 y 100 palabras, en 2 a 4 líneas. | Sí, sin instrucción de contar | C4 (a): fuera de rango = menor | Recorte automático si supera 100 palabras |
 | R-22 | Contenido: nivel o etapa profesional + área de especialidad; 2–3 fortalezas o diferenciadores con respaldo en el original (usando el vocabulario de la oferta cuando hay respaldo, R-04); un logro o hecho concreto del original. | Sí, como lista de contenidos, sin estructura-plantilla ni frases modelo | C4 (c) | — |
-| R-23 | Si el candidato está sin empleo y la oferta no fija fecha de inicio, se indica disponibilidad inmediata. | Sí | — | — |
+| R-23 | Si el candidato está sin empleo y la oferta no fija fecha de inicio, se indica disponibilidad inmediata. | Sí | — | `agregarDisponibilidad` (v10.3): si ningún cargo de EXPERIENCIA LABORAL dice "Presente" y el perfil no menciona disponibilidad, agrega "Disponible para incorporación inmediata." al final del perfil. No revisa si la oferta fija fecha de inicio. |
 | R-24 | Redacción impersonal con frases nominales. Prohibido: primera persona explícita o implícita (yo soy, me considero, busco, busca, busca integrarse, en búsqueda de); tercera persona (ha liderado, ha desarrollado, ha gestionado). | Sí | C4 (d) / C6 | — |
 | R-25 | Palabras y frases prohibidas en el perfil: proactivo, apasionado, dinámico, innovador, orientado a resultados, nuevos desafíos, ganas de aprender, soy una persona, me considero, profesional apasionado; verbos de soporte en cualquier conjugación (apoyar, aportar, contribuir, colaborar, asistir); frases de proceso completo (ciclo completo, end-to-end, de principio a fin, desde X hasta Y, productivo-comercial, operativo-comercial). | Sí, como lista | C4 (d) / C6 | — |
 | R-26 | Enumeraciones del tipo "X, Y y Z": cada elemento necesita su propio respaldo. Un elemento sin respaldo se elimina; no se rescata como "en formación" ni "en desarrollo" dentro del perfil. | Sí | C5 (afirmación sin respaldo) | — |
@@ -258,3 +258,13 @@ Motivados por la Fase 4: el crítico Haiku no fue confiable, y la vara principal
 | P3 exige conservar solo las cifras relevantes para la oferta. `verificar.ts` acepta en `evals/casos/<caso>.json` un campo `cifras_no_relevantes`, que se revisa a mano (ej. el "45" de valentina, reemplazado por el "240" del mismo original) | P3 |
 
 `verificar.ts` agrega la columna **brechas**: brecha de 3 meses o más entre dos cargos sin entrada cronológica, entrada de búsqueda en una brecha abierta hasta hoy, y perfil sin disponibilidad cuando el candidato no tiene cargo actual.
+
+### Cambios v10.3 (2026-09-26)
+
+| Cambio | Reglas |
+|---|---|
+| P2 prohíbe también redondear cifras (la v10.2 convirtió 240 en "más de 200") | P2, principio 2 del prompt |
+| Disponibilidad inmediata agregada por código cuando no hay cargo actual y el perfil no la menciona (`agregarDisponibilidad` en `app/lib/cv-postprocess.ts`, en `route.ts` y en el eval) | R-23, R-44 |
+| Vigilancia de cifras en producción: `route.ts` registra con `console.warn` cada cifra del CV adaptado que no está en la fuente (`cifrasSinRespaldo`, misma lógica que `verificar.ts`). No modifica el CV. | P2 |
+
+**Limitación conocida — R-31 en todo el CV:** el modelo cumple "sin repetir verbo dentro de un cargo", pero en CVs largos (senior, ~25 bullets) repite algún verbo más de 3 veces en todo el CV (andres_senior: Lideré ×4, Diseñé ×4 en v10.1 y v10.2). Se acepta así: el verificador lo sigue reportando, pero no bloquea.

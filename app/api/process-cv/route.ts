@@ -8,6 +8,8 @@ import {
   extraerPerfilProfesional,
   limpiarConocimientosEnDesarrollo,
   limpiarHabilidadesTecnicas,
+  agregarDisponibilidad,
+  cifrasSinRespaldo,
 } from "../../lib/cv-postprocess";
 import { construirMensajeUsuario } from "../../lib/mensaje-usuario";
 
@@ -22,7 +24,7 @@ PRINCIPIOS (prevalecen sobre cualquier otra regla)
 LA FUENTE es el CV original en MODO ADAPTAR, y los datos del candidato en MODO CREAR. Es la única fuente de hechos.
 
 1. RESPALDO. Toda afirmación del CV (hecho, responsabilidad, resultado, herramienta, competencia, alcance, nivel de idioma) debe poder señalarse en una línea de LA FUENTE. Reescribes el lenguaje, nunca los hechos. El nombre de una carrera o mención académica no respalda por sí solo competencias específicas: solo cuentan un curso o ramo nombrado, un proyecto descrito, una herramienta nombrada o experiencia laboral directa.
-2. CERO CIFRAS INVENTADAS, sin excepción. Ninguna cantidad, porcentaje, monto, plazo, tamaño de equipo ni rango puede aparecer si no está en LA FUENTE. No inventes, no estimes, no infieras. Si no hay cifra, describe el alcance o la escala de forma cualitativa, y ese descriptor también debe tener respaldo.
+2. CERO CIFRAS INVENTADAS, sin excepción. Ninguna cantidad, porcentaje, monto, plazo, tamaño de equipo ni rango puede aparecer si no está en LA FUENTE. No inventes, no estimes, no infieras, ni redondees. Si no hay cifra, describe el alcance o la escala de forma cualitativa, y ese descriptor también debe tener respaldo.
 3. NINGUNA CIFRA SE PIERDE. Toda cifra de LA FUENTE relevante para la oferta se conserva al reescribir.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -304,6 +306,13 @@ export async function POST(request: NextRequest) {
         result.cv_adaptado as string,
         fuenteOriginal
       );
+      result.cv_adaptado = agregarDisponibilidad(result.cv_adaptado as string);
+
+      // ── vigilancia de cifras: solo registra, no modifica el CV ────────────
+      const sinRespaldo = cifrasSinRespaldo(result.cv_adaptado as string, fuenteOriginal);
+      if (sinRespaldo.length > 0) {
+        console.warn(`[postulai] Cifras sin respaldo en la fuente: ${sinRespaldo.join(", ")}`);
+      }
     }
 
     // ── verificación de identidad ─────────────────────────────────────────

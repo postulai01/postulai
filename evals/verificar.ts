@@ -9,6 +9,8 @@
  *   npx tsx evals/verificar.ts --caso=camila_junior
  *   npx tsx evals/verificar.ts evals/resultados/<archivo>.json [...]
  *   npx tsx evals/verificar.ts --sin-detalle                    # solo la tabla
+ *   npx tsx evals/verificar.ts --aplicar-postproceso            # aplica antes agregarDisponibilidad (como producción
+ *                                                               # desde v10.3) a resultados guardados antes de ese cambio
  *
  * Revisa:
  *   cifras+    cifras del CV adaptado que no están en el original (P2)
@@ -35,43 +37,17 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import { extraerPerfilProfesional } from "../app/lib/cv-postprocess";
+import {
+  extraerPerfilProfesional,
+  extraerCifras,
+  cifraPresente,
+  agregarDisponibilidad,
+} from "../app/lib/cv-postprocess";
 
 // ─── normalización ────────────────────────────────────────────────────────────
 
 const sinTildes = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "");
 const norm = (s: string) => sinTildes(s.toLowerCase());
-
-const LINEA_CONTACTO = /@|\+\s?56|m[oó]vil|tel[eé]fono|linkedin\.com/i;
-
-const NUMEROS_EN_PALABRAS: Record<string, string> = {
-  uno: "1", una: "1", dos: "2", tres: "3", cuatro: "4", cinco: "5", seis: "6", siete: "7",
-  ocho: "8", nueve: "9", diez: "10", once: "11", doce: "12", veinte: "20", cien: "100",
-  primer: "1", primero: "1", segundo: "2", tercer: "3", tercero: "3", cuarto: "4",
-  quinto: "5", sexto: "6", septimo: "7", octavo: "8", noveno: "9", decimo: "10",
-};
-
-function extraerCifras(texto: string): Set<string> {
-  const cifras = new Set<string>();
-  for (const linea of texto.split("\n")) {
-    if (LINEA_CONTACTO.test(linea)) continue;
-    const limpia = linea
-      .replace(/\b\d{1,2}\/\d{4}\b/g, " ")        // fechas MM/AAAA
-      .replace(/\b(19|20)\d{2}\b/g, " ");          // años
-    for (const m of limpia.match(/\d+(?:[.,]\d+)*/g) ?? []) {
-      cifras.add(/^\d{1,3}(\.\d{3})+$/.test(m) ? m.replace(/\./g, "") : m);
-    }
-  }
-  return cifras;
-}
-
-function cifraPresente(cifra: string, texto: string, cifrasTexto: Set<string>): boolean {
-  if (cifrasTexto.has(cifra)) return true;
-  const n = norm(texto);
-  return Object.entries(NUMEROS_EN_PALABRAS).some(
-    ([palabra, valor]) => valor === cifra && new RegExp(`\\b${palabra}\\b`).test(n)
-  );
-}
 
 // ─── estructura del CV ────────────────────────────────────────────────────────
 
@@ -245,7 +221,9 @@ function verificar(archivo: string): Reporte {
   const casoJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), "evals/casos", `${caso}.json`), "utf-8"));
   const original: string = casoJson.cv_texto;
   const nivel: Nivel | "?" = casoJson.nivel ?? "?";
-  const cv: string = resultado.cv_adaptado ?? "";
+  const cv: string = APLICAR_POSTPROCESO
+    ? agregarDisponibilidad(resultado.cv_adaptado ?? "")
+    : (resultado.cv_adaptado ?? "");
 
   const v: Record<string, string[]> = Object.fromEntries([...TIPOS, ...INFORMATIVOS].map(t => [t, [] as string[]]));
   const secciones = seccionar(cv);
@@ -379,6 +357,8 @@ function verificar(archivo: string): Reporte {
     palabrasPerfil, v,
   };
 }
+
+const APLICAR_POSTPROCESO = process.argv.includes("--aplicar-postproceso");
 
 // ─── selección de archivos ────────────────────────────────────────────────────
 
