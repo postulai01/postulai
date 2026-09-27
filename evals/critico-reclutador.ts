@@ -6,6 +6,7 @@
  *   npx tsx evals/critico-reclutador.ts --caso=pedro_xepelin --repeticiones=3
  *   npx tsx evals/critico-reclutador.ts --caso=pedro_xepelin --con-pdf --template=moderno
  *   npx tsx evals/critico-reclutador.ts --caso=pedro_xepelin --forzar-regen
+ *   npx tsx evals/critico-reclutador.ts --caso=andres_senior --resultado=evals/resultados/andres_senior-<ts>.json
  *
  * Flags:
  *   --template=<moderno|tradicional|ejecutivo>  Solo con --con-pdf; default: los 3
@@ -13,6 +14,7 @@
  *   --forzar-regen                              Fuerza regenerar aunque SYSTEM_PROMPT no cambió
  *   --con-pdf                                   Genera PDF y evalúa criterios D1-D4 (default: texto solo)
  *   --repeticiones=N                            Corre el crítico N veces; reporta avg/min/max (default: 1)
+ *   --resultado=<archivo>                       Critica esa adaptación guardada, sin regenerar (ignora --forzar-regen)
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -24,6 +26,7 @@ import {
   limpiarHabilidadesTecnicas,
   calcularMatch,
 } from "../app/lib/cv-postprocess";
+import { construirMensajeUsuario } from "../app/lib/mensaje-usuario";
 
 // ─── modelos y costos ─────────────────────────────────────────────────────────
 
@@ -114,6 +117,7 @@ interface Args {
   caso?: string;
   cvAntes?: string; cvDespues?: string; oferta?: string; etiqueta?: string;
   template?: string;
+  resultado?: string;
   modeloCompleto: boolean;
   forzarRegen: boolean;
   conPdf: boolean;
@@ -135,6 +139,7 @@ function parseArgs(): Args {
     oferta:         args["oferta"],
     etiqueta:       args["etiqueta"],
     template:       args["template"],
+    resultado:      args["resultado"],
     modeloCompleto: flags.has("modelo-completo"),
     forzarRegen:    flags.has("forzar-regen"),
     conPdf:         flags.has("con-pdf"),
@@ -192,7 +197,7 @@ async function generateAdaptacion(
     system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
     messages: [{
       role: "user",
-      content: `MODO: ADAPTAR\n\nCV ORIGINAL:\n${cvTexto}\n\nOFERTA DE TRABAJO:\n${ofertaTexto}`,
+      content: construirMensajeUsuario({ modo: "adaptar", cv: cvTexto, oferta: ofertaTexto }),
     }],
   });
 
@@ -262,6 +267,7 @@ interface Problema {
 }
 
 interface CriticaResult {
+  keywords_con_respaldo?: string[];
   primera_impresion: string;
   resumen_ejecutivo: string;
   problemas: Problema[];
@@ -396,6 +402,7 @@ function printReporte(
     console.log(`\n  OPORTUNIDADES PERDIDAS:`);
     for (const o of critica.delta_evaluacion.oportunidades_perdidas) console.log(`    - ${o}`);
   }
+  console.log(`\n  KEYWORDS CON RESPALDO (base de C3): ${critica.keywords_con_respaldo?.length ? critica.keywords_con_respaldo.join(", ") : "ninguna"}`);
   if (critica.gap_de_perfil?.length > 0) {
     console.log(`\n  GAP DE PERFIL (informativo, no penaliza):`);
     for (const g of critica.gap_de_perfil) console.log(`    · ${g}`);
@@ -451,10 +458,11 @@ async function main() {
     const caso = JSON.parse(fs.readFileSync(casoPath, "utf-8"));
     cvAntes  = caso.cv_texto;
     oferta   = caso.oferta_texto;
-    etiqueta = args.caso;
+    etiqueta = args.etiqueta ?? args.caso;
 
-    const latest    = findLatestResult(resultadosDir, args.caso);
-    const needsRegen = args.forzarRegen || !latest || !resultadoEsFresco(latest);
+    const latest    = args.resultado ?? findLatestResult(resultadosDir, args.caso);
+    if (args.resultado && !fs.existsSync(args.resultado)) { console.error(`❌  Resultado no encontrado: ${args.resultado}`); process.exit(1); }
+    const needsRegen = !args.resultado && (args.forzarRegen || !latest || !resultadoEsFresco(latest));
 
     console.log(`\n📋  Caso: ${args.caso}`);
     console.log(`💰  Costo estimado: ${estimarCostoTotal(args)}`);

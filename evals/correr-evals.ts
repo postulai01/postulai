@@ -1,3 +1,7 @@
+// OBSOLETO (2026-09-26): este script y su rúbrica (evals/rubrica.md) corresponden al
+// SYSTEM_PROMPT v9 y contradicen evals/spec-cv.md. No se mantienen alineados.
+// Para evaluar usa evals/critico-reclutador.ts.
+
 import Anthropic from "@anthropic-ai/sdk";
 import { jsonrepair } from "jsonrepair";
 import * as fs from "fs";

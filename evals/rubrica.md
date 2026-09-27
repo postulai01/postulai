@@ -1,3 +1,5 @@
+> **OBSOLETO (2026-09-26).** Esta rúbrica corresponde al SYSTEM_PROMPT v9 y contradice `evals/spec-cv.md` (perfil ≤70 palabras, ≥1 número por cargo, ≥70 % de keywords). No se mantiene alineada. Para evaluar usa `evals/critico-reclutador.ts` con la rúbrica `evals/critico-reclutador.md`.
+
 # Rúbrica de Evaluación — SYSTEM_PROMPT de Postulai
 
 Criterios extraídos directamente de las reglas del SYSTEM_PROMPT en `app/api/process-cv/route.ts`.
