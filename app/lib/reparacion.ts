@@ -7,7 +7,10 @@
 
 import type Anthropic from "@anthropic-ai/sdk";
 import { cifrasSinRespaldo } from "./cv-postprocess";
-import { detectarReparables, type ViolacionReparable } from "./cv-verificacion";
+import {
+  detectarReparables, type ViolacionReparable, verboProhibido, raizVerbo, primeraPalabra, perfilNombraCargo,
+  FRASES_CV, FRASES_PERFIL, norm,
+} from "./cv-verificacion";
 
 export const MODELO_REPARACION = "claude-haiku-4-5-20251001";
 
@@ -24,6 +27,7 @@ Reglas para todas las líneas:
 - No agregues hechos, responsabilidades, herramientas, cifras ni resultados que no estén en el CV original.
 - Conserva todas las cifras que ya tiene la línea, sin cambiarlas ni redondearlas.
 - Mantén el contenido y el nivel de detalle; cambia solo lo necesario para cumplir la regla.
+- No subas el nivel de responsabilidad ni de dominio: participar o apoyar no se convierte en coordinar, liderar, dirigir, gestionar ni supervisar, y un nivel declarado (básico, intermedio) no se convierte en dominio ni en avanzado.
 - No uses términos internos ni nombres de reglas.
 
 Responde ÚNICAMENTE con un JSON válido: {"lineas":[{"id":"<id>","texto":"<línea corregida>"}]}, con un elemento por cada id recibido. El texto va sin guion inicial.`;
@@ -32,11 +36,11 @@ function instruccion(v: ViolacionReparable): string {
   const tiempo = v.cargoActual ? "presente (es el cargo actual)" : "pasado (es un cargo anterior)";
   switch (v.tipo) {
     case "verbo_prohibido":
-      return `El bullet empieza con un verbo o construcción prohibida (${v.detalle}). Reescríbelo empezando con un verbo de acción en primera persona singular, en ${tiempo}. No uses: realizar, participar, apoyar, contribuir, colaborar, ayudar, asistir, estar a cargo de, ser responsable de.`;
+      return `El bullet empieza con un verbo o construcción prohibida (${v.detalle}). Reescríbelo empezando con un verbo de acción en primera persona singular, en ${tiempo}, que describa exactamente la misma acción que el CV original, con el mismo nivel de responsabilidad y distinto de los verbos ya usados en este cargo. No uses: realizar, participar, apoyar, contribuir, colaborar, ayudar, asistir, estar a cargo de, ser responsable de.`;
     case "verbo_repetido":
       return `El bullet repite un verbo inicial dentro del mismo cargo (${v.detalle}). Cambia el verbo inicial por otro verbo de acción en primera persona singular, en ${tiempo}, distinto de los ya usados en el cargo, y ajusta solo lo necesario para que la frase quede correcta.`;
     case "perfil_sin_cargo":
-      return `El perfil profesional no nombra el cargo al que se postula: "${v.detalle}". Reescríbelo para que su primera frase nombre ese cargo como el cargo al que se postula, sin nombrar la empresa y sin presentar al candidato como si ya ocupara ese cargo si el CV original no lo respalda. Mantén el resto del contenido, entre 50 y 100 palabras, en redacción impersonal con frases nominales (sin primera ni tercera persona).`;
+      return `El perfil profesional no nombra el cargo al que se postula: "${v.detalle}". Devuelve el perfil completo: agrega o ajusta solo su primera frase para nombrar ese cargo como el cargo al que se postula, sin nombrar la empresa y sin presentar al candidato como si ya ocupara ese cargo. Conserva todas las demás frases y datos tal como están (institución, niveles, cifras); no resumas ni acortes. Debe quedar entre 50 y 100 palabras, en redacción impersonal con frases nominales.`;
     case "educacion_extra":
       return `En EDUCACIÓN solo va la línea de carrera e institución con sus fechas. Esta línea extra se conserva solo si es un premio nacional, una publicación académica, un promedio sobre 6.0 o una beca competitiva; en ese caso devuélvela igual. Si no lo es, devuelve texto vacío "" para eliminarla.`;
   }
@@ -86,6 +90,10 @@ export async function repararCV(opts: {
     return { cv, estado: "descartada", detalle, usage };
   }
 
+  // Validación línea por línea: una línea reparada que no pasa se rechaza y queda la original.
+  const fuenteNorm = norm(fuente);
+  const rechazadas: string[] = [];
+
   // Aplicar: reemplazos por índice de línea; null = eliminar la línea.
   const lineas = cv.split("\n");
   const reemplazos = new Map<number, string | null>();
@@ -99,6 +107,8 @@ export async function repararCV(opts: {
       continue;
     }
     if (!limpio || limpio === v.texto) continue;
+    const motivo = motivoRechazo(v, limpio, fuenteNorm);
+    if (motivo) { rechazadas.push(`${v.tipo} (${v.id}): ${motivo}`); continue; }
     if (v.tipo === "perfil_sin_cargo") {
       reemplazos.set(v.indices[0], limpio);
       for (const i of v.indices.slice(1)) reemplazos.set(i, null);
@@ -108,8 +118,9 @@ export async function repararCV(opts: {
     }
     aplicadas.push(`${v.tipo} (${v.id})`);
   }
+  if (rechazadas.length > 0) console.warn(`[postulai] Reparación: líneas rechazadas (${rechazadas.join("; ")})`);
   if (reemplazos.size === 0) {
-    const detalle = ["sin cambios utilizables en la respuesta", ...resumen];
+    const detalle = ["sin cambios utilizables en la respuesta", ...rechazadas.map(r => `rechazada ${r}`), ...resumen];
     console.warn(`[postulai] Reparación descartada (${detalle.join("; ")})`);
     return { cv, estado: "descartada", detalle, usage };
   }
@@ -123,11 +134,47 @@ export async function repararCV(opts: {
   const antes = new Set(cifrasSinRespaldo(cv, fuente));
   const nuevas = cifrasSinRespaldo(reparado, fuente).filter(c => !antes.has(c));
   if (nuevas.length > 0) {
-    const detalle = [`cifras nuevas sin respaldo: ${nuevas.join(", ")}`, ...aplicadas];
+    const detalle = [`cifras nuevas sin respaldo: ${nuevas.join(", ")}`, ...aplicadas, ...rechazadas.map(r => `rechazada ${r}`)];
     console.warn(`[postulai] Reparación descartada (${detalle.join("; ")})`);
     return { cv, estado: "descartada", detalle, usage };
   }
 
-  console.warn(`[postulai] Reparación aplicada: ${aplicadas.join("; ")}`);
-  return { cv: reparado, estado: "aplicada", detalle: aplicadas, usage };
+  const detalle = [...aplicadas, ...rechazadas.map(r => `rechazada ${r}`)];
+  console.warn(`[postulai] Reparación aplicada: ${detalle.join("; ")}`);
+  return { cv: reparado, estado: "aplicada", detalle, usage };
+}
+
+// ─── validación de líneas reparadas ──────────────────────────────────────────
+
+// Verbos que suben el nivel de responsabilidad; solo se aceptan si su raíz aparece en la fuente.
+const VERBOS_ESCALADA = /^(coordin|lider|dirig|gestion|supervis|encabez|administr|conduc|jefatur)/;
+// Palabras que suben el nivel de dominio o experiencia; no pueden aparecer si no estaban en la línea.
+const PALABRAS_NIVEL = /\b(dominio|experto|experta|avanzad[oa]|solid[oa]|amplia experiencia|especialista)\b/g;
+
+function frasesProhibidas(texto: string): Set<string> {
+  const n = norm(texto);
+  return new Set([...FRASES_CV, ...FRASES_PERFIL].filter(([re]) => re.test(n)).map(([, nombre]) => nombre));
+}
+
+function motivoRechazo(v: ViolacionReparable, nuevo: string, fuenteNorm: string): string | null {
+  const antes = frasesProhibidas(v.texto);
+  const agregadas = [...frasesProhibidas(nuevo)].filter(f => !antes.has(f));
+  if (agregadas.length > 0) return `agrega frases prohibidas (${agregadas.join(", ")})`;
+
+  const nivelAntes = new Set(norm(v.texto).match(PALABRAS_NIVEL) ?? []);
+  const nivelNuevo = (norm(nuevo).match(PALABRAS_NIVEL) ?? []).filter(w => !nivelAntes.has(w));
+  if (nivelNuevo.length > 0) return `sube el nivel declarado (${nivelNuevo.join(", ")})`;
+
+  if (v.tipo === "verbo_prohibido" || v.tipo === "verbo_repetido") {
+    if (verboProhibido(nuevo)) return "sigue empezando con un verbo prohibido";
+    const raiz = raizVerbo(primeraPalabra(nuevo));
+    if (VERBOS_ESCALADA.test(raiz) && !fuenteNorm.includes(raiz.slice(0, 6))) return `escala la responsabilidad ("${primeraPalabra(nuevo)}" sin respaldo en la fuente)`;
+    if ((v.otrosVerbos ?? []).some(o => raizVerbo(o) === raiz)) return `repite un verbo del mismo cargo ("${primeraPalabra(nuevo)}")`;
+  }
+  if (v.tipo === "perfil_sin_cargo") {
+    const palabras = nuevo.split(/\s+/).filter(Boolean).length;
+    if (palabras < 50 || palabras > 100) return `perfil de ${palabras} palabras (fuera de 50–100)`;
+    if (!perfilNombraCargo(nuevo, v.detalle)) return "el perfil sigue sin nombrar el cargo";
+  }
+  return null;
 }

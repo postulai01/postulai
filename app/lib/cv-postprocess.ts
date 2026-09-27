@@ -335,6 +335,26 @@ export function postprocesarCV(cvText: string, fuenteOriginal: string): string {
   let cv = limpiarConocimientosEnDesarrollo(cvText, fuenteOriginal);
   cv = limpiarHabilidadesTecnicas(cv, fuenteOriginal);
   cv = limpiarHabilidadesBlandas(cv);
+  cv = quitarDisponibilidadEstudiante(cv);
   cv = agregarDisponibilidad(cv);
   return cv;
+}
+
+// R-23: a un estudiante (alguna línea de EDUCACIÓN en curso) no se le indica disponibilidad.
+// Elimina del perfil las oraciones que la mencionan.
+export function quitarDisponibilidadEstudiante(cvText: string): string {
+  if (!esEstudiante(seccionar(cvText))) return cvText;
+  const lines = cvText.split("\n");
+  const iPerfil = lines.findIndex(l => /PERFIL\s+PROFESIONAL/i.test(l));
+  if (iPerfil === -1) return cvText;
+  for (let i = iPerfil + 1; i < lines.length; i++) {
+    if (esSoloSeparador(lines[i])) continue;
+    if (esEncabezadoSeccion(lines[i])) break;
+    if (!/disponib/i.test(lines[i])) continue;
+    const oraciones = lines[i].match(/[^.!?]+[.!?]*/g) ?? [lines[i]];
+    const quedan = oraciones.filter(o => !/disponib/i.test(o));
+    console.warn(`[postulai] Perfil: eliminando disponibilidad en candidato estudiante ("${oraciones.filter(o => /disponib/i.test(o)).join(" ").trim()}")`);
+    lines[i] = quedan.join("").trim();
+  }
+  return lines.join("\n");
 }

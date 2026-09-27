@@ -275,7 +275,7 @@ Motivados por un CV real generado en producción con v10.3 (oferta de EY Parthen
 
 | Cambio | Reglas |
 |---|---|
-| Sin disponibilidad para estudiantes (prompt y `agregarDisponibilidad`) | R-23 |
+| Sin disponibilidad para estudiantes (prompt, `agregarDisponibilidad` y `quitarDisponibilidadEstudiante`, que elimina del perfil la oración de disponibilidad si el modelo la escribió) | R-23 |
 | principales_cambios sin términos internos (prompt + `reemplazarTerminosInternos`) | R-73 |
 | Filtro de frases prohibidas en Habilidades blandas (`limpiarHabilidadesBlandas`) | R-62 |
 | Reparación dirigida (`app/lib/reparacion.ts`) | R-20, R-31 (dentro del cargo), R-33, R-51 |
@@ -287,6 +287,14 @@ Motivados por un CV real generado en producción con v10.3 (oferta de EY Parthen
 - líneas bajo EDUCACIÓN que no son carrera e institución ni una excepción de R-51.
 
 Solo si hay alguna, se envían a Haiku 4.5 **solo esas líneas**, cada una con la regla que incumple, y el CV original como fuente, con la instrucción de no agregar hechos ni cifras. Las líneas se reemplazan (una línea de EDUCACIÓN puede eliminarse) y se vuelve a correr `cifrasSinRespaldo`: si la reparación introdujo una cifra nueva, se descarta completa y queda la versión anterior. Si la API falla, también se descarta. Cada reparación aplicada o descartada se registra con `console.warn`. Límites: timeout de 20 s y un solo reintento.
+
+**Validación línea por línea (agregada tras la prueba con Haiku real).** En la primera prueba, Haiku convirtió "Participo en 3 campañas" en "Coordiné 3 campañas", subió "Manejo de Excel a nivel intermedio" a "Dominio de Excel" y resumió perfiles a menos de 50 palabras. La verificación de cifras no detecta nada de eso. Por eso cada línea reparada se rechaza (y queda la original) si:
+- agrega frases prohibidas (R-25, R-39) que no estaban;
+- agrega palabras de nivel (dominio, experto, avanzado, sólido, especialista…);
+- un bullet sigue empezando con un verbo prohibido, usa un verbo de escalada (coordinar, liderar, dirigir, gestionar, supervisar…) cuya raíz no aparece en la fuente, o repite un verbo de otro bullet del mismo cargo;
+- el perfil queda fuera de 50–100 palabras o sigue sin nombrar el cargo.
+
+Si se rechazan todas las líneas, la reparación se descarta.
 
 **Herramientas de evals:**
 - `evals/reparar-guardados.ts` aplica el post-procesamiento y la reparación a resultados guardados sin regenerarlos; sin `--ejecutar`, solo estima el costo.

@@ -231,6 +231,7 @@ export interface ViolacionReparable {
   texto: string;         // texto actual, sin "- "
   detalle: string;       // dato para la instrucción (verbo, cargo, verbos usados, etc.)
   cargoActual?: boolean; // para bullets: si el cargo termina en Presente
+  otrosVerbos?: string[]; // para bullets: verbos iniciales de los demás bullets del mismo cargo
 }
 
 export function detectarReparables(cv: string, cargoOferta: string | null): ViolacionReparable[] {
@@ -248,6 +249,7 @@ export function detectarReparables(cv: string, cargoOferta: string | null): Viol
       out.push({
         id: `L${idx}`, tipo: "verbo_prohibido", indices: [idx], texto: b,
         detalle: `${motivo}; verbos ya usados en este cargo: ${c.bullets.map(primeraPalabra).join(", ")}`, cargoActual: actual,
+        otrosVerbos: c.bullets.filter((_, j) => j !== k).map(primeraPalabra),
       });
     });
     for (const r of verbosRepetidosEnCargo(c)) {
@@ -256,6 +258,7 @@ export function detectarReparables(cv: string, cargoOferta: string | null): Viol
       out.push({
         id: `L${r.idx}`, tipo: "verbo_repetido", indices: [r.idx], texto: r.bullet,
         detalle: `verbo repetido: ${r.verbo}; verbos ya usados en este cargo: ${r.usados.join(", ")}`, cargoActual: actual,
+        otrosVerbos: c.bullets.filter((_, j) => c.bulletIdx[j] !== r.idx).map(primeraPalabra),
       });
     }
   }
