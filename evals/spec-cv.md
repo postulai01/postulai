@@ -1,6 +1,6 @@
-# Especificación del CV adaptado — Postulai (spec-cv v10.3)
+# Especificación del CV adaptado — Postulai (spec-cv v10.4)
 
-**Fecha:** 2026-09-26 (v10.1 a v10.3: ver §13)
+**Fecha:** 2026-09-27 (v10.1 a v10.4: ver §13)
 **Base:** auditoría `evals/auditoria-v9.md` + decisiones de diseño de la Fase 2
 **Fuente única de verdad.** El SYSTEM_PROMPT v10 (`app/api/process-cv/route.ts`), el mensaje de usuario que arma la misma ruta y la rúbrica del crítico (`evals/critico-reclutador.md`) se derivan de este documento. Si alguno de ellos contradice esta spec, el error está en ese archivo, no aquí.
 
@@ -72,10 +72,10 @@ Orden de las reglas en el prompt: R-20 va primero.
 
 | ID | Regla | Prompt | Rúbrica | Código |
 |---|---|---|---|---|
-| R-20 | **Primera regla del perfil:** nombra el cargo al que se postula, tal como lo nombra la oferta. Nunca el nombre de la empresa. Sin oferta (modo crear sin oferta): nombra el título o rol profesional del candidato. | Sí, primera | C4 (b): no nombrar el cargo = importante; nombrar la empresa = importante | — |
+| R-20 | **Primera regla del perfil:** nombra el cargo al que se postula, tal como lo nombra la oferta. Nunca el nombre de la empresa. Sin oferta (modo crear sin oferta): nombra el título o rol profesional del candidato. | Sí, primera | C4 (b): no nombrar el cargo = importante; nombrar la empresa = importante | `verificar.ts` (cargo) y reparación dirigida (v10.4) |
 | R-21 | Entre 50 y 100 palabras, en 2 a 4 líneas. | Sí, sin instrucción de contar | C4 (a): fuera de rango = menor | Recorte automático si supera 100 palabras |
 | R-22 | Contenido: nivel o etapa profesional + área de especialidad; 2–3 fortalezas o diferenciadores con respaldo en el original (usando el vocabulario de la oferta cuando hay respaldo, R-04); un logro o hecho concreto del original. | Sí, como lista de contenidos, sin estructura-plantilla ni frases modelo | C4 (c) | — |
-| R-23 | Si el candidato está sin empleo y la oferta no fija fecha de inicio, se indica disponibilidad inmediata. | Sí | — | `agregarDisponibilidad` (v10.3): si ningún cargo de EXPERIENCIA LABORAL dice "Presente" y el perfil no menciona disponibilidad, agrega "Disponible para incorporación inmediata." al final del perfil. No revisa si la oferta fija fecha de inicio. |
+| R-23 | Si el candidato está sin empleo, **no es estudiante** y la oferta no fija fecha de inicio, se indica disponibilidad inmediata. A un estudiante nunca se le indica disponibilidad: no está en su CV original (v10.4). | Sí | — | `agregarDisponibilidad`: si ningún cargo de EXPERIENCIA LABORAL dice "Presente", ninguna línea de EDUCACIÓN está en curso y el perfil no menciona disponibilidad, agrega "Disponible para incorporación inmediata." al final del perfil. No revisa si la oferta fija fecha de inicio. `verificar.ts` (brechas) marca a un estudiante con disponibilidad. |
 | R-24 | Redacción impersonal con frases nominales. Prohibido: primera persona explícita o implícita (yo soy, me considero, busco, busca, busca integrarse, en búsqueda de); tercera persona (ha liderado, ha desarrollado, ha gestionado). | Sí | C4 (d) / C6 | — |
 | R-25 | Palabras y frases prohibidas en el perfil: proactivo, apasionado, dinámico, innovador, orientado a resultados, nuevos desafíos, ganas de aprender, soy una persona, me considero, profesional apasionado; verbos de soporte en cualquier conjugación (apoyar, aportar, contribuir, colaborar, asistir); frases de proceso completo (ciclo completo, end-to-end, de principio a fin, desde X hasta Y, productivo-comercial, operativo-comercial). | Sí, como lista | C4 (d) / C6 | — |
 | R-26 | Enumeraciones del tipo "X, Y y Z": cada elemento necesita su propio respaldo. Un elemento sin respaldo se elimina; no se rescata como "en formación" ni "en desarrollo" dentro del perfil. | Sí | C5 (afirmación sin respaldo) | — |
@@ -124,7 +124,7 @@ Orden de las reglas en el prompt: R-20 va primero.
 | ID | Regla | Prompt | Rúbrica | Código |
 |---|---|---|---|---|
 | R-50 | Formato: `Carrera \| Institución — MM/AAAA – MM/AAAA · Ciudad`. | Sí | D2 | — |
-| R-51 | Sin bullets. Única excepción: premio nacional, publicación académica, promedio sobre 6.0, beca competitiva. No son excepción: magíster integrado, ramos eximidos, colegio bilingüe, duración de la carrera, lo implícito en el nombre de la institución. | Sí | C6 | — |
+| R-51 | Sin bullets. Única excepción: premio nacional, publicación académica, promedio sobre 6.0, beca competitiva. No son excepción: magíster integrado, ramos eximidos, colegio bilingüe, duración de la carrera, lo implícito en el nombre de la institución. | Sí | C6 | `verificar.ts` (educación) y reparación dirigida (v10.4) |
 | R-52 | Nivel educativo en nomenclatura formal chilena (Enseñanza Media Completa, CFT, IP, Universidad) cuando es evidente, sin inventar nombres formales. | Sí | — | — |
 
 ---
@@ -135,7 +135,7 @@ Orden de las reglas en el prompt: R-20 va primero.
 |---|---|---|---|---|
 | R-60 | Tres categorías, cada una en una sola línea separada por `·`, con las etiquetas exactas `Habilidades técnicas:`, `Habilidades blandas:`, `Conocimientos en desarrollo:`. | Sí | — | Los filtros dependen de estas etiquetas |
 | R-61 | Habilidades técnicas (máx. 6): solo herramientas, software, plataformas, lenguajes o certificaciones con nombre propio mencionados en el CV original. Las funciones o tareas no van aquí aunque la oferta las nombre: selección, reclutamiento, entrevistas, psicometría, análisis, gestión, atención al cliente, negociación, planificación, evaluación, coordinación, capacitación, ventas. | Sí, con la lista de funciones | C6 | `limpiarHabilidadesTecnicas` elimina las que no tienen respaldo |
-| R-62 | Habilidades blandas (máx. 5). Prohibidas: disposición al aprendizaje, aprendizaje rápido, multifuncional, dinámico, proactivo; funciones disfrazadas de habilidad blanda (gestión operativa, análisis de procesos, organización a secas). | Sí, como lista | C6 | — |
+| R-62 | Habilidades blandas (máx. 5). Prohibidas: disposición al aprendizaje, aprendizaje rápido, multifuncional, dinámico, proactivo, orientación a resultados, orientado a resultados; funciones disfrazadas de habilidad blanda (gestión operativa, análisis de procesos, organización a secas). | Sí, como lista | C6 | `limpiarHabilidadesBlandas` (v10.4) elimina las frases prohibidas de la línea, con `console.warn` |
 | R-63 | Conocimientos en desarrollo: solo con un indicio concreto en el CV original (ramo, curso, proyecto, certificación en curso). Que la oferta lo pida nunca es un indicio. Si no hay indicio, se omite la categoría. | Sí, una línea | — | `limpiarConocimientosEnDesarrollo` elimina lo que no tiene respaldo |
 | R-64 | Idiomas: el nivel de cada idioma se toma tal cual del CV original, nunca se sube. Un idioma sin nivel declarado se lista sin nivel. | Sí | C5 (afirmación sin respaldo): crítico | — |
 
@@ -148,7 +148,7 @@ Orden de las reglas en el prompt: R-20 va primero.
 | R-70 | Carta: 250–350 palabras, 3 párrafos. P1: por qué esta empresa y este cargo, con algo concreto de la empresa. P2: dos logros relevantes del candidato, con cifras solo si existen en el original. P3: cierre con disponibilidad y contacto. | Sí | C8 | — |
 | R-71 | Aperturas prohibidas de la carta: "Mi nombre es", "Me dirijo a usted", "Estoy muy interesado", "Por medio de la presente", "A quien corresponda", "Es un honor", "Tengo el agrado". | Sí, como lista | C8 | — |
 | R-72 | Sugerencias: exactamente 3, en orden: visibilidad digital (LinkedIn), contacto directo, mejora de perfil o habilidad. Formato "Título breve: acción concreta", título de 2–4 palabras, total ≤ 20 palabras. Al menos una apunta a lo más relevante de la oferta que el candidato no tiene, como acción que puede empezar. Nunca sugerir decir en la entrevista que ya sabe o está aprendiendo algo. | Sí | — | — |
-| R-73 | Principales cambios: exactamente 5, formato "qué había → qué hay ahora". | Sí | — | — |
+| R-73 | Principales cambios: exactamente 5, formato "qué había → qué hay ahora". Escritos para el candidato: nunca usan términos internos del prompt ("LA FUENTE", nombres de principios o reglas); se refieren al CV original (en modo crear, a los datos entregados). | Sí | — | `reemplazarTerminosInternos` (v10.4) cambia "LA FUENTE" por "tu CV original" |
 | R-74 | Contrato JSON de salida sin cambios respecto a v9: `cv_adaptado`, `carta_presentacion`, `sugerencias`, `principales_cambios`, `titulo_postulacion`, `palabras_clave_oferta` (mismos tipos y reglas de formato de v9). | Sí | — | `route.ts` y `calcularMatch` dependen de estos campos |
 | R-75 | Formato de texto de `cv_adaptado` del que depende el código, que se mantiene exactamente: (a) la primera línea es el nombre completo del candidato; (b) encabezados de sección en MAYÚSCULAS, de menos de 60 caracteres, seguidos de una línea `———————————————`: `PERFIL PROFESIONAL`, `EXPERIENCIA LABORAL`, `EDUCACIÓN`, `HABILIDADES`, `IDIOMAS`, `CERTIFICACIONES`; (c) línea de cargo `Cargo \| Empresa — fechas · Ciudad`, con " — " antes de las fechas; (d) bullets que empiezan con "- "; (e) etiquetas de habilidades exactas `Habilidades técnicas:`, `Habilidades blandas:`, `Conocimientos en desarrollo:`. | Sí | — | `extraerPerfilProfesional` (a, b), verificación de identidad (a), `parseCvText`/`splitJobLine` de los templates PDF (b, c, d), `limpiarHabilidadesTecnicas`/`limpiarConocimientosEnDesarrollo` (e) |
 
@@ -268,3 +268,27 @@ Motivados por la Fase 4: el crítico Haiku no fue confiable, y la vara principal
 | Vigilancia de cifras en producción: `route.ts` registra con `console.warn` cada cifra del CV adaptado que no está en la fuente (`cifrasSinRespaldo`, misma lógica que `verificar.ts`). No modifica el CV. | P2 |
 
 **Limitación conocida — R-31 en todo el CV:** el modelo cumple "sin repetir verbo dentro de un cargo", pero en CVs largos (senior, ~25 bullets) repite algún verbo más de 3 veces en todo el CV (andres_senior: Lideré ×4, Diseñé ×4 en v10.1 y v10.2). Se acepta así: el verificador lo sigue reportando, pero no bloquea.
+
+### Cambios v10.4 (2026-09-27)
+
+Motivados por un CV real generado en producción con v10.3 (oferta de EY Parthenon): honestidad correcta, pero con "Participo" (R-33), "Orientación a resultados" en blandas (R-62), perfil sin el cargo (R-20), líneas de magíster integrado y exención de inglés bajo EDUCACIÓN (R-51), disponibilidad siendo estudiante (R-23) y "LA FUENTE" en principales_cambios (R-73).
+
+| Cambio | Reglas |
+|---|---|
+| Sin disponibilidad para estudiantes (prompt y `agregarDisponibilidad`) | R-23 |
+| principales_cambios sin términos internos (prompt + `reemplazarTerminosInternos`) | R-73 |
+| Filtro de frases prohibidas en Habilidades blandas (`limpiarHabilidadesBlandas`) | R-62 |
+| Reparación dirigida (`app/lib/reparacion.ts`) | R-20, R-31 (dentro del cargo), R-33, R-51 |
+
+**Reparación dirigida (R-77).** Después del post-procesamiento determinista (`postprocesarCV`: filtros de habilidades y disponibilidad), `detectarReparables` (`app/lib/cv-verificacion.ts`, la misma lógica de `verificar.ts`) busca cuatro violaciones:
+- un bullet que empieza con un verbo prohibido;
+- un verbo inicial repetido dentro de un mismo cargo;
+- un perfil que no nombra el cargo de la oferta (sacado de `titulo_postulacion`);
+- líneas bajo EDUCACIÓN que no son carrera e institución ni una excepción de R-51.
+
+Solo si hay alguna, se envían a Haiku 4.5 **solo esas líneas**, cada una con la regla que incumple, y el CV original como fuente, con la instrucción de no agregar hechos ni cifras. Las líneas se reemplazan (una línea de EDUCACIÓN puede eliminarse) y se vuelve a correr `cifrasSinRespaldo`: si la reparación introdujo una cifra nueva, se descarta completa y queda la versión anterior. Si la API falla, también se descarta. Cada reparación aplicada o descartada se registra con `console.warn`. Límites: timeout de 20 s y un solo reintento.
+
+**Herramientas de evals:**
+- `evals/reparar-guardados.ts` aplica el post-procesamiento y la reparación a resultados guardados sin regenerarlos; sin `--ejecutar`, solo estima el costo.
+- `verificar.ts` agrega las columnas **cargo** (R-20) y **educación** (R-51), y la regla de blandas (R-62) en frases.
+- Los casos tienen el campo `cargo_oferta`, que se usa cuando el resultado guardado no tiene `titulo_postulacion`.

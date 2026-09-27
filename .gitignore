@@ -43,4 +43,5 @@ next-env.d.ts
 # eval results (generated outputs)
 evals/resultados/*.json
 evals/criticas/
+evals/reparaciones/
 test-results/
