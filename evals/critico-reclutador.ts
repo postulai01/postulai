@@ -15,6 +15,7 @@
  *   --con-pdf                                   Genera PDF y evalúa criterios D1-D4 (default: texto solo)
  *   --repeticiones=N                            Corre el crítico N veces; reporta avg/min/max (default: 1)
  *   --resultado=<archivo>                       Critica esa adaptación guardada, sin regenerar (ignora --forzar-regen)
+ *   --sin-critico                               Solo genera la adaptación (si hace falta) y termina, sin llamar al crítico
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -120,6 +121,7 @@ interface Args {
   resultado?: string;
   modeloCompleto: boolean;
   forzarRegen: boolean;
+  sinCritico: boolean;
   conPdf: boolean;
   repeticiones: number;
 }
@@ -142,6 +144,7 @@ function parseArgs(): Args {
     resultado:      args["resultado"],
     modeloCompleto: flags.has("modelo-completo"),
     forzarRegen:    flags.has("forzar-regen"),
+    sinCritico:     flags.has("sin-critico"),
     conPdf:         flags.has("con-pdf"),
     repeticiones:   Math.max(1, parseInt(args["repeticiones"] ?? "1", 10)),
   };
@@ -503,6 +506,11 @@ async function main() {
   } else {
     console.error("❌  Uso: --caso=<nombre> | --cv-antes=<f> --cv-despues=<f> --oferta=<f>");
     process.exit(1);
+  }
+
+  if (args.sinCritico) {
+    console.log("\n⏭️   --sin-critico: se omite la crítica.\n");
+    return;
   }
 
   // ── calcularMatch para detectar no_usadas ──────────────────────────────────

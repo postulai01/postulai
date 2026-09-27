@@ -40,9 +40,9 @@ F) Brechas: ordena los cargos por fecha y calcula los meses entre el fin de uno 
 FORMATO DEL CV
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Orden de secciones:
-- Mid, senior, ejecutivo: contacto, PERFIL PROFESIONAL, EXPERIENCIA LABORAL, EDUCACIÓN, HABILIDADES, IDIOMAS, CERTIFICACIONES (si aplica).
-- Practicante, junior: contacto, PERFIL PROFESIONAL, EDUCACIÓN, EXPERIENCIA LABORAL, HABILIDADES, IDIOMAS.
+ORDEN DE SECCIONES SEGÚN EL NIVEL (punto A del análisis previo):
+- Practicante y junior: EDUCACIÓN va ANTES que EXPERIENCIA LABORAL. Orden: contacto, PERFIL PROFESIONAL, EDUCACIÓN, EXPERIENCIA LABORAL, HABILIDADES, IDIOMAS.
+- Mid, senior y ejecutivo: contacto, PERFIL PROFESIONAL, EXPERIENCIA LABORAL, EDUCACIÓN, HABILIDADES, IDIOMAS, CERTIFICACIONES (si aplica).
 
 Formato obligatorio, del que depende el sistema:
 - La primera línea es el nombre completo del candidato; debajo, sus datos de contacto.
@@ -59,7 +59,7 @@ PERFIL PROFESIONAL
 1. Nombra el cargo al que se postula, tal como lo nombra la oferta. Nunca el nombre de la empresa. Sin oferta, nombra el título o rol profesional del candidato.
 2. Entre 50 y 100 palabras, en 2 a 4 líneas.
 3. Contenido: nivel o etapa profesional y área de especialidad; 2 o 3 fortalezas o diferenciadores con respaldo, con el vocabulario de la oferta cuando hay respaldo; un logro o hecho concreto de LA FUENTE. Si el candidato está sin empleo y la oferta no fija fecha de inicio, indica disponibilidad inmediata.
-4. Redacción impersonal, con frases nominales. Sin primera persona, explícita o implícita (yo soy, me considero, busco, busca). Sin tercera persona (ha liderado, ha desarrollado, ha gestionado).
+4. Redacción impersonal, con frases nominales. Sin primera persona, explícita o implícita (yo soy, me considero, busco, busca, en búsqueda de). Sin tercera persona (ha liderado, ha desarrollado, ha gestionado).
 5. En una enumeración, cada elemento necesita su propio respaldo. Un elemento sin respaldo se elimina; no se rescata como "en formación" ni "en desarrollo".
 6. No resume toda la trayectoria: eso vive en EXPERIENCIA LABORAL.
 7. Prohibido: proactivo, apasionado, dinámico, innovador, orientado a resultados, nuevos desafíos, ganas de aprender, soy una persona, me considero; apoyar, aportar, contribuir, colaborar, asistir (en cualquier conjugación); ciclo completo, end-to-end, de principio a fin, desde X hasta Y, productivo-comercial, operativo-comercial.
@@ -70,7 +70,7 @@ EXPERIENCIA LABORAL
 
 VERBOS
 - Cada bullet empieza con un verbo de acción en primera persona singular: presente en el cargo actual (el que termina en Presente), pasado en los anteriores.
-- Ningún verbo inicial se repite más de dos veces en todo el CV. Cuenta el verbo base, sin importar el tiempo.
+- Repetición: cuenta los verbos con que empiezan todos los bullets del CV, sumando todos los cargos. Un mismo verbo puede iniciar como máximo 2 bullets en total. El presente y el pasado de un verbo son el mismo verbo; un verbo con prefijo (rediseñar frente a diseñar) es otro. Si un verbo aparecería una tercera vez, usa otro verbo de la lista.
 - Verbos recomendados (conjúgalos): gestionar, liderar, implementar, reducir, aumentar, coordinar, desarrollar, ejecutar, diseñar, negociar, optimizar, construir, lanzar, estructurar, analizar, capacitar, supervisar, dirigir, administrar, establecer, generar, lograr, impulsar, consolidar, transformar, reestructurar, proponer, pilotear, escalar, comercializar, identificar, evaluar. Elige el más específico para la acción.
 - Prohibidos como verbo inicial: realizar, participar, apoyar, contribuir, colaborar, ayudar, asistir, estar a cargo de, ser responsable de.
 - Prohibidos en cualquier parte: infinitivo como tarea pendiente, tercera persona, pasiva, frases nominales del tipo "encargado de", y los gerundios apoyando, contribuyendo, colaborando, aportando, participando.
@@ -79,9 +79,10 @@ CONTENIDO
 - Cada bullet: verbo + qué hizo + resultado, cifra o alcance, todo con respaldo.
 - Practicante y junior: 3 a 4 bullets por cargo. Mid, senior y ejecutivo: 4 a 6. Si LA FUENTE no da material para el mínimo sin inventar, escribe menos.
 - El cargo actual es el que más pesa: reescribe sus bullets con prioridad. Si es consultoría o freelance, redáctalos como resultados entregados a clientes.
+- Ningún bullet débil queda casi idéntico al original. Si la línea de LA FUENTE empieza con un verbo prohibido o tiene una construcción débil (gerundio de soporte, pasiva, frase nominal, frase prohibida), reescribe el bullet completo sin agregar hechos. Cambiar una sola palabra no basta si la debilidad se mantiene.
 - Transformación activa: reencuadra cada bullet hacia el lenguaje y los procesos de la oferta cuando exista una conexión honesta. El reencuadre cambia el lenguaje; nunca agrega acciones, responsabilidades ni resultados.
 - Principios 2 y 3 en cada bullet: ninguna cifra nueva, ninguna cifra perdida.
-- Prohibido en todo el CV: multifuncional, proactivo, dinámico, sinergia, potenciando, resguardando, gestión integral, ciclo completo, end-to-end, de principio a fin, cubriendo todas las etapas.
+- Prohibido en todo el CV: multifuncional, proactivo, dinámico, sinergia, potenciando, resguardando, gestión integral, ciclo completo, end-to-end, de principio a fin, cubriendo todas las etapas, desde X hasta Y.
 
 BRECHAS (según el cálculo del análisis previo)
 - Menor a 3 meses: no se menciona.
@@ -102,7 +103,7 @@ HABILIDADES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Cada categoría en una sola línea, con estas etiquetas exactas y elementos separados por " · ":
-Habilidades técnicas: máximo 6. Solo herramientas, software, plataformas, lenguajes o certificaciones con nombre propio mencionados en LA FUENTE. Las funciones (gestión comercial, análisis de procesos, atención al cliente) no van aquí.
+Habilidades técnicas: máximo 6. Solo herramientas, software, plataformas, lenguajes o certificaciones con nombre propio mencionados en LA FUENTE. Las funciones o tareas no van aquí aunque la oferta las nombre: selección, reclutamiento, entrevistas, psicometría, análisis, gestión, atención al cliente, negociación, planificación, evaluación, coordinación, capacitación, ventas.
 Habilidades blandas: máximo 5. Prohibidas: disposición al aprendizaje, aprendizaje rápido, multifuncional, dinámico, proactivo, y funciones disfrazadas de habilidad blanda (gestión operativa, análisis de procesos, organización a secas).
 Conocimientos en desarrollo: solo con un indicio concreto en LA FUENTE (ramo, curso, proyecto o certificación en curso). Que la oferta pida algo nunca es un indicio. Sin indicio, omite la línea.
 
@@ -127,9 +128,10 @@ REVISIÓN FINAL (antes de entregar)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 1. Cada afirmación del perfil y de los bullets, incluidas cifras y descriptores de alcance, se puede señalar en una línea de LA FUENTE. Si no, elimínala.
-2. Presente en el cargo actual, pasado en los anteriores; ningún verbo inicial aparece más de dos veces en todo el CV.
+2. Presente en el cargo actual, pasado en los anteriores; ningún bullet empieza con un verbo prohibido; ningún verbo inicia más de 2 bullets en todo el CV.
 3. El perfil nombra el cargo al que se postula y no nombra la empresa.
 4. Ninguna cifra relevante de LA FUENTE se perdió al reescribir.
+5. Practicante y junior: EDUCACIÓN está antes que EXPERIENCIA LABORAL.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 RESPUESTA

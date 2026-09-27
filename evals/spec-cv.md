@@ -1,6 +1,6 @@
-# Especificación del CV adaptado — Postulai (spec-cv v10)
+# Especificación del CV adaptado — Postulai (spec-cv v10.1)
 
-**Fecha:** 2026-09-26
+**Fecha:** 2026-09-26 (v10.1: ver §13)
 **Base:** auditoría `evals/auditoria-v9.md` + decisiones de diseño de la Fase 2
 **Fuente única de verdad.** El SYSTEM_PROMPT v10 (`app/api/process-cv/route.ts`), el mensaje de usuario que arma la misma ruta y la rúbrica del crítico (`evals/critico-reclutador.md`) se derivan de este documento. Si alguno de ellos contradice esta spec, el error está en ese archivo, no aquí.
 
@@ -57,7 +57,7 @@ Restricciones de redacción del prompt (decisión 8):
 | ID | Regla | Prompt | Rúbrica | Código |
 |---|---|---|---|---|
 | R-10 | Orden mid/senior/ejecutivo: Contacto → Perfil profesional → Experiencia laboral → Educación → Habilidades → Idiomas → Certificaciones (si aplica). | Sí | C7 / D2 | — |
-| R-11 | Orden practicante/junior: Contacto → Perfil profesional → Educación → Experiencia laboral → Habilidades → Idiomas. | Sí | C7 / D2 | — |
+| R-11 | Orden practicante/junior: Contacto → Perfil profesional → Educación → Experiencia laboral → Habilidades → Idiomas. **EDUCACIÓN va antes que EXPERIENCIA LABORAL.** | Sí, destacada al inicio de FORMATO y en la revisión final | C7 / D2 | `verificar.ts` (orden) |
 | R-12 | Cada título de sección en MAYÚSCULAS seguido de una línea de `———`. El título del perfil es exactamente `PERFIL PROFESIONAL`. | Sí | — | `extraerPerfilProfesional` depende de esto |
 | R-13 | Sin tablas, columnas múltiples, íconos, gráficos, encabezados ni pies de página. | Sí | D1 | — |
 | R-14 | Fechas `MM/AAAA – MM/AAAA`; cargo actual `MM/AAAA – Presente`. Si el original solo da el año, se usa `AAAA` (no se inventan meses, P1). | Sí | D2 | — |
@@ -76,7 +76,7 @@ Orden de las reglas en el prompt: R-20 va primero.
 | R-21 | Entre 50 y 100 palabras, en 2 a 4 líneas. | Sí, sin instrucción de contar | C4 (a): fuera de rango = menor | Recorte automático si supera 100 palabras |
 | R-22 | Contenido: nivel o etapa profesional + área de especialidad; 2–3 fortalezas o diferenciadores con respaldo en el original (usando el vocabulario de la oferta cuando hay respaldo, R-04); un logro o hecho concreto del original. | Sí, como lista de contenidos, sin estructura-plantilla ni frases modelo | C4 (c) | — |
 | R-23 | Si el candidato está sin empleo y la oferta no fija fecha de inicio, se indica disponibilidad inmediata. | Sí | — | — |
-| R-24 | Redacción impersonal con frases nominales. Prohibido: primera persona explícita o implícita (yo soy, me considero, busco, busca, busca integrarse); tercera persona (ha liderado, ha desarrollado, ha gestionado). | Sí | C4 (d) / C6 | — |
+| R-24 | Redacción impersonal con frases nominales. Prohibido: primera persona explícita o implícita (yo soy, me considero, busco, busca, busca integrarse, en búsqueda de); tercera persona (ha liderado, ha desarrollado, ha gestionado). | Sí | C4 (d) / C6 | — |
 | R-25 | Palabras y frases prohibidas en el perfil: proactivo, apasionado, dinámico, innovador, orientado a resultados, nuevos desafíos, ganas de aprender, soy una persona, me considero, profesional apasionado; verbos de soporte en cualquier conjugación (apoyar, aportar, contribuir, colaborar, asistir); frases de proceso completo (ciclo completo, end-to-end, de principio a fin, desde X hasta Y, productivo-comercial, operativo-comercial). | Sí, como lista | C4 (d) / C6 | — |
 | R-26 | Enumeraciones del tipo "X, Y y Z": cada elemento necesita su propio respaldo. Un elemento sin respaldo se elimina; no se rescata como "en formación" ni "en desarrollo" dentro del perfil. | Sí | C5 (afirmación sin respaldo) | — |
 | R-27 | El perfil no lista la trayectoria completa (eso vive en Experiencia laboral). | Sí | C4 | — |
@@ -91,7 +91,7 @@ Orden de las reglas en el prompt: R-20 va primero.
 | ID | Regla | Prompt | Rúbrica | Código |
 |---|---|---|---|---|
 | R-30 | Cada bullet empieza con un verbo de acción en primera persona singular: **presente** para el cargo actual (el que termina en "Presente"), **pasado** para los anteriores. | Sí | C1: acepta ambos tiempos según el caso; tiempo cambiado entre cargo actual y anterior = menor | — |
-| R-31 | Ningún verbo inicial se repite más de dos veces en todo el CV. Cuenta el verbo base, sin importar el tiempo (gestioné y gestiono son el mismo verbo). | Sí (regla nueva) | C1: tercera aparición o más = menor por cada verbo repetido | — |
+| R-31 | Se cuentan los verbos con que empiezan **todos** los bullets del CV, sumando todos los cargos. Un mismo verbo puede iniciar como máximo 2 bullets en total. Cuenta el verbo base: el presente y el pasado del mismo verbo son el mismo verbo; un verbo con prefijo (rediseñar frente a diseñar) es otro verbo. Si un verbo aparece una tercera vez, ese bullet cambia a otro verbo de la lista R-32. | Sí, con el procedimiento de conteo |  C1: tercera aparición o más = menor por cada verbo repetido | — |
 | R-32 | Verbos recomendados (lista de palabras, en infinitivo para que el modelo conjugue): gestionar, liderar, implementar, reducir, aumentar, coordinar, desarrollar, ejecutar, diseñar, negociar, optimizar, construir, lanzar, estructurar, analizar, capacitar, supervisar, dirigir, administrar, establecer, generar, lograr, impulsar, consolidar, transformar, reestructurar, proponer, pilotear, escalar, comercializar, identificar, evaluar. Se prefiere el verbo más específico a la acción. | Sí, como lista | C1 no penaliza como "débil" un verbo de esta lista | — |
 | R-33 | Prohibido como verbo inicial: realizar, participar, apoyar, contribuir, colaborar, ayudar, asistir, estar a cargo de, ser responsable de. Prohibido en cualquier parte: infinitivo como tarea pendiente, tercera persona (gestionó, coordinó, ejecutó), gerundios de soporte (apoyando, contribuyendo, colaborando, aportando, participando), construcciones pasivas y frases nominales ("encargado de…"). | Sí, como lista | C1: importante si afecta al cargo actual; menor en cargos anteriores | — |
 
@@ -102,9 +102,10 @@ Orden de las reglas en el prompt: R-20 va primero.
 | R-34 | Cada bullet = verbo + qué hizo + resultado, cifra o alcance, todo con respaldo (P1). | Sí | C1 / C2 | — |
 | R-35 | Cantidad: 3–4 bullets por cargo para practicante/junior; 4–6 para mid/senior/ejecutivo. Si el original no da material para el mínimo sin inventar, se escriben menos bullets. | Sí | C7 | — |
 | R-36 | El cargo actual es el que más pesa: sus bullets se reescriben con prioridad. Si es consultoría o freelance, se redactan como resultados entregados a clientes, con respaldo. | Sí | C1 / C7 | — |
+| R-37b | **Ningún bullet débil queda casi idéntico al original.** Si la línea del original empieza con un verbo prohibido (R-33) o tiene una construcción débil (gerundio de soporte, pasiva, frase nominal, frase prohibida de R-39), el bullet se reescribe completo, siempre sin agregar hechos: cambiar solo una palabra no basta si la debilidad se mantiene. | Sí | C1 | `verificar.ts` (≈orig) |
 | R-37 | **Transformación activa:** cada bullet se reencuadra hacia el lenguaje y los procesos de la oferta cuando existe conexión honesta (R-05). El reencuadre cambia el lenguaje, nunca agrega acciones, responsabilidades ni resultados. | Sí | C3 (oportunidad perdida) / C5 (agregado sin respaldo) | — |
 | R-38 | **Cifras:** P2 y P3 aplicados a cada bullet. Si el original no tiene cifras, alcance o escala cualitativa con respaldo (P2). No hay mínimo de bullets con número. | Sí | C2 (ver §9) | — |
-| R-39 | Palabras prohibidas en cualquier parte del CV: multifuncional, proactivo, dinámico, sinergia, potenciando, resguardando, gestión integral, ciclo completo, end-to-end, de principio a fin, cubriendo todas las etapas. | Sí, como lista | C6 | — |
+| R-39 | Palabras prohibidas en cualquier parte del CV: multifuncional, proactivo, dinámico, sinergia, potenciando, resguardando, gestión integral, ciclo completo, end-to-end, de principio a fin, cubriendo todas las etapas, desde X hasta Y. | Sí, como lista | C6 | `verificar.ts` (frases) |
 
 ### 5.3 Brechas laborales
 
@@ -132,7 +133,7 @@ Orden de las reglas en el prompt: R-20 va primero.
 | ID | Regla | Prompt | Rúbrica | Código |
 |---|---|---|---|---|
 | R-60 | Tres categorías, cada una en una sola línea separada por `·`, con las etiquetas exactas `Habilidades técnicas:`, `Habilidades blandas:`, `Conocimientos en desarrollo:`. | Sí | — | Los filtros dependen de estas etiquetas |
-| R-61 | Habilidades técnicas (máx. 6): solo herramientas, software, plataformas, lenguajes o certificaciones con nombre propio mencionados en el CV original. Las funciones ("gestión comercial", "análisis de procesos") no van aquí. | Sí, una línea | C6 | `limpiarHabilidadesTecnicas` elimina las que no tienen respaldo |
+| R-61 | Habilidades técnicas (máx. 6): solo herramientas, software, plataformas, lenguajes o certificaciones con nombre propio mencionados en el CV original. Las funciones o tareas no van aquí aunque la oferta las nombre: selección, reclutamiento, entrevistas, psicometría, análisis, gestión, atención al cliente, negociación, planificación, evaluación, coordinación, capacitación, ventas. | Sí, con la lista de funciones | C6 | `limpiarHabilidadesTecnicas` elimina las que no tienen respaldo |
 | R-62 | Habilidades blandas (máx. 5). Prohibidas: disposición al aprendizaje, aprendizaje rápido, multifuncional, dinámico, proactivo; funciones disfrazadas de habilidad blanda (gestión operativa, análisis de procesos, organización a secas). | Sí, como lista | C6 | — |
 | R-63 | Conocimientos en desarrollo: solo con un indicio concreto en el CV original (ramo, curso, proyecto, certificación en curso). Que la oferta lo pida nunca es un indicio. Si no hay indicio, se omite la categoría. | Sí, una línea | — | `limpiarConocimientosEnDesarrollo` elimina lo que no tiene respaldo |
 | R-64 | Idiomas: el nivel de cada idioma se toma tal cual del CV original, nunca se sube. Un idioma sin nivel declarado se lista sin nivel. | Sí | C5 (afirmación sin respaldo): crítico | — |
@@ -186,6 +187,9 @@ Solo lo que el código no verifica. Cuatro ítems, sin repetir reglas con otras 
 2. **Verbos.** Presente en el cargo actual, pasado en los anteriores; ningún verbo inicial aparece más de dos veces en todo el CV.
 3. **Cargo en el perfil.** El perfil nombra el cargo al que se postula y no nombra la empresa.
 4. **Cifras del original.** Ninguna cifra relevante del CV original se perdió al reescribir.
+5. **Orden de secciones (v10.1).** Practicante y junior: EDUCACIÓN antes que EXPERIENCIA LABORAL.
+
+En v10.1 el ítem 2 también exige que ningún bullet empiece con un verbo prohibido, y se agrega el ítem 5. Es una excepción a la decisión 9 (solo lo que el código no verifica): `verificar.ts` es una herramienta de evals, no corrige nada en producción, y la Fase 4 mostró que el modelo no aplica estas reglas si solo están en su sección.
 
 ---
 
@@ -224,4 +228,21 @@ Estas no venían en tus 9 decisiones; las derivé para cerrar huecos:
 4. **§9, severidades:** asigné severidades concretas a cada violación para que el crítico sea más consistente entre corridas.
 5. **`evals/rubrica.md`** (rúbrica antigua de `correr-evals.ts`) contradice esta spec (perfil ≤ 70 palabras, ≥ 1 número por cargo, ≥ 70 % de keywords). Propongo marcarla como obsoleta en la Fase 3, no alinearla, porque la Fase 4 usa `critico-reclutador.ts`.
 6. **R-14 (agregado en el ajuste de Fase 2):** si el original solo da el año, se usa el año; no se inventan meses para cumplir el formato MM/AAAA.
-7. **Candidato a código (fuera de alcance):** P2 y P3 se podrían verificar con código, comparando las cifras del adaptado con las del original, igual que `limpiarHabilidadesTecnicas`. Queda anotado; esta spec no lo implementa.
+7. **Candidato a código:** P2 y P3 ya se verifican en evals con `evals/verificar.ts` (v10.1). En producción siguen sin verificarse.
+
+---
+
+## 13. Cambios v10.1 (2026-09-26)
+
+Motivados por la Fase 4: el crítico Haiku no fue confiable, y la vara principal pasa a ser `evals/verificar.ts` (sin API).
+
+| Cambio | Reglas |
+|---|---|
+| "desde X hasta Y" prohibido también en los bullets | R-39 |
+| Ningún bullet débil queda casi idéntico al original | R-37b (nueva) |
+| Orden practicante/junior destacado al inicio de FORMATO y en la revisión final | R-11, §10 ítem 5 |
+| Lista explícita de funciones que no van en Habilidades técnicas | R-61 |
+| R-31 reescrita como procedimiento de conteo sobre todos los bullets del CV | R-31 |
+| "en búsqueda de" agregado a la primera persona implícita del perfil | R-24 |
+
+**Verificación automática (`evals/verificar.ts`):** P2 (cifras+), P3 (cifras−), R-31 (verbos>2), R-33 (prohib), R-24/R-25/R-39 (frases), R-10/R-11/R-75 (orden), R-60/R-61 (etiquetas), R-21 (perfil) y R-37b (≈orig). El nivel de cada caso sale del campo `nivel` de `evals/casos/<caso>.json`.

@@ -58,6 +58,7 @@ C3 se evalúa **solo** sobre `keywords_con_respaldo`. Una keyword en `gap_de_per
 Cada bullet empieza con un verbo de acción en primera persona singular: presente en el cargo actual (el que termina en "Presente"), pasado en los cargos anteriores. Ambos tiempos son correctos en su caso.
 - Verbo inicial débil (realicé, participé, apoyé, contribuí, colaboré, ayudé, asistí, estuve a cargo de, fui responsable de), tercera persona, infinitivo como tarea pendiente, construcción pasiva o frase nominal ("encargado de…"): **importante** si está en el cargo actual, **menor** en cargos anteriores.
 - Gerundios de soporte (apoyando, contribuyendo, colaborando, aportando, participando): **menor**.
+- Bullet débil del original que quedó casi idéntico, conservando la debilidad: **menor**.
 - Tiempo verbal cambiado (pasado en el cargo actual o presente en uno anterior): **menor**.
 - Un mismo verbo inicial más de dos veces en todo el CV (cuenta el verbo base, sin importar el tiempo): **menor** por cada verbo repetido.
 - No penalices como débil un verbo de esta lista: gestionar, liderar, implementar, reducir, aumentar, coordinar, desarrollar, ejecutar, diseñar, negociar, optimizar, construir, lanzar, estructurar, analizar, capacitar, supervisar, dirigir, administrar, establecer, generar, lograr, impulsar, consolidar, transformar, reestructurar, proponer, pilotear, escalar, comercializar, identificar, evaluar.
@@ -77,7 +78,7 @@ El perfil debe:
 - (a) Tener entre 50 y 100 palabras. Fuera de rango: **menor**.
 - (b) Nombrar el cargo al que se postula y no nombrar la empresa. No nombra el cargo: **importante**. Nombra la empresa: **importante**.
 - (c) Incluir 2–3 diferenciadores con respaldo en el CV original.
-- (d) Evitar frases genéricas ("proactivo", "orientado a resultados", "apasionado"), primera persona explícita o implícita y tercera persona ("ha liderado").
+- (d) Evitar frases genéricas ("proactivo", "orientado a resultados", "apasionado"), primera persona explícita o implícita ("busca", "en búsqueda de") y tercera persona ("ha liderado").
 Un perfil que podría pertenecer a cualquier candidato en cualquier oferta es un perfil fallido. No exijas que el perfil reconozca limitaciones, nivel o brechas frente a la oferta (Regla 9).
 
 **C5 — Coherencia, respaldo y brechas**
@@ -89,7 +90,7 @@ Un perfil que podría pertenecer a cualquier candidato en cualquier oferta es un
   - Mayor a 12 meses: además de la entrada, el perfil puede mencionar brevemente a qué se dedicó el período, solo con respaldo.
 
 **C6 — Eliminación de relleno**
-El CV no debe contener: frases genéricas sin respaldo ("excelentes habilidades de comunicación"), listas de competencias sin evidencia, funciones listadas como habilidades técnicas, texto que repite la descripción del cargo en lugar de lo que hizo el candidato, ni palabras vacías (multifuncional, proactivo, dinámico, sinergia, gestión integral, ciclo completo, end-to-end, de principio a fin).
+El CV no debe contener: frases genéricas sin respaldo ("excelentes habilidades de comunicación"), listas de competencias sin evidencia, funciones listadas como habilidades técnicas, texto que repite la descripción del cargo en lugar de lo que hizo el candidato, ni palabras vacías (multifuncional, proactivo, dinámico, sinergia, gestión integral, ciclo completo, end-to-end, de principio a fin, desde X hasta Y).
 
 **C7 — Adecuación al nivel**
 El lenguaje, la densidad de logros, el orden de secciones (educación antes de experiencia para practicante/junior) y la extensión deben coincidir con el nivel del candidato. Un CV senior con bullets que describen tareas rutinarias suena a semi-senior. Un CV junior con lenguaje de director suena falso.
