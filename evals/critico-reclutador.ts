@@ -23,12 +23,13 @@ import { jsonrepair } from "jsonrepair";
 import * as fs from "fs";
 import * as path from "path";
 import {
-  limpiarConocimientosEnDesarrollo,
-  limpiarHabilidadesTecnicas,
-  agregarDisponibilidad,
+  postprocesarCV,
   cifrasSinRespaldo,
+  reemplazarTerminosInternos,
   calcularMatch,
 } from "../app/lib/cv-postprocess";
+import { cargoDesdeTitulo } from "../app/lib/cv-verificacion";
+import { repararCV } from "../app/lib/reparacion";
 import { construirMensajeUsuario } from "../app/lib/mensaje-usuario";
 
 // ─── modelos y costos ─────────────────────────────────────────────────────────
@@ -183,6 +184,8 @@ interface ResultadoAdaptacion {
   carta_presentacion: string;
   palabras_clave_oferta: string[];
   sugerencias: string[];
+  titulo_postulacion?: string;
+  principales_cambios?: string[];
 }
 
 async function generateAdaptacion(
@@ -214,10 +217,13 @@ async function generateAdaptacion(
   if (typeof parsed.cv_adaptado !== "string") throw new Error("cv_adaptado no es string");
 
   // Post-procesamiento (igual que producción)
-  let cvAdaptado = parsed.cv_adaptado as string;
-  cvAdaptado = limpiarConocimientosEnDesarrollo(cvAdaptado, cvTexto);
-  cvAdaptado = limpiarHabilidadesTecnicas(cvAdaptado, cvTexto);
-  cvAdaptado = agregarDisponibilidad(cvAdaptado);
+  let cvAdaptado = postprocesarCV(parsed.cv_adaptado as string, cvTexto);
+  const reparacion = await repararCV({
+    client, cv: cvAdaptado, fuente: cvTexto, cargoOferta: cargoDesdeTitulo(parsed.titulo_postulacion),
+  });
+  cvAdaptado = reparacion.cv;
+  const costoReparacion = reparacion.usage ? calcularCostoReal(MODELO_ITERACION, reparacion.usage as UsageInfo) : 0;
+  console.log(`  🔧  Reparación: ${reparacion.estado}${reparacion.detalle.length ? ` (${reparacion.detalle.join("; ")})` : ""} · costo $${costoReparacion.toFixed(4)}`);
   const sinRespaldo = cifrasSinRespaldo(cvAdaptado, cvTexto);
   if (sinRespaldo.length > 0) console.warn(`  ⚠️   Cifras sin respaldo en la fuente: ${sinRespaldo.join(", ")}`);
 
@@ -226,12 +232,17 @@ async function generateAdaptacion(
     carta_presentacion:   (parsed.carta_presentacion as string) ?? "",
     palabras_clave_oferta: (parsed.palabras_clave_oferta as string[]) ?? [],
     sugerencias:          (parsed.sugerencias as string[]) ?? [],
+    titulo_postulacion:   (parsed.titulo_postulacion as string) ?? "",
+    principales_cambios:  ((parsed.principales_cambios as string[]) ?? []).map(reemplazarTerminosInternos),
   };
 
   const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
   const outPath = path.join(resultadosDir, `${caso}-${ts}.json`);
   fs.mkdirSync(resultadosDir, { recursive: true });
-  fs.writeFileSync(outPath, JSON.stringify({ caso, ts, costo_adaptacion: costo, ...resultado }, null, 2));
+  fs.writeFileSync(outPath, JSON.stringify({
+    caso, ts, costo_adaptacion: costo, costo_reparacion: costoReparacion,
+    reparacion: { estado: reparacion.estado, detalle: reparacion.detalle }, ...resultado,
+  }, null, 2));
   console.log(`  ✓  Adaptación guardada: ${path.basename(outPath)}`);
   return resultado;
 }

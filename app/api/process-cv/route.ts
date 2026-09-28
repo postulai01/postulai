@@ -6,12 +6,13 @@ import {
   normalizarParaComparar,
   calcularMatch,
   extraerPerfilProfesional,
-  limpiarConocimientosEnDesarrollo,
-  limpiarHabilidadesTecnicas,
-  agregarDisponibilidad,
+  postprocesarCV,
   cifrasSinRespaldo,
+  reemplazarTerminosInternos,
 } from "../../lib/cv-postprocess";
 import { construirMensajeUsuario } from "../../lib/mensaje-usuario";
+import { cargoDesdeTitulo } from "../../lib/cv-verificacion";
+import { repararCV } from "../../lib/reparacion";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -58,13 +59,13 @@ Formato obligatorio, del que depende el sistema:
 PERFIL PROFESIONAL
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. Nombra el cargo al que se postula, tal como lo nombra la oferta. Nunca el nombre de la empresa. Sin oferta, nombra el título o rol profesional del candidato.
+1. Nombra el cargo al que se postula, tal como lo nombra la oferta, integrado de forma natural en la primera oración, sin fórmulas como candidato a o postulante a. Nunca el nombre de la empresa. Sin oferta, nombra el título o rol profesional del candidato.
 2. Entre 50 y 100 palabras, en 2 a 4 líneas.
-3. Contenido: nivel o etapa profesional y área de especialidad; 2 o 3 fortalezas o diferenciadores con respaldo, con el vocabulario de la oferta cuando hay respaldo; un logro o hecho concreto de LA FUENTE. Si el candidato está sin empleo y la oferta no fija fecha de inicio, indica disponibilidad inmediata.
+3. Contenido: nivel o etapa profesional y área de especialidad; 2 o 3 fortalezas o diferenciadores con respaldo, con el vocabulario de la oferta cuando hay respaldo; un logro o hecho concreto de LA FUENTE. Si el candidato está sin empleo, no es estudiante y la oferta no fija fecha de inicio, indica disponibilidad inmediata. A un estudiante nunca le indiques disponibilidad: no está en LA FUENTE.
 4. Redacción impersonal, con frases nominales. Sin primera persona, explícita o implícita (yo soy, me considero, busco, busca, en búsqueda de). Sin tercera persona (ha liderado, ha desarrollado, ha gestionado).
 5. En una enumeración, cada elemento necesita su propio respaldo. Un elemento sin respaldo se elimina; no se rescata como "en formación" ni "en desarrollo".
 6. No resume toda la trayectoria: eso vive en EXPERIENCIA LABORAL.
-7. Prohibido: proactivo, apasionado, dinámico, innovador, orientado a resultados, nuevos desafíos, ganas de aprender, soy una persona, me considero; apoyar, aportar, contribuir, colaborar, asistir (en cualquier conjugación); ciclo completo, end-to-end, de principio a fin, desde X hasta Y, productivo-comercial, operativo-comercial.
+7. Prohibido: candidato a, postulante a, proactivo, apasionado, dinámico, innovador, orientado a resultados, nuevos desafíos, ganas de aprender, soy una persona, me considero; apoyar, aportar, contribuir, colaborar, asistir (en cualquier conjugación); ciclo completo, end-to-end, de principio a fin, desde X hasta Y, productivo-comercial, operativo-comercial.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EXPERIENCIA LABORAL
@@ -106,7 +107,7 @@ HABILIDADES
 
 Cada categoría en una sola línea, con estas etiquetas exactas y elementos separados por " · ":
 Habilidades técnicas: máximo 6. Solo herramientas, software, plataformas, lenguajes o certificaciones con nombre propio mencionados en LA FUENTE. Las funciones o tareas no van aquí aunque la oferta las nombre: selección, reclutamiento, entrevistas, psicometría, análisis, gestión, atención al cliente, negociación, planificación, evaluación, coordinación, capacitación, ventas.
-Habilidades blandas: máximo 5. Prohibidas: disposición al aprendizaje, aprendizaje rápido, multifuncional, dinámico, proactivo, y funciones disfrazadas de habilidad blanda (gestión operativa, análisis de procesos, organización a secas).
+Habilidades blandas: máximo 5. Prohibidas: disposición al aprendizaje, aprendizaje rápido, multifuncional, dinámico, proactivo, orientación a resultados, y funciones disfrazadas de habilidad blanda (gestión operativa, análisis de procesos, organización a secas).
 Conocimientos en desarrollo: solo con un indicio concreto en LA FUENTE (ramo, curso, proyecto o certificación en curso). Que la oferta pida algo nunca es un indicio. Sin indicio, omite la línea.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -143,7 +144,7 @@ Responde ÚNICAMENTE con un JSON válido con estos campos:
 - cv_adaptado: string con el CV completo, en el formato indicado arriba.
 - carta_presentacion: string con la carta.
 - sugerencias: array de exactamente 3 strings, en este orden: visibilidad digital (qué cambiar en LinkedIn para este cargo), contacto directo (con el reclutador, la empresa o la red del sector), mejora de perfil o habilidad. Formato "Título breve: acción concreta"; el título tiene 2 a 4 palabras y el total no supera 20 palabras. Al menos una apunta a lo más relevante de la oferta que el candidato no tiene, como una acción concreta que puede empezar (un curso introductorio, un proyecto personal). Nunca sugieras decir en la entrevista que ya sabe o que está aprendiendo algo.
-- principales_cambios: array de exactamente 5 strings en formato "qué había → qué hay ahora".
+- principales_cambios: array de exactamente 5 strings en formato "qué había → qué hay ahora". Están escritos para el candidato: nunca uses términos internos de estas instrucciones (LA FUENTE, nombres de principios o de reglas); refiérete al CV original (en MODO CREAR, a los datos entregados).
 - titulo_postulacion: string. En MODO ADAPTAR o MODO CREAR CON OFERTA: "CV para [Empresa] · [Cargo]"; si no se identifica la empresa, "CV para [Cargo]". En MODO CREAR SIN OFERTA: "CV Profesional · [Título profesional del candidato]".
 - palabras_clave_oferta: string[] con las palabras clave del punto C del análisis previo, en MODO ADAPTAR o MODO CREAR CON OFERTA. En MODO CREAR SIN OFERTA: array vacío [].`;
 
@@ -291,22 +292,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // ── filtro anti-fabricación: Conocimientos en desarrollo y Habilidades técnicas ─────────────
+    // ── post-procesamiento: filtros de habilidades, disponibilidad y reparación dirigida ─────────
     if (typeof result.cv_adaptado === "string") {
       const fuenteOriginal = modo === "adaptar"
         ? (typeof cv === "string" ? cv : "")
         : (typeof datos_personales === "string"
             ? datos_personales
             : JSON.stringify(datos_personales ?? ""));
-      result.cv_adaptado = limpiarConocimientosEnDesarrollo(
-        result.cv_adaptado as string,
-        fuenteOriginal
-      );
-      result.cv_adaptado = limpiarHabilidadesTecnicas(
-        result.cv_adaptado as string,
-        fuenteOriginal
-      );
-      result.cv_adaptado = agregarDisponibilidad(result.cv_adaptado as string);
+      result.cv_adaptado = postprocesarCV(result.cv_adaptado as string, fuenteOriginal);
+
+      const cargoOferta = modo === "crear" && !oferta ? null : cargoDesdeTitulo(result.titulo_postulacion);
+      const reparacion = await repararCV({
+        client,
+        cv: result.cv_adaptado as string,
+        fuente: fuenteOriginal,
+        cargoOferta,
+      });
+      result.cv_adaptado = reparacion.cv;
 
       // ── vigilancia de cifras: solo registra, no modifica el CV ────────────
       const sinRespaldo = cifrasSinRespaldo(result.cv_adaptado as string, fuenteOriginal);
@@ -342,6 +344,12 @@ export async function POST(request: NextRequest) {
           }, { status: 403 });
         }
       }
+    }
+
+    if (Array.isArray(result.principales_cambios)) {
+      result.principales_cambios = result.principales_cambios.map((c: unknown) =>
+        typeof c === "string" ? reemplazarTerminosInternos(c) : c
+      );
     }
 
     const keywords: string[] = Array.isArray(result.palabras_clave_oferta)

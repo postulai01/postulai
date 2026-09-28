@@ -3,6 +3,8 @@
  * Importar desde aquí; nunca duplicar estas funciones.
  */
 
+import { BLANDAS_PROHIBIDAS, esEncabezado, esEstudiante, norm, seccionar } from "./cv-verificacion";
+
 // ─── normalización de texto ──────────────────────────────────────────────────
 
 export function normalizarParaComparar(text: string): string {
@@ -246,8 +248,9 @@ export function cifrasSinRespaldo(cvAdaptado: string, fuenteOriginal: string): s
 }
 
 // ─── disponibilidad inmediata ────────────────────────────────────────────────
-// Si ningún cargo de EXPERIENCIA LABORAL dice "Presente" y el perfil no menciona
-// disponibilidad, agrega la frase al final del perfil. No revisa si la oferta fija fecha de inicio.
+// Si ningún cargo de EXPERIENCIA LABORAL dice "Presente", el candidato no es estudiante (ninguna
+// línea de EDUCACIÓN en curso) y el perfil no menciona disponibilidad, agrega la frase al final
+// del perfil. No revisa si la oferta fija fecha de inicio.
 
 export const FRASE_DISPONIBILIDAD = "Disponible para incorporación inmediata.";
 
@@ -273,6 +276,7 @@ export function agregarDisponibilidad(cvText: string): string {
     }
   }
   if (!hayCargo) return cvText;
+  if (esEstudiante(seccionar(cvText))) return cvText;
 
   // Última línea no vacía del perfil
   const iPerfil = lines.findIndex(l => /PERFIL\s+PROFESIONAL/i.test(l));
@@ -290,4 +294,89 @@ export function agregarDisponibilidad(cvText: string): string {
   const linea = lines[ultima].replace(/\s+$/, "");
   lines[ultima] = /[.!?]$/.test(linea) ? `${linea} ${FRASE_DISPONIBILIDAD}` : `${linea}. ${FRASE_DISPONIBILIDAD}`;
   return lines.join("\n");
+}
+
+// ─── habilidades blandas prohibidas ──────────────────────────────────────────
+
+export function limpiarHabilidadesBlandas(cvText: string): string {
+  const out: string[] = [];
+  for (const line of cvText.split("\n")) {
+    const trimmed = line.trim();
+    if (!/^Habilidades blandas\s*:/i.test(trimmed)) {
+      out.push(line);
+      continue;
+    }
+    const colonIdx = trimmed.indexOf(":");
+    const prefix = trimmed.slice(0, colonIdx + 1);
+    const items = trimmed.slice(colonIdx + 1).split(/\s*·\s*|\s*,\s*/).map(t => t.trim()).filter(Boolean);
+    const validas = items.filter(item => {
+      const prohibida = BLANDAS_PROHIBIDAS.find(([re]) => re.test(norm(item)));
+      if (prohibida) console.warn(`[postulai] Habilidades blandas: eliminando "${item}" — frase prohibida (${prohibida[1]})`);
+      return !prohibida;
+    });
+    if (validas.length > 0) {
+      const indent = line.slice(0, line.length - trimmed.length);
+      out.push(`${indent}${prefix} ${validas.join(" · ")}`);
+    }
+  }
+  return out.join("\n");
+}
+
+// ─── términos internos del prompt en textos para el usuario ──────────────────
+
+export function reemplazarTerminosInternos(texto: string): string {
+  return texto.replace(/\bLA FUENTE\b/g, "tu CV original");
+}
+
+// ─── post-procesamiento determinista completo ────────────────────────────────
+// Mismo orden en producción (route.ts) y en los evals.
+
+export function postprocesarCV(cvText: string, fuenteOriginal: string): string {
+  let cv = limpiarConocimientosEnDesarrollo(cvText, fuenteOriginal);
+  cv = limpiarHabilidadesTecnicas(cv, fuenteOriginal);
+  cv = limpiarHabilidadesBlandas(cv);
+  cv = ordenarEducacionEstudiante(cv);
+  cv = quitarDisponibilidadEstudiante(cv);
+  cv = agregarDisponibilidad(cv);
+  return cv;
+}
+
+// R-23: a un estudiante (alguna línea de EDUCACIÓN en curso) no se le indica disponibilidad.
+// Elimina del perfil las oraciones que la mencionan.
+export function quitarDisponibilidadEstudiante(cvText: string): string {
+  if (!esEstudiante(seccionar(cvText))) return cvText;
+  const lines = cvText.split("\n");
+  const iPerfil = lines.findIndex(l => /PERFIL\s+PROFESIONAL/i.test(l));
+  if (iPerfil === -1) return cvText;
+  for (let i = iPerfil + 1; i < lines.length; i++) {
+    if (esSoloSeparador(lines[i])) continue;
+    if (esEncabezadoSeccion(lines[i])) break;
+    if (!/disponib/i.test(lines[i])) continue;
+    const oraciones = lines[i].match(/[^.!?]+[.!?]*/g) ?? [lines[i]];
+    const quedan = oraciones.filter(o => !/disponib/i.test(o));
+    console.warn(`[postulai] Perfil: eliminando disponibilidad en candidato estudiante ("${oraciones.filter(o => /disponib/i.test(o)).join(" ").trim()}")`);
+    lines[i] = quedan.join("").trim();
+  }
+  return lines.join("\n");
+}
+
+// R-11: si el candidato es estudiante (alguna línea de EDUCACIÓN en curso) y EXPERIENCIA LABORAL
+// aparece antes que EDUCACIÓN, mueve el bloque completo de EDUCACIÓN justo antes de EXPERIENCIA
+// LABORAL, sin tocar su contenido.
+export function ordenarEducacionEstudiante(cvText: string): string {
+  if (!esEstudiante(seccionar(cvText))) return cvText;
+  const lines = cvText.split("\n");
+  const encabezados = lines.map((l, i) => (esEncabezado(l) ? i : -1)).filter(i => i >= 0);
+  const iExp = lines.findIndex(l => esEncabezado(l) && l.trim() === "EXPERIENCIA LABORAL");
+  const iEdu = lines.findIndex(l => esEncabezado(l) && l.trim() === "EDUCACIÓN");
+  if (iExp === -1 || iEdu === -1 || iEdu < iExp) return cvText;
+
+  const finEdu = encabezados.find(i => i > iEdu) ?? lines.length;
+  const bloque = lines.slice(iEdu, finEdu);
+  while (bloque.length > 0 && !bloque[bloque.length - 1].trim()) bloque.pop();
+  const resto = [...lines.slice(0, iEdu), ...lines.slice(finEdu)];
+  while (resto.length > 0 && !resto[resto.length - 1].trim()) resto.pop();
+  resto.splice(iExp, 0, ...bloque, "");
+  console.warn("[postulai] Orden: EDUCACIÓN movida antes de EXPERIENCIA LABORAL (candidato estudiante)");
+  return resto.join("\n") + (cvText.endsWith("\n") ? "\n" : "");
 }
