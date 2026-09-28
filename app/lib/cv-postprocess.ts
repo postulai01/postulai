@@ -3,7 +3,7 @@
  * Importar desde aquí; nunca duplicar estas funciones.
  */
 
-import { BLANDAS_PROHIBIDAS, esEstudiante, norm, seccionar } from "./cv-verificacion";
+import { BLANDAS_PROHIBIDAS, esEncabezado, esEstudiante, norm, seccionar } from "./cv-verificacion";
 
 // ─── normalización de texto ──────────────────────────────────────────────────
 
@@ -335,6 +335,7 @@ export function postprocesarCV(cvText: string, fuenteOriginal: string): string {
   let cv = limpiarConocimientosEnDesarrollo(cvText, fuenteOriginal);
   cv = limpiarHabilidadesTecnicas(cv, fuenteOriginal);
   cv = limpiarHabilidadesBlandas(cv);
+  cv = ordenarEducacionEstudiante(cv);
   cv = quitarDisponibilidadEstudiante(cv);
   cv = agregarDisponibilidad(cv);
   return cv;
@@ -357,4 +358,25 @@ export function quitarDisponibilidadEstudiante(cvText: string): string {
     lines[i] = quedan.join("").trim();
   }
   return lines.join("\n");
+}
+
+// R-11: si el candidato es estudiante (alguna línea de EDUCACIÓN en curso) y EXPERIENCIA LABORAL
+// aparece antes que EDUCACIÓN, mueve el bloque completo de EDUCACIÓN justo antes de EXPERIENCIA
+// LABORAL, sin tocar su contenido.
+export function ordenarEducacionEstudiante(cvText: string): string {
+  if (!esEstudiante(seccionar(cvText))) return cvText;
+  const lines = cvText.split("\n");
+  const encabezados = lines.map((l, i) => (esEncabezado(l) ? i : -1)).filter(i => i >= 0);
+  const iExp = lines.findIndex(l => esEncabezado(l) && l.trim() === "EXPERIENCIA LABORAL");
+  const iEdu = lines.findIndex(l => esEncabezado(l) && l.trim() === "EDUCACIÓN");
+  if (iExp === -1 || iEdu === -1 || iEdu < iExp) return cvText;
+
+  const finEdu = encabezados.find(i => i > iEdu) ?? lines.length;
+  const bloque = lines.slice(iEdu, finEdu);
+  while (bloque.length > 0 && !bloque[bloque.length - 1].trim()) bloque.pop();
+  const resto = [...lines.slice(0, iEdu), ...lines.slice(finEdu)];
+  while (resto.length > 0 && !resto[resto.length - 1].trim()) resto.pop();
+  resto.splice(iExp, 0, ...bloque, "");
+  console.warn("[postulai] Orden: EDUCACIÓN movida antes de EXPERIENCIA LABORAL (candidato estudiante)");
+  return resto.join("\n") + (cvText.endsWith("\n") ? "\n" : "");
 }

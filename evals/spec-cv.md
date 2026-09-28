@@ -57,7 +57,7 @@ Restricciones de redacción del prompt (decisión 8):
 | ID | Regla | Prompt | Rúbrica | Código |
 |---|---|---|---|---|
 | R-10 | Orden junior/mid/senior/ejecutivo (experiencia primero): Contacto → Perfil profesional → Experiencia laboral → Educación → Habilidades → Idiomas → Certificaciones (si aplica). | Sí | C7 / D2 | — |
-| R-11 | Orden estudiante/practicante/recién egresado con menos de 1 año de experiencia laboral: Contacto → Perfil profesional → Educación → Experiencia laboral → Habilidades → Idiomas. **EDUCACIÓN va antes que EXPERIENCIA LABORAL solo en este nivel;** un junior con 1–4 años de experiencia va con experiencia primero (R-10). | Sí, destacada al inicio de FORMATO y en la revisión final | C7 / D2 | `verificar.ts` (orden) |
+| R-11 | Orden estudiante/practicante/recién egresado con menos de 1 año de experiencia laboral: Contacto → Perfil profesional → Educación → Experiencia laboral → Habilidades → Idiomas. **EDUCACIÓN va antes que EXPERIENCIA LABORAL solo en este nivel;** un junior con 1–4 años de experiencia va con experiencia primero (R-10). | Sí, destacada al inicio de FORMATO y en la revisión final | C7 / D2 | `verificar.ts` (orden); `ordenarEducacionEstudiante` (v10.4) mueve EDUCACIÓN antes de EXPERIENCIA LABORAL si el candidato es estudiante |
 | R-12 | Cada título de sección en MAYÚSCULAS seguido de una línea de `———`. El título del perfil es exactamente `PERFIL PROFESIONAL`. | Sí | — | `extraerPerfilProfesional` depende de esto |
 | R-13 | Sin tablas, columnas múltiples, íconos, gráficos, encabezados ni pies de página. | Sí | D1 | — |
 | R-14 | Fechas `MM/AAAA – MM/AAAA`; cargo actual `MM/AAAA – Presente`. Si el original solo da el año, se usa `AAAA` (no se inventan meses, P1). | Sí | D2 | — |
@@ -72,7 +72,7 @@ Orden de las reglas en el prompt: R-20 va primero.
 
 | ID | Regla | Prompt | Rúbrica | Código |
 |---|---|---|---|---|
-| R-20 | **Primera regla del perfil:** nombra el cargo al que se postula, tal como lo nombra la oferta. Nunca el nombre de la empresa. Sin oferta (modo crear sin oferta): nombra el título o rol profesional del candidato. | Sí, primera | C4 (b): no nombrar el cargo = importante; nombrar la empresa = importante | `verificar.ts` (cargo) y reparación dirigida (v10.4) |
+| R-20 | **Primera regla del perfil:** nombra el cargo al que se postula, tal como lo nombra la oferta, **integrado de forma natural en la primera oración, sin fórmulas como "candidato a" o "postulante a"** (v10.4). Nunca el nombre de la empresa. Sin oferta (modo crear sin oferta): nombra el título o rol profesional del candidato. | Sí, primera | C4 (b): no nombrar el cargo = importante; nombrar la empresa = importante | `verificar.ts` (cargo) y reparación dirigida (v10.4) |
 | R-21 | Entre 50 y 100 palabras, en 2 a 4 líneas. | Sí, sin instrucción de contar | C4 (a): fuera de rango = menor | Recorte automático si supera 100 palabras |
 | R-22 | Contenido: nivel o etapa profesional + área de especialidad; 2–3 fortalezas o diferenciadores con respaldo en el original (usando el vocabulario de la oferta cuando hay respaldo, R-04); un logro o hecho concreto del original. | Sí, como lista de contenidos, sin estructura-plantilla ni frases modelo | C4 (c) | — |
 | R-23 | Si el candidato está sin empleo, **no es estudiante** y la oferta no fija fecha de inicio, se indica disponibilidad inmediata. A un estudiante nunca se le indica disponibilidad: no está en su CV original (v10.4). | Sí | — | `agregarDisponibilidad`: si ningún cargo de EXPERIENCIA LABORAL dice "Presente", ninguna línea de EDUCACIÓN está en curso y el perfil no menciona disponibilidad, agrega "Disponible para incorporación inmediata." al final del perfil. No revisa si la oferta fija fecha de inicio. `verificar.ts` (brechas) marca a un estudiante con disponibilidad. |
@@ -300,3 +300,19 @@ Si se rechazan todas las líneas, la reparación se descarta.
 - `evals/reparar-guardados.ts` aplica el post-procesamiento y la reparación a resultados guardados sin regenerarlos; sin `--ejecutar`, solo estima el costo.
 - `verificar.ts` agrega las columnas **cargo** (R-20) y **educación** (R-51), y la regla de blandas (R-62) en frases.
 - Los casos tienen el campo `cargo_oferta`, que se usa cuando el resultado guardado no tiene `titulo_postulacion`.
+
+### Ajustes v10.4 tras probar la preview con la oferta de EY (PED-6)
+
+| Cambio | Reglas |
+|---|---|
+| `ordenarEducacionEstudiante` (en `postprocesarCV`): si el candidato es estudiante (misma detección que `quitarDisponibilidadEstudiante`: una línea de EDUCACIÓN en curso) y EXPERIENCIA LABORAL va antes, mueve el bloque completo de EDUCACIÓN antes de EXPERIENCIA LABORAL, sin tocar su contenido. Determinista, sin API. | R-11 |
+| El cargo se integra de forma natural en la primera oración del perfil, sin "candidato a" ni "postulante a" (prompt, instrucción de reparación y nueva frase prohibida "fórmula de postulación" en `FRASES_PERFIL`, que también hace rechazar una reparación que la use) | R-20, R-25 |
+| En la reparación de verbos, si el original indica participación, apoyo o colaboración, se ofrecen verbos equivalentes que no suben el nivel (integrar, formar parte de), para que la corrección no se rechace por escalada | R-33, R-77 |
+| **Un único reintento** en la reparación, solo para las líneas rechazadas por la validación, con el motivo del rechazo y la propuesta rechazada. Si el reintento también se rechaza o falla, quedan las líneas originales y se mantiene lo aceptado en el primer intento. | R-77 |
+
+Prueba con Haiku real sobre los 3 CVs de estudiante guardados:
+- **Resultado:** los 3 perfiles nombran el cargo sin fórmula, y "Participo en 3 campañas" pasa a "Integré 3 campañas".
+- **Reintento:** se activó en 2 de 3 casos, por un perfil de 48 palabras y por "orientado a resultados".
+- **Costo:** ~$0.0025 por CV reparado sin reintento y ~$0.005 con reintento.
+
+**Hallazgo pendiente:** el modelo principal también infla verbos, y ningún detector lo marca. Por ejemplo, "Participación en 3 campañas" pasó a "Coordiné con distintos equipos de trabajo en 3 campañas" en pedro_cencomalls y pedro_xepelin v10.2. Un detector de verbos de escalada sin respaldo en la fuente (la misma regla `VERBOS_ESCALADA` de la validación) podría sumarse a `detectarReparables`.

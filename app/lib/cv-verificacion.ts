@@ -167,6 +167,7 @@ export const FRASES_PERFIL: [RegExp, string][] = [
   [/\b(apoy|aport|contribu|colabor)(?!ador|acion|ucion)\w*/, "verbo de soporte"], [/\basist(?!ente|encia)\w*/, "asistir"],
   [/\bproductivo-comercial\b/, "productivo-comercial"], [/\boperativo-comercial\b/, "operativo-comercial"],
   [/\bha (liderado|desarrollado|gestionado|dirigido|coordinado|implementado)\b/, "tercera persona"],
+  [/\b(candidat[oa]|postulante)s? (a|al|para|como)\b/, "fórmula de postulación"],
 ];
 
 // Frases prohibidas en "Habilidades blandas:" (R-62). Se comparan sobre texto normalizado.

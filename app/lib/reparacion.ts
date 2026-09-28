@@ -36,11 +36,11 @@ function instruccion(v: ViolacionReparable): string {
   const tiempo = v.cargoActual ? "presente (es el cargo actual)" : "pasado (es un cargo anterior)";
   switch (v.tipo) {
     case "verbo_prohibido":
-      return `El bullet empieza con un verbo o construcción prohibida (${v.detalle}). Reescríbelo empezando con un verbo de acción en primera persona singular, en ${tiempo}, que describa exactamente la misma acción que el CV original, con el mismo nivel de responsabilidad y distinto de los verbos ya usados en este cargo. No uses: realizar, participar, apoyar, contribuir, colaborar, ayudar, asistir, estar a cargo de, ser responsable de.`;
+      return `El bullet empieza con un verbo o construcción prohibida (${v.detalle}). Reescríbelo empezando con un verbo de acción en primera persona singular, en ${tiempo}, que describa exactamente la misma acción que el CV original, con el mismo nivel de responsabilidad y distinto de los verbos ya usados en este cargo. No uses: realizar, participar, apoyar, contribuir, colaborar, ayudar, asistir, estar a cargo de, ser responsable de. Si el original indica participación, apoyo o colaboración, usa un verbo equivalente que no suba el nivel de responsabilidad, como integrar o formar parte de (${v.cargoActual ? "integro, formo parte de" : "integré, formé parte de"}); nunca coordinar, liderar, dirigir, gestionar ni supervisar.`;
     case "verbo_repetido":
       return `El bullet repite un verbo inicial dentro del mismo cargo (${v.detalle}). Cambia el verbo inicial por otro verbo de acción en primera persona singular, en ${tiempo}, distinto de los ya usados en el cargo, y ajusta solo lo necesario para que la frase quede correcta.`;
     case "perfil_sin_cargo":
-      return `El perfil profesional no nombra el cargo al que se postula: "${v.detalle}". Devuelve el perfil completo: agrega o ajusta solo su primera frase para nombrar ese cargo como el cargo al que se postula, sin nombrar la empresa y sin presentar al candidato como si ya ocupara ese cargo. Conserva todas las demás frases y datos tal como están (institución, niveles, cifras); no resumas ni acortes. Debe quedar entre 50 y 100 palabras, en redacción impersonal con frases nominales.`;
+      return `El perfil profesional no nombra el cargo al que se postula: "${v.detalle}". Devuelve el perfil completo: ajusta solo su primera oración para que integre ese cargo de forma natural, como el cargo hacia el que se orienta el perfil, sin fórmulas como "candidato a" o "postulante a", sin nombrar la empresa y sin presentar al candidato como si ya ocupara ese cargo. Conserva todas las demás frases y datos tal como están (institución, niveles, cifras); no resumas ni acortes. Debe quedar entre 50 y 100 palabras, en redacción impersonal con frases nominales.`;
     case "educacion_extra":
       return `En EDUCACIÓN solo va la línea de carrera e institución con sus fechas. Esta línea extra se conserva solo si es un premio nacional, una publicación académica, un promedio sobre 6.0 o una beca competitiva; en ese caso devuélvela igual. Si no lo es, devuelve texto vacío "" para eliminarla.`;
   }
@@ -57,33 +57,15 @@ export async function repararCV(opts: {
   if (violaciones.length === 0) return { cv, estado: "sin_violaciones", detalle: [] };
 
   const resumen = violaciones.map(v => `${v.tipo} (${v.id})`);
-  const items = violaciones.map(v => ({ id: v.id, regla: instruccion(v), texto: v.texto }));
+  const fuenteNorm = norm(fuente);
 
+  // Primer intento: todas las líneas afectadas.
   let usage: Anthropic.Usage | undefined;
   let respuesta: Record<string, string>;
   try {
-    const res = await client.messages.create(
-      {
-        model: MODELO_REPARACION,
-        max_tokens: 2000,
-        temperature: 0,
-        system: SYSTEM_REPARACION,
-        messages: [{
-          role: "user",
-          content: `CV ORIGINAL:\n${fuente}\n\nLÍNEAS A CORREGIR:\n${JSON.stringify(items, null, 2)}`,
-        }],
-      },
-      { timeout: 20_000, maxRetries: 1 }
-    );
-    usage = res.usage;
-    const raw = res.content[0]?.type === "text" ? res.content[0].text : "";
-    const m = raw.match(/\{[\s\S]*\}/);
-    if (!m) throw new Error("la respuesta no contiene JSON");
-    const parsed = JSON.parse(m[0]) as { lineas?: { id?: unknown; texto?: unknown }[] };
-    respuesta = {};
-    for (const l of parsed.lineas ?? []) {
-      if (typeof l.id === "string" && typeof l.texto === "string") respuesta[l.id] = l.texto.trim();
-    }
+    const r = await llamarHaiku(client, fuente, violaciones.map(v => ({ id: v.id, regla: instruccion(v), texto: v.texto })));
+    usage = r.usage;
+    respuesta = r.respuesta;
   } catch (err) {
     const detalle = [`error: ${(err as Error).message}`, ...resumen];
     console.warn(`[postulai] Reparación descartada (${detalle.join("; ")})`);
@@ -91,34 +73,64 @@ export async function repararCV(opts: {
   }
 
   // Validación línea por línea: una línea reparada que no pasa se rechaza y queda la original.
-  const fuenteNorm = norm(fuente);
-  const rechazadas: string[] = [];
+  const aceptadas = new Map<string, string>(); // id → texto aceptado ("" = eliminar, solo EDUCACIÓN)
+  let rechazos = new Map<string, { motivo: string; propuesta: string }>();
+  const evaluar = (v: ViolacionReparable, texto: string | undefined) => {
+    if (texto === undefined) return;
+    const limpio = texto.replace(/^\s*[-•]\s+/, "").trim();
+    if (v.tipo === "educacion_extra") { if (limpio === "") aceptadas.set(v.id, ""); return; }
+    if (!limpio || limpio === v.texto) return;
+    const motivo = motivoRechazo(v, limpio, fuenteNorm);
+    if (motivo) rechazos.set(v.id, { motivo, propuesta: limpio });
+    else { aceptadas.set(v.id, limpio); rechazos.delete(v.id); }
+  };
+  for (const v of violaciones) evaluar(v, respuesta[v.id]);
+
+  // Un único reintento, solo para las líneas rechazadas, con el motivo del rechazo.
+  if (rechazos.size > 0) {
+    const pendientes = violaciones.filter(v => rechazos.has(v.id));
+    console.warn(`[postulai] Reparación: reintentando líneas rechazadas (${pendientes.map(v => `${v.tipo} (${v.id}): ${rechazos.get(v.id)!.motivo}`).join("; ")})`);
+    try {
+      const r = await llamarHaiku(client, fuente, pendientes.map(v => ({
+        id: v.id,
+        regla: `${instruccion(v)} Tu propuesta anterior fue rechazada por este motivo: ${rechazos.get(v.id)!.motivo}. Propuesta rechazada: "${rechazos.get(v.id)!.propuesta}".`,
+        texto: v.texto,
+      })));
+      usage = sumarUsage(usage, r.usage);
+      const previos = rechazos;
+      rechazos = new Map();
+      for (const v of pendientes) {
+        evaluar(v, r.respuesta[v.id]);
+        if (!aceptadas.has(v.id) && !rechazos.has(v.id)) rechazos.set(v.id, previos.get(v.id)!);
+      }
+    } catch (err) {
+      console.warn(`[postulai] Reparación: el reintento falló (${(err as Error).message}); se conservan las líneas originales`);
+    }
+  }
+
+  const rechazadas = violaciones.filter(v => rechazos.has(v.id)).map(v => `${v.tipo} (${v.id}): ${rechazos.get(v.id)!.motivo}`);
+  if (rechazadas.length > 0) console.warn(`[postulai] Reparación: líneas rechazadas (${rechazadas.join("; ")})`);
 
   // Aplicar: reemplazos por índice de línea; null = eliminar la línea.
   const lineas = cv.split("\n");
   const reemplazos = new Map<number, string | null>();
   const aplicadas: string[] = [];
   for (const v of violaciones) {
-    const texto = respuesta[v.id];
+    const texto = aceptadas.get(v.id);
     if (texto === undefined) continue;
-    const limpio = texto.replace(/^\s*[-•]\s+/, "").trim();
     if (v.tipo === "educacion_extra") {
-      if (limpio === "") { reemplazos.set(v.indices[0], null); aplicadas.push(`${v.tipo} (${v.id}): eliminada`); }
-      continue;
-    }
-    if (!limpio || limpio === v.texto) continue;
-    const motivo = motivoRechazo(v, limpio, fuenteNorm);
-    if (motivo) { rechazadas.push(`${v.tipo} (${v.id}): ${motivo}`); continue; }
-    if (v.tipo === "perfil_sin_cargo") {
-      reemplazos.set(v.indices[0], limpio);
+      reemplazos.set(v.indices[0], null);
+      aplicadas.push(`${v.tipo} (${v.id}): eliminada`);
+    } else if (v.tipo === "perfil_sin_cargo") {
+      reemplazos.set(v.indices[0], texto);
       for (const i of v.indices.slice(1)) reemplazos.set(i, null);
+      aplicadas.push(`${v.tipo} (${v.id})`);
     } else {
       const prefijo = lineas[v.indices[0]].match(/^\s*[-•]\s+/)?.[0] ?? "- ";
-      reemplazos.set(v.indices[0], prefijo + limpio);
+      reemplazos.set(v.indices[0], prefijo + texto);
+      aplicadas.push(`${v.tipo} (${v.id})`);
     }
-    aplicadas.push(`${v.tipo} (${v.id})`);
   }
-  if (rechazadas.length > 0) console.warn(`[postulai] Reparación: líneas rechazadas (${rechazadas.join("; ")})`);
   if (reemplazos.size === 0) {
     const detalle = ["sin cambios utilizables en la respuesta", ...rechazadas.map(r => `rechazada ${r}`), ...resumen];
     console.warn(`[postulai] Reparación descartada (${detalle.join("; ")})`);
@@ -142,6 +154,40 @@ export async function repararCV(opts: {
   const detalle = [...aplicadas, ...rechazadas.map(r => `rechazada ${r}`)];
   console.warn(`[postulai] Reparación aplicada: ${detalle.join("; ")}`);
   return { cv: reparado, estado: "aplicada", detalle, usage };
+}
+
+async function llamarHaiku(
+  client: Anthropic,
+  fuente: string,
+  items: { id: string; regla: string; texto: string }[]
+): Promise<{ respuesta: Record<string, string>; usage: Anthropic.Usage }> {
+  const res = await client.messages.create(
+    {
+      model: MODELO_REPARACION,
+      max_tokens: 2000,
+      temperature: 0,
+      system: SYSTEM_REPARACION,
+      messages: [{
+        role: "user",
+        content: `CV ORIGINAL:\n${fuente}\n\nLÍNEAS A CORREGIR:\n${JSON.stringify(items, null, 2)}`,
+      }],
+    },
+    { timeout: 20_000, maxRetries: 1 }
+  );
+  const raw = res.content[0]?.type === "text" ? res.content[0].text : "";
+  const m = raw.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error("la respuesta no contiene JSON");
+  const parsed = JSON.parse(m[0]) as { lineas?: { id?: unknown; texto?: unknown }[] };
+  const respuesta: Record<string, string> = {};
+  for (const l of parsed.lineas ?? []) {
+    if (typeof l.id === "string" && typeof l.texto === "string") respuesta[l.id] = l.texto.trim();
+  }
+  return { respuesta, usage: res.usage };
+}
+
+function sumarUsage(a: Anthropic.Usage | undefined, b: Anthropic.Usage): Anthropic.Usage {
+  if (!a) return b;
+  return { ...a, input_tokens: a.input_tokens + b.input_tokens, output_tokens: a.output_tokens + b.output_tokens };
 }
 
 // ─── validación de líneas reparadas ──────────────────────────────────────────

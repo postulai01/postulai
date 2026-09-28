@@ -59,13 +59,13 @@ Formato obligatorio, del que depende el sistema:
 PERFIL PROFESIONAL
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. Nombra el cargo al que se postula, tal como lo nombra la oferta. Nunca el nombre de la empresa. Sin oferta, nombra el título o rol profesional del candidato.
+1. Nombra el cargo al que se postula, tal como lo nombra la oferta, integrado de forma natural en la primera oración, sin fórmulas como candidato a o postulante a. Nunca el nombre de la empresa. Sin oferta, nombra el título o rol profesional del candidato.
 2. Entre 50 y 100 palabras, en 2 a 4 líneas.
 3. Contenido: nivel o etapa profesional y área de especialidad; 2 o 3 fortalezas o diferenciadores con respaldo, con el vocabulario de la oferta cuando hay respaldo; un logro o hecho concreto de LA FUENTE. Si el candidato está sin empleo, no es estudiante y la oferta no fija fecha de inicio, indica disponibilidad inmediata. A un estudiante nunca le indiques disponibilidad: no está en LA FUENTE.
 4. Redacción impersonal, con frases nominales. Sin primera persona, explícita o implícita (yo soy, me considero, busco, busca, en búsqueda de). Sin tercera persona (ha liderado, ha desarrollado, ha gestionado).
 5. En una enumeración, cada elemento necesita su propio respaldo. Un elemento sin respaldo se elimina; no se rescata como "en formación" ni "en desarrollo".
 6. No resume toda la trayectoria: eso vive en EXPERIENCIA LABORAL.
-7. Prohibido: proactivo, apasionado, dinámico, innovador, orientado a resultados, nuevos desafíos, ganas de aprender, soy una persona, me considero; apoyar, aportar, contribuir, colaborar, asistir (en cualquier conjugación); ciclo completo, end-to-end, de principio a fin, desde X hasta Y, productivo-comercial, operativo-comercial.
+7. Prohibido: candidato a, postulante a, proactivo, apasionado, dinámico, innovador, orientado a resultados, nuevos desafíos, ganas de aprender, soy una persona, me considero; apoyar, aportar, contribuir, colaborar, asistir (en cualquier conjugación); ciclo completo, end-to-end, de principio a fin, desde X hasta Y, productivo-comercial, operativo-comercial.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EXPERIENCIA LABORAL

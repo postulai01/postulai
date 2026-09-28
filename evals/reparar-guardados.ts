@@ -8,6 +8,8 @@
  *   npx tsx evals/reparar-guardados.ts evals/resultados/<archivo>.json [...]            # solo estima el costo
  *   npx tsx evals/reparar-guardados.ts evals/resultados/<archivo>.json [...] --ejecutar # llama a la API
  *
+ * La estimación cubre el primer intento; si alguna línea se rechaza, un reintento puede sumar ~$0.0025 por CV.
+ *
  * Después: npx tsx evals/verificar.ts evals/reparaciones/<archivo>.json [...]
  */
 
