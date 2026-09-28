@@ -8,6 +8,9 @@
  * - directo (0.95): la keyword está contenida en una competencia, variante, herramienta, certificación
  *   o idioma del CV ("Excel" ← "Microsoft Excel"); 0.9 si solo aparece completa en una línea del CV
  *   original (carreras, que el extractor no devuelve como competencia).
+ * Carreras: las ofertas listan carreras alternativas ("Ingeniería Comercial, Industrial o afines"). Todas las
+ * carreras requeridas cuentan como UN requisito en el score; si una calza, las demás no aparecen como brecha.
+ *
  * - relacionado (0.7–0.85): al menos la mitad de las raíces de la keyword están en una competencia, y
  *   una de ellas no es genérica ("gestión de ventas" ← "ventas directas"; "análisis financiero" ←
  *   "análisis de datos" no, porque "análisis" es genérica). Nunca por sinónimos.
@@ -46,6 +49,18 @@ const PESO_RELACIONADO_EN_SCORE = 0.5;
 // Raíces que no bastan por sí solas para un match relacionado: aparecen en cualquier función.
 const RAICES_GENERICAS = new Set(["gesti", "manej", "desar", "proce", "admin", "contr", "anali", "trabaj", "equip", "servi", "clien"]
   .map(r => r.slice(0, 5)));
+
+// Nombres de carreras chilenas frecuentes en ofertas, sobre texto normalizado.
+const PATRON_CARRERA = new RegExp("^(" + [
+  "ingenieria", "ingeniero", "licenciatura", "psicologia", "derecho", "economia", "contador", "contabilidad",
+  "auditoria", "administracion (publica|de empresas)", "periodismo", "arquitectura", "medicina", "enfermeria",
+  "kinesiologia", "sociologia", "trabajo social", "tecnico (en|de)", "diseno", "pedagogia", "agronomia",
+  "geologia", "bioquimica", "quimica", "nutricion", "fonoaudiologia", "terapia ocupacional", "odontologia",
+].join("|") + ")\\b");
+
+export function esCarrera(keyword: string): boolean {
+  return PATRON_CARRERA.test(normalizarParaComparar(keyword));
+}
 
 const singular = (p: string) => p.replace(/ciones$/, "cion").replace(/([aeiou])s$/, "$1");
 
@@ -96,7 +111,17 @@ export async function mapearCompetencias(
   const matches_directos: MatchDirecto[] = [];
   const matches_relacionados: MatchRelacionado[] = [];
   const gap_keywords: { keyword: string; tipo: TipoKeyword }[] = [];
+  const gapCarreras: { keyword: string; tipo: TipoKeyword }[] = [];
   let cubiertasRequeridas = 0;
+  let coberturaCarreras = 0; // 1 si alguna carrera requerida calza directo, 0.5 si solo relacionada
+  let hayCarrerasRequeridas = false;
+
+  // Suma la cobertura de una keyword requerida al score; las carreras van como un solo requisito.
+  const cubrir = (keyword: string, tipo: TipoKeyword, cobertura: number) => {
+    if (tipo !== "requerido") return;
+    if (esCarrera(keyword)) coberturaCarreras = Math.max(coberturaCarreras, cobertura);
+    else cubiertasRequeridas += cobertura;
+  };
 
   const todas: { keyword: string; tipo: TipoKeyword }[] = [
     ...keywordsJD.requeridas.map(k => ({ keyword: k.keyword, tipo: "requerido" as const })),
@@ -104,15 +129,16 @@ export async function mapearCompetencias(
   ];
 
   for (const { keyword, tipo } of todas) {
+    if (tipo === "requerido" && esCarrera(keyword)) hayCarrerasRequeridas = true;
     const directo = nombresDirectos.find(d => contiene(d.nombre, keyword));
     if (directo) {
       matches_directos.push({ competencia_cv: directo.etiqueta, keyword_jd: keyword, relevancia: RELEVANCIA_DIRECTO, tipo });
-      if (tipo === "requerido") cubiertasRequeridas += 1;
+      cubrir(keyword, tipo, 1);
       continue;
     }
     if (extras.cvTexto && lineaConKeyword(extras.cvTexto, keyword)) {
       matches_directos.push({ competencia_cv: "(texto del CV)", keyword_jd: keyword, relevancia: RELEVANCIA_TEXTO, tipo });
-      if (tipo === "requerido") cubiertasRequeridas += 1;
+      cubrir(keyword, tipo, 1);
       continue;
     }
 
@@ -126,13 +152,17 @@ export async function mapearCompetencias(
     if (mejor) {
       const relevancia = Math.round((0.7 + 0.15 * mejor.af) * 100) / 100;
       matches_relacionados.push({ competencia_cv: mejor.nombre, keyword_jd: keyword, relevancia, tipo });
-      if (tipo === "requerido") cubiertasRequeridas += PESO_RELACIONADO_EN_SCORE;
+      cubrir(keyword, tipo, PESO_RELACIONADO_EN_SCORE);
       continue;
     }
-    gap_keywords.push({ keyword, tipo });
+    (tipo === "requerido" && esCarrera(keyword) ? gapCarreras : gap_keywords).push({ keyword, tipo });
   }
 
-  const total = keywordsJD.requeridas.length;
+  // Si ninguna carrera requerida calza, todas son brecha; si alguna calza, las demás eran alternativas.
+  if (coberturaCarreras === 0) gap_keywords.push(...gapCarreras);
+  cubiertasRequeridas += coberturaCarreras;
+  const noCarreras = keywordsJD.requeridas.filter(k => !esCarrera(k.keyword)).length;
+  const total = noCarreras + (hayCarrerasRequeridas ? 1 : 0);
   const score_adaptacion = total === 0 ? 0 : Math.round((cubiertasRequeridas / total) * 100) / 100;
   return { matches_directos, matches_relacionados, gap_keywords, score_adaptacion };
 }

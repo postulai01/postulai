@@ -8,9 +8,10 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { cifrasSinRespaldo } from "./cv-postprocess";
 import {
-  detectarReparables, type ViolacionReparable, verboProhibido, raizVerbo, primeraPalabra, perfilNombraCargo,
+  detectarReparables, type ViolacionReparable, verboProhibido, verboEscalado, raizVerbo, primeraPalabra, perfilNombraCargo,
   FRASES_CV, FRASES_PERFIL, norm,
 } from "./cv-verificacion";
+import type { ResultadoMapeo } from "./mapeo-semantico";
 
 export const MODELO_REPARACION = "claude-haiku-4-5-20251001";
 
@@ -37,6 +38,8 @@ function instruccion(v: ViolacionReparable): string {
   switch (v.tipo) {
     case "verbo_prohibido":
       return `El bullet empieza con un verbo o construcción prohibida (${v.detalle}). Reescríbelo empezando con un verbo de acción en primera persona singular, en ${tiempo}, que describa exactamente la misma acción que el CV original, con el mismo nivel de responsabilidad y distinto de los verbos ya usados en este cargo. No uses: realizar, participar, apoyar, contribuir, colaborar, ayudar, asistir, estar a cargo de, ser responsable de. Si el original indica participación, apoyo o colaboración, usa un verbo equivalente que no suba el nivel de responsabilidad, como integrar o formar parte de (${v.cargoActual ? "integro, formo parte de" : "integré, formé parte de"}); nunca coordinar, liderar, dirigir, gestionar ni supervisar.`;
+    case "verbo_escalado":
+      return `El bullet empieza con un verbo que sube el nivel de responsabilidad sin respaldo en el CV original (${v.detalle}). Reescríbelo empezando con un verbo de acción en primera persona singular, en ${tiempo}, que describa exactamente lo que el CV original dice que hizo, sin subir el nivel de responsabilidad y distinto de los verbos ya usados en este cargo. Nunca coordinar, liderar, dirigir, gestionar, supervisar, encabezar, administrar ni conducir, salvo que el CV original use ese mismo verbo.`;
     case "verbo_repetido":
       return `El bullet repite un verbo inicial dentro del mismo cargo (${v.detalle}). Cambia el verbo inicial por otro verbo de acción en primera persona singular, en ${tiempo}, distinto de los ya usados en el cargo, y ajusta solo lo necesario para que la frase quede correcta.`;
     case "perfil_sin_cargo":
@@ -51,9 +54,10 @@ export async function repararCV(opts: {
   cv: string;
   fuente: string;
   cargoOferta: string | null;
+  mapeo?: ResultadoMapeo; // PED-23: vocabulario de la oferta que el CV respalda; todavía no se pasa desde route.ts
 }): Promise<ResultadoReparacion> {
-  const { client, cv, fuente, cargoOferta } = opts;
-  const violaciones = detectarReparables(cv, cargoOferta);
+  const { client, cv, fuente, cargoOferta, mapeo } = opts;
+  const violaciones = detectarReparables(cv, cargoOferta, fuente);
   if (violaciones.length === 0) return { cv, estado: "sin_violaciones", detalle: [] };
 
   const resumen = violaciones.map(v => `${v.tipo} (${v.id})`);
@@ -63,7 +67,7 @@ export async function repararCV(opts: {
   let usage: Anthropic.Usage | undefined;
   let respuesta: Record<string, string>;
   try {
-    const r = await llamarHaiku(client, fuente, violaciones.map(v => ({ id: v.id, regla: instruccion(v), texto: v.texto })));
+    const r = await llamarHaiku(client, fuente, mapeo, violaciones.map(v => ({ id: v.id, regla: instruccion(v), texto: v.texto })));
     usage = r.usage;
     respuesta = r.respuesta;
   } catch (err) {
@@ -91,7 +95,7 @@ export async function repararCV(opts: {
     const pendientes = violaciones.filter(v => rechazos.has(v.id));
     console.warn(`[postulai] Reparación: reintentando líneas rechazadas (${pendientes.map(v => `${v.tipo} (${v.id}): ${rechazos.get(v.id)!.motivo}`).join("; ")})`);
     try {
-      const r = await llamarHaiku(client, fuente, pendientes.map(v => ({
+      const r = await llamarHaiku(client, fuente, mapeo, pendientes.map(v => ({
         id: v.id,
         regla: `${instruccion(v)} Tu propuesta anterior fue rechazada por este motivo: ${rechazos.get(v.id)!.motivo}. Propuesta rechazada: "${rechazos.get(v.id)!.propuesta}".`,
         texto: v.texto,
@@ -156,9 +160,20 @@ export async function repararCV(opts: {
   return { cv: reparado, estado: "aplicada", detalle, usage };
 }
 
+// Solo lo que el CV respalda (matches directos y relacionados); las brechas no se envían, para que
+// Haiku no las agregue.
+function contextoMapeo(mapeo: ResultadoMapeo | undefined): string {
+  if (!mapeo) return "";
+  const respaldadas = [...mapeo.matches_directos, ...mapeo.matches_relacionados]
+    .map(m => `- ${m.keyword_jd} (${m.tipo}) ← ${m.competencia_cv}`);
+  if (respaldadas.length === 0) return "";
+  return `\n\nVOCABULARIO DE LA OFERTA CON RESPALDO EN EL CV (úsalo solo si la línea ya describe eso; nunca agregues un término a una línea que no lo respalda):\n${respaldadas.join("\n")}`;
+}
+
 async function llamarHaiku(
   client: Anthropic,
   fuente: string,
+  mapeo: ResultadoMapeo | undefined,
   items: { id: string; regla: string; texto: string }[]
 ): Promise<{ respuesta: Record<string, string>; usage: Anthropic.Usage }> {
   const res = await client.messages.create(
@@ -169,7 +184,7 @@ async function llamarHaiku(
       system: SYSTEM_REPARACION,
       messages: [{
         role: "user",
-        content: `CV ORIGINAL:\n${fuente}\n\nLÍNEAS A CORREGIR:\n${JSON.stringify(items, null, 2)}`,
+        content: `CV ORIGINAL:\n${fuente}${contextoMapeo(mapeo)}\n\nLÍNEAS A CORREGIR:\n${JSON.stringify(items, null, 2)}`,
       }],
     },
     { timeout: 20_000, maxRetries: 1 }
@@ -192,8 +207,6 @@ function sumarUsage(a: Anthropic.Usage | undefined, b: Anthropic.Usage): Anthrop
 
 // ─── validación de líneas reparadas ──────────────────────────────────────────
 
-// Verbos que suben el nivel de responsabilidad; solo se aceptan si su raíz aparece en la fuente.
-const VERBOS_ESCALADA = /^(coordin|lider|dirig|gestion|supervis|encabez|administr|conduc|jefatur)/;
 // Palabras que suben el nivel de dominio o experiencia; no pueden aparecer si no estaban en la línea.
 const PALABRAS_NIVEL = /\b(dominio|experto|experta|avanzad[oa]|solid[oa]|amplia experiencia|especialista)\b/g;
 
@@ -211,10 +224,10 @@ function motivoRechazo(v: ViolacionReparable, nuevo: string, fuenteNorm: string)
   const nivelNuevo = (norm(nuevo).match(PALABRAS_NIVEL) ?? []).filter(w => !nivelAntes.has(w));
   if (nivelNuevo.length > 0) return `sube el nivel declarado (${nivelNuevo.join(", ")})`;
 
-  if (v.tipo === "verbo_prohibido" || v.tipo === "verbo_repetido") {
+  if (v.tipo === "verbo_prohibido" || v.tipo === "verbo_repetido" || v.tipo === "verbo_escalado") {
     if (verboProhibido(nuevo)) return "sigue empezando con un verbo prohibido";
     const raiz = raizVerbo(primeraPalabra(nuevo));
-    if (VERBOS_ESCALADA.test(raiz) && !fuenteNorm.includes(raiz.slice(0, 6))) return `escala la responsabilidad ("${primeraPalabra(nuevo)}" sin respaldo en la fuente)`;
+    if (verboEscalado(nuevo, fuenteNorm)) return `escala la responsabilidad ("${primeraPalabra(nuevo)}" sin respaldo en la fuente)`;
     if ((v.otrosVerbos ?? []).some(o => raizVerbo(o) === raiz)) return `repite un verbo del mismo cargo ("${primeraPalabra(nuevo)}")`;
   }
   if (v.tipo === "perfil_sin_cargo") {
