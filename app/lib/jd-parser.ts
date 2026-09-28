@@ -5,7 +5,7 @@
  * Cada palabra clave debe aparecer en la oferta; las que no aparecen se descartan.
  */
 import Anthropic from "@anthropic-ai/sdk";
-import { herramientaTieneRespaldo, normalizarParaComparar } from "./cv-postprocess";
+import { herramientaTieneRespaldo, matcheaPalabra, normalizarParaComparar, STOP_WORDS_MATCH } from "./cv-postprocess";
 
 export const MODELO_JD = "claude-haiku-4-5-20251001";
 
@@ -27,6 +27,7 @@ export interface ResultadoJD {
 export const SYSTEM_JD = `Parseas ofertas de trabajo en español o inglés. Extrae las palabras clave que un reclutador buscaría en un CV y clasifícalas:
 - requeridas: lo que la oferta exige. Señales: requisitos, excluyente, obligatorio, indispensable, required, must, "se requiere", "debe".
 - deseables: lo que la oferta valora pero no exige. Señales: deseable, valorable, idealmente, "se valorará", plus, nice to have, preferred.
+Si la oferta dice explícitamente deseable, valorable, no excluyente, nice-to-have o idealmente junto a un término, ese término es deseable aunque también aparezca en las funciones. Si no lo dice explícitamente pero aparece en los requisitos, es requerida, incluidos sus detalles (por ejemplo, lo que se pide dentro de una herramienta requerida).
 Si una sección no dice cuál es, las funciones y requisitos principales son requeridas.
 
 Cada palabra clave:
@@ -36,6 +37,8 @@ Cada palabra clave:
 
 nivel: "practicante", "junior", "semi-senior", "senior" o "jefatura", según el cargo y los años de experiencia pedidos.
 industria: el rubro de la empresa en 1 a 3 palabras, o null si la oferta no lo dice.
+
+Dentro de un requisito o función, extrae como keywords propias solo las tecnologías con nombre propio (DAX, BigQuery, Google Cloud Platform, SAP, Python), con la misma clasificación que su requisito. No extraigas los conceptos genéricos que las acompañan (consultas, joins, agregaciones, visualizaciones).
 
 Responde ÚNICAMENTE con un JSON válido: {"requeridas":[{"keyword":"...","relevancia":8}],"deseables":[{"keyword":"...","relevancia":4}],"nivel":"...","industria":"..."}`;
 
@@ -75,12 +78,39 @@ function limpiarKeywords(lista: unknown, ofertaNorm: string, descartadas: string
   return out.sort((a, b) => b.relevancia - a.relevancia);
 }
 
+// ─── requerida → deseable (sin API) ──────────────────────────────────────────
+// Con un término que está en funciones y también marcado como deseable, Haiku no decide de forma estable.
+// Si en alguna línea de la oferta la keyword aparece DESPUÉS de un marcador de deseable, pasa a deseables.
+// Solo después: en "SQL: nivel intermedio. Deseable manejo de BigQuery." SQL sigue requerida.
+
+const MARCADOR_DESEABLE = /\b(deseable|valorable|no excluyente|idealmente|nice to have)\b/;
+
+// Todas las palabras significativas de la keyword deben estar después del marcador: "cierre mensual"
+// no se mueve por "Deseable: … procesos de cierre financiero".
+export function marcadaComoDeseable(keyword: string, texto: string): boolean {
+  const palabras = normalizarParaComparar(keyword).split(" ").filter(p => p && !STOP_WORDS_MATCH.has(p));
+  if (palabras.length === 0) return false;
+  return texto.split("\n").some(linea => {
+    const n = normalizarParaComparar(linea);
+    const marcador = n.match(MARCADOR_DESEABLE);
+    if (!marcador || marcador.index === undefined) return false;
+    const despues = n.slice(marcador.index + marcador[0].length);
+    return palabras.every(p => matcheaPalabra(p, despues));
+  });
+}
+
 export function consolidarJD(texto: string, respuesta: Record<string, unknown>): Omit<ResultadoJD, "usage"> {
   const ofertaNorm = normalizarParaComparar(texto);
   const descartadas: string[] = [];
   const vistas = new Set<string>();
-  const keywords_requeridas = limpiarKeywords(respuesta.requeridas, ofertaNorm, descartadas, vistas);
-  const keywords_deseables = limpiarKeywords(respuesta.deseables, ofertaNorm, descartadas, vistas);
+  const requeridasModelo = limpiarKeywords(respuesta.requeridas, ofertaNorm, descartadas, vistas);
+  const movidas = requeridasModelo.filter(k => marcadaComoDeseable(k.keyword, texto));
+  if (movidas.length > 0) {
+    console.warn(`[postulai] Parser JD: requeridas movidas a deseables por la oferta: ${movidas.map(k => k.keyword).join(", ")}`);
+  }
+  const keywords_requeridas = requeridasModelo.filter(k => !movidas.includes(k));
+  const keywords_deseables = [...movidas, ...limpiarKeywords(respuesta.deseables, ofertaNorm, descartadas, vistas)]
+    .sort((a, b) => b.relevancia - a.relevancia);
   const industria = typeof respuesta.industria === "string" && respuesta.industria.trim() ? respuesta.industria.trim() : undefined;
   return {
     texto_limpio: texto,
