@@ -7,8 +7,8 @@
  * Los idiomas se detectan sin API.
  */
 import Anthropic from "@anthropic-ai/sdk";
-import { herramientaTieneRespaldo, normalizarParaComparar } from "./cv-postprocess";
-import { esEncabezado, esSeparador } from "./cv-verificacion";
+import { herramientaTieneRespaldo, normalizarParaComparar, STOP_WORDS_MATCH } from "./cv-postprocess";
+import { BLANDAS_PROHIBIDAS, esEncabezado, esSeparador, FRASES_CV, FRASES_PERFIL } from "./cv-verificacion";
 
 export const MODELO_EXTRACCION = "claude-haiku-4-5-20251001";
 
@@ -17,6 +17,7 @@ export interface Competencia {
   tipo: "tecnica" | "blanda";
   fuente: string;    // primera línea del CV que la respalda
   menciones: number; // cantidad de líneas distintas que la respaldan
+  variantes?: string[]; // otros nombres fusionados en esta competencia (sirven para el matching)
 }
 
 export interface ResultadoExtraccion {
@@ -142,14 +143,87 @@ export function consolidar(lineas: LineaCV[], respuesta: RespuestaLinea[]): Omit
     }
   }
 
+  const fusion = fusionarCompetencias([...competencias.values()]);
+  descartadas.push(...fusion.descartadas);
+
   return {
-    competencias: [...competencias.values()]
-      .map(({ ids, ...c }) => ({ ...c, menciones: ids.size }))
-      .sort((a, b) => b.menciones - a.menciones),
+    competencias: fusion.competencias,
     herramientas: [...herramientas.values()],
     certificaciones: [...certificaciones.values()],
     descartadas,
   };
+}
+
+// ─── casi-duplicados y frases prohibidas (sin API) ───────────────────────────
+// Dos competencias se fusionan si las palabras significativas de una están todas en la otra:
+// "reclutamiento" ⊂ "reclutamiento y selección"; "evaluación del desempeño" = "evaluación de desempeño".
+// La fusión es transitiva: "compensaciones" y "remuneraciones" se unen a través de
+// "compensaciones y remuneraciones". Los demás nombres quedan en `variantes` para el matching.
+
+// Frases que el CV adaptado no puede usar (cv-verificacion.ts). Los verbos de soporte no aplican a un
+// nombre de competencia: descartarían "trabajo colaborativo".
+const FRASES_PROHIBIDAS = [...BLANDAS_PROHIBIDAS, ...FRASES_CV, ...FRASES_PERFIL]
+  .filter(([, nombre]) => !["verbo de soporte", "asistir", "gerundio de soporte"].includes(nombre));
+
+export function fraseProhibida(nombre: string): string | null {
+  const n = normalizarParaComparar(nombre);
+  return FRASES_PROHIBIDAS.find(([re]) => re.test(n))?.[1] ?? null;
+}
+
+// Palabras significativas en singular: "negociaciones colectivas" → {negociacion, colectiva}.
+function palabrasClave(nombre: string): Set<string> {
+  return new Set(normalizarParaComparar(nombre).split(" ")
+    .filter(p => p && !STOP_WORDS_MATCH.has(p))
+    .map(p => p.replace(/ciones$/, "cion").replace(/([aeiou])s$/, "$1")));
+}
+
+const contenida = (a: Set<string>, b: Set<string>) => [...a].every(p => b.has(p));
+
+interface CompetenciaInterna extends Competencia {
+  ids?: Set<string>; // líneas que la respaldan; sin ids (resultados guardados) se suman las menciones
+}
+
+export function fusionarCompetencias(items: CompetenciaInterna[]): { competencias: Competencia[]; descartadas: string[] } {
+  const claves = items.map(c => palabrasClave(c.nombre));
+  const padre = items.map((_, i) => i);
+  const raiz = (i: number): number => (padre[i] === i ? i : (padre[i] = raiz(padre[i])));
+  for (let i = 0; i < items.length; i++) {
+    for (let j = i + 1; j < items.length; j++) {
+      if (claves[i].size === 0 || claves[j].size === 0) continue;
+      if (contenida(claves[i], claves[j]) || contenida(claves[j], claves[i])) padre[raiz(j)] = raiz(i);
+    }
+  }
+  const grupos = new Map<number, number[]>();
+  items.forEach((_, i) => grupos.set(raiz(i), [...(grupos.get(raiz(i)) ?? []), i]));
+
+  const competencias: Competencia[] = [];
+  const descartadas: string[] = [];
+  for (const miembros of grupos.values()) {
+    const validos = miembros.filter(i => {
+      const motivo = fraseProhibida(items[i].nombre);
+      if (motivo) descartadas.push(`competencia "${items[i].nombre}" (frase prohibida: ${motivo})`);
+      return !motivo;
+    });
+    if (validos.length === 0) continue;
+
+    // Nombre del grupo: el de menos palabras; si empatan, el que respaldan más menciones de los miembros
+    // que lo contienen ("compensaciones" gana a "remuneraciones" por "compensaciones y beneficios").
+    const respaldo = (i: number) => miembros.filter(k => contenida(claves[i], claves[k])).reduce((s, k) => s + items[k].menciones, 0);
+    const [canon] = [...validos].sort((a, b) =>
+      claves[a].size - claves[b].size
+      || respaldo(b) - respaldo(a)
+      || items[b].menciones - items[a].menciones
+      || a - b);
+
+    // Las líneas de una variante prohibida también respaldan al grupo ("emprendimiento end-to-end" → emprendimiento).
+    const conIds = miembros.every(i => items[i].ids);
+    const ids = new Set(miembros.flatMap(i => [...(items[i].ids ?? [])]));
+    const menciones = conIds ? ids.size : miembros.reduce((s, i) => s + items[i].menciones, 0);
+    const variantes = validos.filter(i => i !== canon).map(i => items[i].nombre);
+    const { nombre, tipo, fuente } = items[canon];
+    competencias.push({ nombre, tipo, fuente, menciones, ...(variantes.length ? { variantes } : {}) });
+  }
+  return { competencias: competencias.sort((a, b) => b.menciones - a.menciones), descartadas };
 }
 
 // ─── función principal ───────────────────────────────────────────────────────
