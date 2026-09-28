@@ -223,7 +223,24 @@ export function lineasExtraEducacion(secciones: Seccion[]): { idx: number; texto
 
 // ─── violaciones reparables (reparación dirigida) ─────────────────────────────
 
-export type TipoReparable = "verbo_prohibido" | "verbo_repetido" | "perfil_sin_cargo" | "educacion_extra";
+export type TipoReparable = "verbo_prohibido" | "verbo_repetido" | "verbo_escalado" | "perfil_sin_cargo" | "educacion_extra";
+
+// Verbos que suben el nivel de responsabilidad; solo se aceptan si su raíz aparece en la fuente.
+// Compartido con reparacion.ts, que los usa para rechazar líneas reparadas.
+export const VERBOS_ESCALADA = /^(coordin|lider|dirig|gestion|supervis|encabez|administr|conduc|jefatur)/;
+
+// Verbo inicial de escalada cuya raíz no aparece en la fuente ("Coordiné" sin "coordin" en el CV original).
+// Revisa la raíz en todo el CV original, no en la línea que originó el bullet. Compara también contra la raíz de
+// cada palabra de la fuente: "Dirijo" tiene raíz "dirig", que no aparece literal en un CV que dice "Dirijo".
+export function verboEscalado(bullet: string, fuenteNorm: string): string | null {
+  const primera = primeraPalabra(bullet);
+  const raiz = raizVerbo(primera);
+  if (!VERBOS_ESCALADA.test(raiz)) return null;
+  const prefijo = raiz.slice(0, 6);
+  if (fuenteNorm.includes(prefijo)) return null;
+  const respaldada = fuenteNorm.split(/[^a-zñ]+/).some(w => w && raizVerbo(w).startsWith(prefijo));
+  return respaldada ? null : primera;
+}
 
 export interface ViolacionReparable {
   id: string;            // "L<índice de la primera línea>"
@@ -235,22 +252,35 @@ export interface ViolacionReparable {
   otrosVerbos?: string[]; // para bullets: verbos iniciales de los demás bullets del mismo cargo
 }
 
-export function detectarReparables(cv: string, cargoOferta: string | null): ViolacionReparable[] {
+// Sin `fuente` no se revisan verbos de escalada (resultados guardados sin CV original).
+export function detectarReparables(cv: string, cargoOferta: string | null, fuente?: string): ViolacionReparable[] {
   const secciones = seccionar(cv);
   const out: ViolacionReparable[] = [];
   const yaMarcadas = new Set<number>();
+  const fuenteNorm = fuente !== undefined ? norm(fuente) : null;
 
   for (const c of cargos(secciones)) {
     const actual = esCargoActual(c.titulo);
     c.bullets.forEach((b, k) => {
-      const motivo = verboProhibido(b);
-      if (!motivo) return;
       const idx = c.bulletIdx[k];
+      const otrosVerbos = c.bullets.filter((_, j) => j !== k).map(primeraPalabra);
+      const motivo = verboProhibido(b);
+      if (motivo) {
+        yaMarcadas.add(idx);
+        out.push({
+          id: `L${idx}`, tipo: "verbo_prohibido", indices: [idx], texto: b,
+          detalle: `${motivo}; verbos ya usados en este cargo: ${c.bullets.map(primeraPalabra).join(", ")}`, cargoActual: actual,
+          otrosVerbos,
+        });
+        return;
+      }
+      const escalado = fuenteNorm !== null ? verboEscalado(b, fuenteNorm) : null;
+      if (!escalado) return;
       yaMarcadas.add(idx);
       out.push({
-        id: `L${idx}`, tipo: "verbo_prohibido", indices: [idx], texto: b,
-        detalle: `${motivo}; verbos ya usados en este cargo: ${c.bullets.map(primeraPalabra).join(", ")}`, cargoActual: actual,
-        otrosVerbos: c.bullets.filter((_, j) => j !== k).map(primeraPalabra),
+        id: `L${idx}`, tipo: "verbo_escalado", indices: [idx], texto: b,
+        detalle: `"${escalado}" no tiene respaldo en el CV original; verbos ya usados en este cargo: ${c.bullets.map(primeraPalabra).join(", ")}`,
+        cargoActual: actual, otrosVerbos,
       });
     });
     for (const r of verbosRepetidosEnCargo(c)) {

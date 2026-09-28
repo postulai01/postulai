@@ -48,7 +48,7 @@ async function main() {
     const fuente: string = casoJson.cv_texto;
     const cargo: string | null = cargoDesdeTitulo(resultado.titulo_postulacion) ?? casoJson.cargo_oferta ?? null;
     const cv = postprocesarCV(resultado.cv_adaptado ?? "", fuente);
-    const violaciones = detectarReparables(cv, cargo);
+    const violaciones = detectarReparables(cv, cargo, fuente);
     const tokIn = violaciones.length ? Math.round((fuente.length + 1800 + violaciones.reduce((s, v) => s + v.texto.length + 500, 0)) / CHARS_POR_TOKEN) : 0;
     const tokOut = violaciones.reduce((s, v) => s + (v.tipo === "perfil_sin_cargo" ? 250 : 60), violaciones.length ? 30 : 0);
     return { archivo, resultado, caso, fuente, cargo, cv, violaciones, estimado: (tokIn * PRECIO_IN + tokOut * PRECIO_OUT) / 1e6 };
