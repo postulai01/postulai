@@ -1,0 +1,161 @@
+{
+  "caso": "valentina_cambio_rubro",
+  "ts": "2026-09-28T20-37-06",
+  "costo": 0.009389,
+  "competencias": [
+    {
+      "nombre": "liderazgo de equipos",
+      "tipo": "blanda",
+      "fuente": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales. Experiencia en formación de equipos, gestión del desempeño y construcción de culturas de alto rendimiento a escala regional.",
+      "menciones": 2
+    },
+    {
+      "nombre": "administración de presupuestos",
+      "tipo": "tecnica",
+      "fuente": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales. Experiencia en formación de equipos, gestión del desempeño y construcción de culturas de alto rendimiento a escala regional.",
+      "menciones": 2
+    },
+    {
+      "nombre": "gestión del desempeño",
+      "tipo": "blanda",
+      "fuente": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales. Experiencia en formación de equipos, gestión del desempeño y construcción de culturas de alto rendimiento a escala regional.",
+      "menciones": 2
+    },
+    {
+      "nombre": "gestión de operaciones comerciales",
+      "tipo": "tecnica",
+      "fuente": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales. Experiencia en formación de equipos, gestión del desempeño y construcción de culturas de alto rendimiento a escala regional.",
+      "menciones": 1
+    },
+    {
+      "nombre": "formación de equipos",
+      "tipo": "blanda",
+      "fuente": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales. Experiencia en formación de equipos, gestión del desempeño y construcción de culturas de alto rendimiento a escala regional.",
+      "menciones": 1
+    },
+    {
+      "nombre": "desarrollo de líderes",
+      "tipo": "tecnica",
+      "fuente": "Diseñé el programa de desarrollo de jefes de tienda, formando a 12 líderes que ascendieron a roles de mayor responsabilidad.",
+      "menciones": 1
+    },
+    {
+      "nombre": "evaluación de desempeño",
+      "tipo": "tecnica",
+      "fuente": "Implementé el modelo de evaluación de desempeño por objetivos para el equipo de supervisores, alineando metas individuales a resultados de zona.",
+      "menciones": 1
+    },
+    {
+      "nombre": "alineación de objetivos",
+      "tipo": "tecnica",
+      "fuente": "Implementé el modelo de evaluación de desempeño por objetivos para el equipo de supervisores, alineando metas individuales a resultados de zona.",
+      "menciones": 1
+    },
+    {
+      "nombre": "coordinación de operaciones",
+      "tipo": "tecnica",
+      "fuente": "Coordiné las operaciones de 4 tiendas en la región del Biobío con 95 colaboradores.",
+      "menciones": 1
+    },
+    {
+      "nombre": "gestión de clima laboral",
+      "tipo": "blanda",
+      "fuente": "Reduje la tasa de ausentismo de la zona de 8,2% a 4,1% en 18 meses mediante gestión de clima laboral y programas de bienestar.",
+      "menciones": 1
+    },
+    {
+      "nombre": "programas de bienestar",
+      "tipo": "tecnica",
+      "fuente": "Reduje la tasa de ausentismo de la zona de 8,2% a 4,1% en 18 meses mediante gestión de clima laboral y programas de bienestar.",
+      "menciones": 1
+    },
+    {
+      "nombre": "reclutamiento masivo",
+      "tipo": "tecnica",
+      "fuente": "Gestioné los procesos de reclutamiento masivo para temporadas altas, contratando a más de 60 colaboradores estacionales por período.",
+      "menciones": 1
+    },
+    {
+      "nombre": "formación de supervisores",
+      "tipo": "tecnica",
+      "fuente": "Desarrollé el plan de formación de supervisores de tienda, logrando que el 80% de las jefaturas fueran cubiertas con promoción interna.",
+      "menciones": 1
+    },
+    {
+      "nombre": "promoción interna",
+      "tipo": "tecnica",
+      "fuente": "Desarrollé el plan de formación de supervisores de tienda, logrando que el 80% de las jefaturas fueran cubiertas con promoción interna.",
+      "menciones": 1
+    },
+    {
+      "nombre": "supervisión de equipos",
+      "tipo": "tecnica",
+      "fuente": "Supervisé un equipo de 18 vendedores y cajeros, gestionando turnos, desempeño y resolución de incidencias.",
+      "menciones": 1
+    },
+    {
+      "nombre": "gestión de turnos",
+      "tipo": "tecnica",
+      "fuente": "Supervisé un equipo de 18 vendedores y cajeros, gestionando turnos, desempeño y resolución de incidencias.",
+      "menciones": 1
+    },
+    {
+      "nombre": "resolución de incidencias",
+      "tipo": "blanda",
+      "fuente": "Supervisé un equipo de 18 vendedores y cajeros, gestionando turnos, desempeño y resolución de incidencias.",
+      "menciones": 1
+    },
+    {
+      "nombre": "gestión de ventas",
+      "tipo": "tecnica",
+      "fuente": "Aumenté las ventas de mi tienda en un 23% en el período mediante gestión del equipo y programas de motivación.",
+      "menciones": 1
+    },
+    {
+      "nombre": "estándares de servicio",
+      "tipo": "tecnica",
+      "fuente": "Formé a 5 vendedores nuevos por semestre, asegurando la inducción y adherencia a los estándares de servicio.",
+      "menciones": 1
+    },
+    {
+      "nombre": "comunicación ejecutiva",
+      "tipo": "blanda",
+      "fuente": "Blandas: liderazgo de equipos, gestión del desempeño, comunicación ejecutiva, planificación y organización de tareas",
+      "menciones": 1
+    },
+    {
+      "nombre": "planificación y organización",
+      "tipo": "blanda",
+      "fuente": "Blandas: liderazgo de equipos, gestión del desempeño, comunicación ejecutiva, planificación y organización de tareas",
+      "menciones": 1
+    }
+  ],
+  "herramientas": [
+    "Excel",
+    "SAP",
+    "BUK",
+    "Power BI"
+  ],
+  "certificaciones": [
+    "Diplomado en Gestión de Personas y Organizaciones"
+  ],
+  "descartadas": [
+    "competencia \"dirección de operaciones\" (L9)",
+    "competencia \"incorporación de personal\" (L10)",
+    "competencia \"formación de equipos\" (L10)",
+    "competencia \"inducción de personal\" (L24)"
+  ],
+  "idiomas": [],
+  "usage": {
+    "input_tokens": 1909,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 1496,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

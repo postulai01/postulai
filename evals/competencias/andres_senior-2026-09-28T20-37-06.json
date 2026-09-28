@@ -1,0 +1,361 @@
+{
+  "caso": "andres_senior",
+  "ts": "2026-09-28T20-37-06",
+  "costo": 0.02171,
+  "competencias": [
+    {
+      "nombre": "negociaciones colectivas",
+      "tipo": "tecnica",
+      "fuente": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional.",
+      "menciones": 5
+    },
+    {
+      "nombre": "relaciones laborales",
+      "tipo": "tecnica",
+      "fuente": "Apoyo en la implementación de tecnología para los procesos de auditorías laborales, estrategias para las negociaciones colectivas y relaciones laborales, planes de desarrollo de personas y equipos de trabajo de alto rendimiento.",
+      "menciones": 5
+    },
+    {
+      "nombre": "control presupuestario",
+      "tipo": "tecnica",
+      "fuente": "Diseñé e implementé la matriz de capacitación, entrenamiento y evaluación del desempeño bajo un estricto control presupuestario fundamentado en HR Analytics.",
+      "menciones": 4
+    },
+    {
+      "nombre": "compensaciones y beneficios",
+      "tipo": "tecnica",
+      "fuente": "Áreas de Expertise: Estrategia de Capital Humano, Relaciones Sindicales y Laborales Complejas, Transformación Digital & HR Analytics, Compensaciones y Beneficios Estratégicos, Desarrollo Organizacional Presupuestos y Control de Gestión.",
+      "menciones": 3
+    },
+    {
+      "nombre": "estrategia de capital humano",
+      "tipo": "tecnica",
+      "fuente": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional.",
+      "menciones": 2
+    },
+    {
+      "nombre": "transformación cultural",
+      "tipo": "tecnica",
+      "fuente": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional.",
+      "menciones": 2
+    },
+    {
+      "nombre": "gestión de crisis",
+      "tipo": "tecnica",
+      "fuente": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional.",
+      "menciones": 2
+    },
+    {
+      "nombre": "hr analytics",
+      "tipo": "tecnica",
+      "fuente": "Áreas de Expertise: Estrategia de Capital Humano, Relaciones Sindicales y Laborales Complejas, Transformación Digital & HR Analytics, Compensaciones y Beneficios Estratégicos, Desarrollo Organizacional Presupuestos y Control de Gestión.",
+      "menciones": 2
+    },
+    {
+      "nombre": "compliance normativo-legal",
+      "tipo": "tecnica",
+      "fuente": "Apoyar la definición de programas de actualización y compliance normativo-legal para el personal directivo y operaciones de los clientes corporativos.",
+      "menciones": 2
+    },
+    {
+      "nombre": "implementación de sistemas erp",
+      "tipo": "tecnica",
+      "fuente": "Logro clave: Lideré la puesta en marcha e implementación integral del módulo de Recursos Humanos en el sistema ERP corporativo (integrado con finanzas, compras y producción).",
+      "menciones": 2
+    },
+    {
+      "nombre": "compensaciones y remuneraciones",
+      "tipo": "tecnica",
+      "fuente": "Responsable del diseño de procesos y procedimientos de compensaciones, remuneraciones. Seguimiento y control presupuestario y financiero de la Compañía.",
+      "menciones": 2
+    },
+    {
+      "nombre": "liderazgo de equipos",
+      "tipo": "blanda",
+      "fuente": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional.",
+      "menciones": 1
+    },
+    {
+      "nombre": "automatización digital",
+      "tipo": "tecnica",
+      "fuente": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional.",
+      "menciones": 1
+    },
+    {
+      "nombre": "inteligencia artificial",
+      "tipo": "tecnica",
+      "fuente": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional.",
+      "menciones": 1
+    },
+    {
+      "nombre": "desarrollo de equipos directivos",
+      "tipo": "tecnica",
+      "fuente": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional.",
+      "menciones": 1
+    },
+    {
+      "nombre": "relaciones sindicales y laborales",
+      "tipo": "tecnica",
+      "fuente": "Áreas de Expertise: Estrategia de Capital Humano, Relaciones Sindicales y Laborales Complejas, Transformación Digital & HR Analytics, Compensaciones y Beneficios Estratégicos, Desarrollo Organizacional Presupuestos y Control de Gestión.",
+      "menciones": 1
+    },
+    {
+      "nombre": "transformación digital",
+      "tipo": "tecnica",
+      "fuente": "Áreas de Expertise: Estrategia de Capital Humano, Relaciones Sindicales y Laborales Complejas, Transformación Digital & HR Analytics, Compensaciones y Beneficios Estratégicos, Desarrollo Organizacional Presupuestos y Control de Gestión.",
+      "menciones": 1
+    },
+    {
+      "nombre": "desarrollo organizacional",
+      "tipo": "tecnica",
+      "fuente": "Áreas de Expertise: Estrategia de Capital Humano, Relaciones Sindicales y Laborales Complejas, Transformación Digital & HR Analytics, Compensaciones y Beneficios Estratégicos, Desarrollo Organizacional Presupuestos y Control de Gestión.",
+      "menciones": 1
+    },
+    {
+      "nombre": "presupuestos y control de gestión",
+      "tipo": "tecnica",
+      "fuente": "Áreas de Expertise: Estrategia de Capital Humano, Relaciones Sindicales y Laborales Complejas, Transformación Digital & HR Analytics, Compensaciones y Beneficios Estratégicos, Desarrollo Organizacional Presupuestos y Control de Gestión.",
+      "menciones": 1
+    },
+    {
+      "nombre": "estrategia de gestión de personas",
+      "tipo": "tecnica",
+      "fuente": "Apoyar la definición e implementación de la estrategia de gestión de personas, la definición de todas las políticas de la gerencia, con énfasis en los procesos transaccionales, operacionales y de desarrollo.",
+      "menciones": 1
+    },
+    {
+      "nombre": "definición de políticas",
+      "tipo": "tecnica",
+      "fuente": "Apoyar la definición e implementación de la estrategia de gestión de personas, la definición de todas las políticas de la gerencia, con énfasis en los procesos transaccionales, operacionales y de desarrollo.",
+      "menciones": 1
+    },
+    {
+      "nombre": "auditorías laborales",
+      "tipo": "tecnica",
+      "fuente": "Apoyo en la implementación de tecnología para los procesos de auditorías laborales, estrategias para las negociaciones colectivas y relaciones laborales, planes de desarrollo de personas y equipos de trabajo de alto rendimiento.",
+      "menciones": 1
+    },
+    {
+      "nombre": "desarrollo de personas",
+      "tipo": "tecnica",
+      "fuente": "Apoyo en la implementación de tecnología para los procesos de auditorías laborales, estrategias para las negociaciones colectivas y relaciones laborales, planes de desarrollo de personas y equipos de trabajo de alto rendimiento.",
+      "menciones": 1
+    },
+    {
+      "nombre": "equipos de alto rendimiento",
+      "tipo": "tecnica",
+      "fuente": "Apoyo en la implementación de tecnología para los procesos de auditorías laborales, estrategias para las negociaciones colectivas y relaciones laborales, planes de desarrollo de personas y equipos de trabajo de alto rendimiento.",
+      "menciones": 1
+    },
+    {
+      "nombre": "diagnóstico de procesos",
+      "tipo": "tecnica",
+      "fuente": "Apoyar el diagnóstico, rediseño y optimización de procesos críticos de gestión de personas para empresas industriales, maximizando la eficiencia operativa y documental.",
+      "menciones": 1
+    },
+    {
+      "nombre": "rediseño de procesos",
+      "tipo": "tecnica",
+      "fuente": "Apoyar el diagnóstico, rediseño y optimización de procesos críticos de gestión de personas para empresas industriales, maximizando la eficiencia operativa y documental.",
+      "menciones": 1
+    },
+    {
+      "nombre": "optimización de procesos",
+      "tipo": "tecnica",
+      "fuente": "Apoyar el diagnóstico, rediseño y optimización de procesos críticos de gestión de personas para empresas industriales, maximizando la eficiencia operativa y documental.",
+      "menciones": 1
+    },
+    {
+      "nombre": "mesas de diálogo social",
+      "tipo": "tecnica",
+      "fuente": "Apoyar el diseño e implementación de mesas de diálogo social y estrategias avanzadas de relaciones laborales, mitigando riesgos de conflicto y asegurando la continuidad de la operación.",
+      "menciones": 1
+    },
+    {
+      "nombre": "mitigación de riesgos",
+      "tipo": "tecnica",
+      "fuente": "Apoyar el diseño e implementación de mesas de diálogo social y estrategias avanzadas de relaciones laborales, mitigando riesgos de conflicto y asegurando la continuidad de la operación.",
+      "menciones": 1
+    },
+    {
+      "nombre": "estrategia integral",
+      "tipo": "tecnica",
+      "fuente": "Comandé la estrategia integral de la gerencia, redefiniendo las políticas operacionales y transaccionales para alinearlas con la rentabilidad de la compañía.",
+      "menciones": 1
+    },
+    {
+      "nombre": "políticas operacionales",
+      "tipo": "tecnica",
+      "fuente": "Comandé la estrategia integral de la gerencia, redefiniendo las políticas operacionales y transaccionales para alinearlas con la rentabilidad de la compañía.",
+      "menciones": 1
+    },
+    {
+      "nombre": "digitalización",
+      "tipo": "tecnica",
+      "fuente": "Lideré el proceso integral de transformación cultural del grupo, digitalizando y automatizando los flujos transaccionales y de desarrollo organizacional.",
+      "menciones": 1
+    },
+    {
+      "nombre": "automatización",
+      "tipo": "tecnica",
+      "fuente": "Lideré el proceso integral de transformación cultural del grupo, digitalizando y automatizando los flujos transaccionales y de desarrollo organizacional.",
+      "menciones": 1
+    },
+    {
+      "nombre": "comunicaciones corporativas",
+      "tipo": "blanda",
+      "fuente": "Gestioné de forma directa las comunicaciones corporativas, las relaciones sindicales y los comités de gestión de crisis, manteniendo un clima laboral óptimo y libre de paralizaciones.",
+      "menciones": 1
+    },
+    {
+      "nombre": "relaciones sindicales",
+      "tipo": "tecnica",
+      "fuente": "Gestioné de forma directa las comunicaciones corporativas, las relaciones sindicales y los comités de gestión de crisis, manteniendo un clima laboral óptimo y libre de paralizaciones.",
+      "menciones": 1
+    },
+    {
+      "nombre": "clima laboral",
+      "tipo": "tecnica",
+      "fuente": "Gestioné de forma directa las comunicaciones corporativas, las relaciones sindicales y los comités de gestión de crisis, manteniendo un clima laboral óptimo y libre de paralizaciones.",
+      "menciones": 1
+    },
+    {
+      "nombre": "capacitación y entrenamiento",
+      "tipo": "tecnica",
+      "fuente": "Diseñé e implementé la matriz de capacitación, entrenamiento y evaluación del desempeño bajo un estricto control presupuestario fundamentado en HR Analytics.",
+      "menciones": 1
+    },
+    {
+      "nombre": "evaluación del desempeño",
+      "tipo": "tecnica",
+      "fuente": "Diseñé e implementé la matriz de capacitación, entrenamiento y evaluación del desempeño bajo un estricto control presupuestario fundamentado en HR Analytics.",
+      "menciones": 1
+    },
+    {
+      "nombre": "planificación estratégica",
+      "tipo": "tecnica",
+      "fuente": "Dirigí la planificación estratégica y ejecución de la operación de relaciones laborales, procesamiento de nómina y entrega de beneficios a gran escala.",
+      "menciones": 1
+    },
+    {
+      "nombre": "procesamiento de nómina",
+      "tipo": "tecnica",
+      "fuente": "Dirigí la planificación estratégica y ejecución de la operación de relaciones laborales, procesamiento de nómina y entrega de beneficios a gran escala.",
+      "menciones": 1
+    },
+    {
+      "nombre": "entrega de beneficios",
+      "tipo": "tecnica",
+      "fuente": "Dirigí la planificación estratégica y ejecución de la operación de relaciones laborales, procesamiento de nómina y entrega de beneficios a gran escala.",
+      "menciones": 1
+    },
+    {
+      "nombre": "equidad interna",
+      "tipo": "tecnica",
+      "fuente": "Logro clave: Transformé el modelo corporativo de administración de Compensaciones y Beneficios de la clínica, logrando un equilibrio óptimo entre la equidad interna, la competitividad de mercado y el control del presupuesto.",
+      "menciones": 1
+    },
+    {
+      "nombre": "competitividad de mercado",
+      "tipo": "tecnica",
+      "fuente": "Logro clave: Transformé el modelo corporativo de administración de Compensaciones y Beneficios de la clínica, logrando un equilibrio óptimo entre la equidad interna, la competitividad de mercado y el control del presupuesto.",
+      "menciones": 1
+    },
+    {
+      "nombre": "reclutamiento masivo",
+      "tipo": "tecnica",
+      "fuente": "Rediseñé y controlé el plan maestro de reclutamiento masivo, administración de remuneraciones, presupuestos por proyecto y control documental estricto.",
+      "menciones": 1
+    },
+    {
+      "nombre": "administración de remuneraciones",
+      "tipo": "tecnica",
+      "fuente": "Rediseñé y controlé el plan maestro de reclutamiento masivo, administración de remuneraciones, presupuestos por proyecto y control documental estricto.",
+      "menciones": 1
+    },
+    {
+      "nombre": "remuneraciones",
+      "tipo": "tecnica",
+      "fuente": "Coordiné, controlé y ejecuté los subsistemas corporativos de relaciones laborales, remuneraciones, compensaciones y beneficios de la corporación.",
+      "menciones": 1
+    },
+    {
+      "nombre": "bandas salariales",
+      "tipo": "tecnica",
+      "fuente": "Logro clave: Rediseñé estructuralmente el modelo de compensaciones y las bandas salariales para la fuerza de ventas publicitarias de todas las marcas del grupo, impulsando la competitividad del equipo comercial.",
+      "menciones": 1
+    },
+    {
+      "nombre": "atracción de talento",
+      "tipo": "tecnica",
+      "fuente": "Diseñé y ejecuté las estrategias de Atracción de Talento, Capacitación, Compensaciones y Prevención de Riesgos bajo la implementación de Sistemas de Calidad ISO.",
+      "menciones": 1
+    },
+    {
+      "nombre": "capacitación",
+      "tipo": "tecnica",
+      "fuente": "Diseñé y ejecuté las estrategias de Atracción de Talento, Capacitación, Compensaciones y Prevención de Riesgos bajo la implementación de Sistemas de Calidad ISO.",
+      "menciones": 1
+    },
+    {
+      "nombre": "compensaciones",
+      "tipo": "tecnica",
+      "fuente": "Diseñé y ejecuté las estrategias de Atracción de Talento, Capacitación, Compensaciones y Prevención de Riesgos bajo la implementación de Sistemas de Calidad ISO.",
+      "menciones": 1
+    },
+    {
+      "nombre": "prevención de riesgos",
+      "tipo": "tecnica",
+      "fuente": "Diseñé y ejecuté las estrategias de Atracción de Talento, Capacitación, Compensaciones y Prevención de Riesgos bajo la implementación de Sistemas de Calidad ISO.",
+      "menciones": 1
+    },
+    {
+      "nombre": "sistemas de calidad iso",
+      "tipo": "tecnica",
+      "fuente": "Diseñé y ejecuté las estrategias de Atracción de Talento, Capacitación, Compensaciones y Prevención de Riesgos bajo la implementación de Sistemas de Calidad ISO.",
+      "menciones": 1
+    },
+    {
+      "nombre": "diseño de procesos",
+      "tipo": "tecnica",
+      "fuente": "Responsable del diseño de procesos y procedimientos de compensaciones, remuneraciones. Seguimiento y control presupuestario y financiero de la Compañía.",
+      "menciones": 1
+    }
+  ],
+  "herramientas": [
+    "Inteligencia Artificial (Gemini/Claude)",
+    "n8n",
+    "BUK",
+    "Talana",
+    "Zenda",
+    "Payroll",
+    "Softland",
+    "SAP",
+    "Meta4",
+    "Manager"
+  ],
+  "certificaciones": [
+    "Sistemas de Gestión Empresarial ERP",
+    "Dirección de Operaciones",
+    "People Experience"
+  ],
+  "descartadas": [
+    "competencia \"compensaciones y beneficios\" (L4)",
+    "competencia \"migración de sistemas\" (L40)",
+    "competencia \"implementación de payroll\" (L40)",
+    "competencia \"compensaciones y beneficios\" (L45)"
+  ],
+  "idiomas": [],
+  "usage": {
+    "input_tokens": 4010,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 3540,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

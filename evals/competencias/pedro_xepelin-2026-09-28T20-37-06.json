@@ -1,0 +1,133 @@
+{
+  "caso": "pedro_xepelin",
+  "ts": "2026-09-28T20-37-06",
+  "costo": 0.007952,
+  "competencias": [
+    {
+      "nombre": "ventas directas",
+      "tipo": "tecnica",
+      "fuente": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento. Orientado a resultados, con habilidades de comunicación, trabajo en equipo y manejo de herramientas digitales. Inglés avanzado.",
+      "menciones": 3
+    },
+    {
+      "nombre": "trabajo en equipo",
+      "tipo": "blanda",
+      "fuente": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento. Orientado a resultados, con habilidades de comunicación, trabajo en equipo y manejo de herramientas digitales. Inglés avanzado.",
+      "menciones": 3
+    },
+    {
+      "nombre": "emprendimiento",
+      "tipo": "tecnica",
+      "fuente": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento. Orientado a resultados, con habilidades de comunicación, trabajo en equipo y manejo de herramientas digitales. Inglés avanzado.",
+      "menciones": 2
+    },
+    {
+      "nombre": "comunicación",
+      "tipo": "blanda",
+      "fuente": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento. Orientado a resultados, con habilidades de comunicación, trabajo en equipo y manejo de herramientas digitales. Inglés avanzado.",
+      "menciones": 2
+    },
+    {
+      "nombre": "atención al cliente",
+      "tipo": "blanda",
+      "fuente": "Demostración de producto e impulso de ventas mediante atención directa al cliente.",
+      "menciones": 2
+    },
+    {
+      "nombre": "promoción de productos",
+      "tipo": "tecnica",
+      "fuente": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento. Orientado a resultados, con habilidades de comunicación, trabajo en equipo y manejo de herramientas digitales. Inglés avanzado.",
+      "menciones": 1
+    },
+    {
+      "nombre": "activaciones de marca",
+      "tipo": "tecnica",
+      "fuente": "Ejecución de activaciones de marca en puntos de venta para Hellmann's.",
+      "menciones": 1
+    },
+    {
+      "nombre": "demostración de producto",
+      "tipo": "tecnica",
+      "fuente": "Demostración de producto e impulso de ventas mediante atención directa al cliente.",
+      "menciones": 1
+    },
+    {
+      "nombre": "impulso de ventas",
+      "tipo": "tecnica",
+      "fuente": "Demostración de producto e impulso de ventas mediante atención directa al cliente.",
+      "menciones": 1
+    },
+    {
+      "nombre": "gestión de producción",
+      "tipo": "tecnica",
+      "fuente": "Gestioné actividades de producción, ventas directas en plazas y espacios públicos, y creación de anuncios publicitarios.",
+      "menciones": 1
+    },
+    {
+      "nombre": "publicidad",
+      "tipo": "tecnica",
+      "fuente": "Gestioné actividades de producción, ventas directas en plazas y espacios públicos, y creación de anuncios publicitarios.",
+      "menciones": 1
+    },
+    {
+      "nombre": "emprendimiento end-to-end",
+      "tipo": "tecnica",
+      "fuente": "Desarrollé habilidades de emprendimiento end-to-end: desde la producción hasta la comercialización del producto.",
+      "menciones": 1
+    },
+    {
+      "nombre": "análisis de datos",
+      "tipo": "tecnica",
+      "fuente": "Microsoft Excel (nivel intermedio): análisis de datos, tablas, fórmulas.",
+      "menciones": 1
+    },
+    {
+      "nombre": "pensamiento analítico",
+      "tipo": "blanda",
+      "fuente": "Pensamiento analítico y orientación a resultados.",
+      "menciones": 1
+    },
+    {
+      "nombre": "orientación a resultados",
+      "tipo": "blanda",
+      "fuente": "Pensamiento analítico y orientación a resultados.",
+      "menciones": 1
+    },
+    {
+      "nombre": "adaptabilidad",
+      "tipo": "blanda",
+      "fuente": "Adaptabilidad y gestión multifuncional.",
+      "menciones": 1
+    },
+    {
+      "nombre": "gestión multifuncional",
+      "tipo": "tecnica",
+      "fuente": "Adaptabilidad y gestión multifuncional.",
+      "menciones": 1
+    }
+  ],
+  "herramientas": [
+    "Microsoft Excel",
+    "Microsoft Office",
+    "Word",
+    "PowerPoint"
+  ],
+  "certificaciones": [],
+  "descartadas": [],
+  "idiomas": [
+    "Inglés (avanzado)",
+    "Español (nativo)"
+  ],
+  "usage": {
+    "input_tokens": 1922,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 1206,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
