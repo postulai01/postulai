@@ -1,0 +1,124 @@
+{
+  "caso": "camila_junior",
+  "ts": "2026-09-28T20-37-06",
+  "costo": 0.00611,
+  "competencias": [
+    {
+      "nombre": "selección de personal",
+      "tipo": "tecnica",
+      "fuente": "Psicóloga con 2 años de experiencia en selección de personal y gestión de RRHH en empresas de distribución y servicios. Formación en psicología organizacional con especialización en reclutamiento y evaluación de candidatos.",
+      "menciones": 1
+    },
+    {
+      "nombre": "gestión de RRHH",
+      "tipo": "tecnica",
+      "fuente": "Psicóloga con 2 años de experiencia en selección de personal y gestión de RRHH en empresas de distribución y servicios. Formación en psicología organizacional con especialización en reclutamiento y evaluación de candidatos.",
+      "menciones": 1
+    },
+    {
+      "nombre": "reclutamiento",
+      "tipo": "tecnica",
+      "fuente": "Psicóloga con 2 años de experiencia en selección de personal y gestión de RRHH en empresas de distribución y servicios. Formación en psicología organizacional con especialización en reclutamiento y evaluación de candidatos.",
+      "menciones": 1
+    },
+    {
+      "nombre": "evaluación de candidatos",
+      "tipo": "tecnica",
+      "fuente": "Psicóloga con 2 años de experiencia en selección de personal y gestión de RRHH en empresas de distribución y servicios. Formación en psicología organizacional con especialización en reclutamiento y evaluación de candidatos.",
+      "menciones": 1
+    },
+    {
+      "nombre": "reclutamiento y selección",
+      "tipo": "tecnica",
+      "fuente": "Coordino procesos de reclutamiento y selección para cargos operativos y técnicos (30-40 vacantes al año).",
+      "menciones": 1
+    },
+    {
+      "nombre": "pruebas psicológicas",
+      "tipo": "tecnica",
+      "fuente": "Aplico pruebas psicológicas y entrevistas estructuradas por competencias.",
+      "menciones": 1
+    },
+    {
+      "nombre": "entrevistas por competencias",
+      "tipo": "tecnica",
+      "fuente": "Aplico pruebas psicológicas y entrevistas estructuradas por competencias.",
+      "menciones": 1
+    },
+    {
+      "nombre": "gestión de indicadores",
+      "tipo": "tecnica",
+      "fuente": "Gestiono indicadores de dotación y rotación del área.",
+      "menciones": 1
+    },
+    {
+      "nombre": "onboarding",
+      "tipo": "tecnica",
+      "fuente": "Administré los procesos de incorporación y onboarding para nuevos colaboradores.",
+      "menciones": 1
+    },
+    {
+      "nombre": "capacitación",
+      "tipo": "tecnica",
+      "fuente": "Coordiné la capacitación de 120 colaboradores en el período, reduciendo el tiempo promedio de inducción en un 25%.",
+      "menciones": 1
+    },
+    {
+      "nombre": "relaciones laborales",
+      "tipo": "tecnica",
+      "fuente": "Apoyé la gestión de relaciones laborales y resolución de consultas de colaboradores.",
+      "menciones": 1
+    },
+    {
+      "nombre": "psicometría",
+      "tipo": "tecnica",
+      "fuente": "Técnicas: BUK, entrevistas por competencias, Excel, psicometría",
+      "menciones": 1
+    },
+    {
+      "nombre": "comunicación efectiva",
+      "tipo": "blanda",
+      "fuente": "Blandas: comunicación efectiva, trabajo en equipo, orientación al cliente interno, toma de decisiones",
+      "menciones": 1
+    },
+    {
+      "nombre": "trabajo en equipo",
+      "tipo": "blanda",
+      "fuente": "Blandas: comunicación efectiva, trabajo en equipo, orientación al cliente interno, toma de decisiones",
+      "menciones": 1
+    },
+    {
+      "nombre": "orientación al cliente interno",
+      "tipo": "blanda",
+      "fuente": "Blandas: comunicación efectiva, trabajo en equipo, orientación al cliente interno, toma de decisiones",
+      "menciones": 1
+    },
+    {
+      "nombre": "toma de decisiones",
+      "tipo": "blanda",
+      "fuente": "Blandas: comunicación efectiva, trabajo en equipo, orientación al cliente interno, toma de decisiones",
+      "menciones": 1
+    }
+  ],
+  "herramientas": [
+    "BUK",
+    "Excel"
+  ],
+  "certificaciones": [
+    "Diplomado en Selección y Evaluación de Personas"
+  ],
+  "descartadas": [],
+  "idiomas": [],
+  "usage": {
+    "input_tokens": 1405,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 941,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

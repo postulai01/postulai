@@ -1,0 +1,141 @@
+{
+  "caso": "roberto_brecha",
+  "ts": "2026-09-28T20-37-06",
+  "costo": 0.007421,
+  "competencias": [
+    {
+      "nombre": "Lean Manufacturing",
+      "tipo": "tecnica",
+      "fuente": "Ingeniero en Ejecución Industrial con 8 años de experiencia en mejora continua, gestión de procesos y operaciones de manufactura. Especialización en metodologías Lean Manufacturing, Six Sigma y análisis de datos operacionales. Historial de reducción de costos e incremento de eficiencia en plantas productivas del sector industrial.",
+      "menciones": 2
+    },
+    {
+      "nombre": "Six Sigma",
+      "tipo": "tecnica",
+      "fuente": "Ingeniero en Ejecución Industrial con 8 años de experiencia en mejora continua, gestión de procesos y operaciones de manufactura. Especialización en metodologías Lean Manufacturing, Six Sigma y análisis de datos operacionales. Historial de reducción de costos e incremento de eficiencia en plantas productivas del sector industrial.",
+      "menciones": 2
+    },
+    {
+      "nombre": "mejora continua",
+      "tipo": "tecnica",
+      "fuente": "Ingeniero en Ejecución Industrial con 8 años de experiencia en mejora continua, gestión de procesos y operaciones de manufactura. Especialización en metodologías Lean Manufacturing, Six Sigma y análisis de datos operacionales. Historial de reducción de costos e incremento de eficiencia en plantas productivas del sector industrial.",
+      "menciones": 1
+    },
+    {
+      "nombre": "gestión de procesos",
+      "tipo": "tecnica",
+      "fuente": "Ingeniero en Ejecución Industrial con 8 años de experiencia en mejora continua, gestión de procesos y operaciones de manufactura. Especialización en metodologías Lean Manufacturing, Six Sigma y análisis de datos operacionales. Historial de reducción de costos e incremento de eficiencia en plantas productivas del sector industrial.",
+      "menciones": 1
+    },
+    {
+      "nombre": "operaciones de manufactura",
+      "tipo": "tecnica",
+      "fuente": "Ingeniero en Ejecución Industrial con 8 años de experiencia en mejora continua, gestión de procesos y operaciones de manufactura. Especialización en metodologías Lean Manufacturing, Six Sigma y análisis de datos operacionales. Historial de reducción de costos e incremento de eficiencia en plantas productivas del sector industrial.",
+      "menciones": 1
+    },
+    {
+      "nombre": "análisis de datos operacionales",
+      "tipo": "tecnica",
+      "fuente": "Ingeniero en Ejecución Industrial con 8 años de experiencia en mejora continua, gestión de procesos y operaciones de manufactura. Especialización en metodologías Lean Manufacturing, Six Sigma y análisis de datos operacionales. Historial de reducción de costos e incremento de eficiencia en plantas productivas del sector industrial.",
+      "menciones": 1
+    },
+    {
+      "nombre": "gestión visual",
+      "tipo": "tecnica",
+      "fuente": "Implementé el sistema de gestión visual y control de indicadores OEE, aumentando la eficiencia global del equipo de 71% a 84%.",
+      "menciones": 1
+    },
+    {
+      "nombre": "control de indicadores OEE",
+      "tipo": "tecnica",
+      "fuente": "Implementé el sistema de gestión visual y control de indicadores OEE, aumentando la eficiencia global del equipo de 71% a 84%.",
+      "menciones": 1
+    },
+    {
+      "nombre": "kaizen",
+      "tipo": "tecnica",
+      "fuente": "Diseñé e implementé kaizenes que generaron ahorros de MM$ 45 en costos operacionales en 2023.",
+      "menciones": 1
+    },
+    {
+      "nombre": "resolución de problemas",
+      "tipo": "blanda",
+      "fuente": "Capacité a 60 operarios en metodologías Lean y herramientas de resolución de problemas (5S, A3, SMED).",
+      "menciones": 1
+    },
+    {
+      "nombre": "estándares de trabajo",
+      "tipo": "tecnica",
+      "fuente": "Desarrollé los estándares de trabajo (SOPs) para 15 procesos productivos críticos.",
+      "menciones": 1
+    },
+    {
+      "nombre": "análisis de datos de producción",
+      "tipo": "tecnica",
+      "fuente": "Analicé datos de producción para identificar cuellos de botella, reduciendo el rechazo de calidad en un 22%.",
+      "menciones": 1
+    },
+    {
+      "nombre": "ISO 9001:2015",
+      "tipo": "tecnica",
+      "fuente": "Coordiné la implementación de la certificación ISO 9001:2015 para el área de manufactura.",
+      "menciones": 1
+    },
+    {
+      "nombre": "Excel Avanzado",
+      "tipo": "tecnica",
+      "fuente": "Técnicas: Lean Manufacturing, Six Sigma, SAP PM, Power BI, AutoCAD, Excel Avanzado",
+      "menciones": 1
+    },
+    {
+      "nombre": "liderazgo de equipos",
+      "tipo": "blanda",
+      "fuente": "Blandas: liderazgo de equipos, análisis de problemas, planificación de proyectos, comunicación técnica",
+      "menciones": 1
+    },
+    {
+      "nombre": "análisis de problemas",
+      "tipo": "blanda",
+      "fuente": "Blandas: liderazgo de equipos, análisis de problemas, planificación de proyectos, comunicación técnica",
+      "menciones": 1
+    },
+    {
+      "nombre": "planificación de proyectos",
+      "tipo": "blanda",
+      "fuente": "Blandas: liderazgo de equipos, análisis de problemas, planificación de proyectos, comunicación técnica",
+      "menciones": 1
+    },
+    {
+      "nombre": "comunicación técnica",
+      "tipo": "blanda",
+      "fuente": "Blandas: liderazgo de equipos, análisis de problemas, planificación de proyectos, comunicación técnica",
+      "menciones": 1
+    }
+  ],
+  "herramientas": [
+    "SAP PM",
+    "Power BI",
+    "AutoCAD"
+  ],
+  "certificaciones": [
+    "Certificación Lean Six Sigma Green Belt"
+  ],
+  "descartadas": [
+    "competencia \"Lean Manufacturing\" (L9)",
+    "competencia \"liderazgo de equipos\" (L10)",
+    "competencia \"Lean Manufacturing\" (L13)"
+  ],
+  "idiomas": [],
+  "usage": {
+    "input_tokens": 1586,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 1167,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
