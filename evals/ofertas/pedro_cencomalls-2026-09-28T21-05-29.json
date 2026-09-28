@@ -1,0 +1,85 @@
+{
+  "caso": "pedro_cencomalls",
+  "ts": "2026-09-28T21-05-29",
+  "costo": 0.003147,
+  "texto_limpio": "Practicante para el equipo de Administración y Finanzas en Cenco Malls.\n\nMisión del rol: Apoyar al equipo de Facturación y Deuda en la correcta facturación del período y en el control de la cartera de clientes, aportando con automatización y reportería que habiliten decisiones más rápidas.\n\nPrincipales Funciones:\n- Validar información y detectar inconsistencias para asegurar un cierre del período mensual correcto.\n- Controlar y dar seguimiento a la cartera de clientes (aging, deuda vencida y estado de gestión).\n- Desarrollar automatizaciones en Google Cloud Platform (BigQuery / SQL) para optimizar procesos manuales.\n- Construir y mantener dashboards en Power BI para el insumo estratégico de las gerencias.\n- Coordinar con diferentes equipos la resolución de casos de cartera y destrabe de documentación.\n- Liderar reuniones de seguimiento: definición de agenda, minuta y control de acuerdos.\n\nRequisitos:\nCarreras: Ingeniería Comercial, Ingeniería en Información y Control de Gestión, Ingeniería Civil Industrial o carreras afines.\nSQL: Nivel intermedio (consultas, joins, agregaciones). Deseable manejo de BigQuery.\nPower BI: Nivel intermedio (modelado de datos, medidas DAX básicas y diseño de visualizaciones).\nExcel: Nivel intermedio.\nInglés: Nivel básico a intermedio (deseable, no excluyente).\nDeseable: Conocimiento o exposición previa a SAP y procesos de cierre financiero.\n\nDuración: 6 meses. Ubicación: Oficinas Cenco Costanera.",
+  "keywords_requeridas": [
+    {
+      "keyword": "Ingeniería Comercial",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Ingeniería en Información y Control de Gestión",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Ingeniería Civil Industrial",
+      "relevancia": 9
+    },
+    {
+      "keyword": "SQL",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Power BI",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Excel",
+      "relevancia": 8
+    },
+    {
+      "keyword": "facturación",
+      "relevancia": 8
+    },
+    {
+      "keyword": "cartera de clientes",
+      "relevancia": 8
+    },
+    {
+      "keyword": "cierre del período mensual",
+      "relevancia": 8
+    },
+    {
+      "keyword": "dashboards",
+      "relevancia": 8
+    },
+    {
+      "keyword": "automatizaciones",
+      "relevancia": 8
+    }
+  ],
+  "keywords_deseables": [
+    {
+      "keyword": "BigQuery",
+      "relevancia": 7
+    },
+    {
+      "keyword": "SAP",
+      "relevancia": 6
+    },
+    {
+      "keyword": "procesos de cierre financiero",
+      "relevancia": 6
+    },
+    {
+      "keyword": "inglés",
+      "relevancia": 5
+    }
+  ],
+  "nivel_posicion": "practicante",
+  "industria": "retail, centros comerciales",
+  "descartadas": [],
+  "usage": {
+    "input_tokens": 972,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 435,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
