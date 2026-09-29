@@ -1,0 +1,141 @@
+{
+  "caso": "andres_asap_antofagasta",
+  "ts": "2026-09-29T18-49-26",
+  "costo": 0.006128,
+  "texto_limpio": "ASAP Group, empresa proveedora de servicios para la industria minera, se encuentra en búsqueda de un/a Jefe/a de Relaciones Laborales para liderar integralmente la gestión laboral y la administración de personas en una operación ubicada en la Región de Antofagasta. Buscamos un perfil con experiencia comprobable en minería, liderazgo de equipos en terreno, alto estándar de control documental y capacidad para anticipar riesgos laborales que puedan afectar la continuidad operacional, el cumplimiento contractual o la relación con el mandante.\n\nLa persona seleccionada reportará directamente a la Gerencia de Personas y tendrá bajo su dependencia al equipo de Encargados/as y Asistentes de Relaciones Laborales de la faena. Actuará como contraparte técnica, con igual nivel de coordinación, del Administrador/a de Contrato y del Jefe/a de Operaciones de RRHH, ejerciendo la autoridad de Relaciones Laborales en la obra.\n\nPrincipales responsabilidades\n- Dirigir, planificar y controlar integralmente la gestión de Relaciones Laborales y administración de personas de la faena.\n- Liderar al equipo de RRLL, distribuyendo cargas de trabajo, definiendo prioridades, responsables, plazos y estándares de cumplimiento.\n- Mantener control diario de dotación, asistencia, ausentismo, licencias médicas, permisos, vacaciones, reemplazos, acreditaciones y vencimientos.\n- Supervisar la emisión y control de las listas Go/No Go antes de cada ingreso o subida de personal a faena.\n- Controlar contratos, anexos, renovaciones, jornadas excepcionales, horas extraordinarias, medidas disciplinarias, desvinculaciones, finiquitos y carpetas laborales.\n- Revisar y validar el precierre de remuneraciones y las novedades informadas por el equipo, asegurando exactitud, trazabilidad y cumplimiento de plazos.\n- Mantener la operación permanentemente preparada para auditorías laborales, previsionales y del mandante, gestionando preventivamente brechas, hallazgos y planes de acción.\n- Representar a ASAP Group ante el mandante, la Dirección del Trabajo, fiscalizaciones, comparendos y otras instancias, dentro de las facultades otorgadas.\n- Asesorar al Administrador/a de Contrato, jefaturas y supervisores en legislación laboral, subcontratación, jornadas, disciplina y decisiones relacionadas con personas.\n- Monitorear indicadores de dotación, rotación, ausentismo, horas extraordinarias, acreditación, cumplimiento documental, auditorías y carga de trabajo del equipo.\n- Identificar y escalar oportunamente riesgos legales, laborales o contractuales que puedan afectar la continuidad, el costo o la reputación del servicio.\n- Promover la mejora continua y estandarización de procesos, reduciendo errores, reprocesos y exposición frente a auditorías.\n\nRequisitos del cargo\n- Título profesional de al menos ocho semestres en Ingeniería en Recursos Humanos, Administración de Empresas mención RR.HH., Ingeniería Comercial, Ingeniería Civil Industrial o carrera afín.\n- Mínimo 5 años de experiencia en administración de personal y Relaciones Laborales.\n- Al menos 3 años de experiencia liderando equipos en contratos de servicios para minería, construcción, industria o servicios industriales.\n- Experiencia comprobable en gestión de dotaciones relevantes, auditorías laborales, acreditación minera, remuneraciones, jornadas excepcionales, fiscalizaciones y procesos disciplinarios.\n- Dominio de legislación laboral y previsional chilena, Ley N.º 20.123 sobre subcontratación, negociación colectiva, Reglamento Interno y Ley Karin.\n- Experiencia relacionándose directamente con mandantes, organizaciones sindicales, trabajadores y organismos fiscalizadores.\n- Manejo de plataformas de acreditación como WebControl, SIGA o equivalentes.\n- Manejo de ERP de personas o remuneraciones, portal Mi DT, Excel avanzado y herramientas de reportería.\n\nPerfil buscado\nLiderazgo visible y efectivo en terreno, autonomía técnica, firmeza para sostener decisiones de cumplimiento, criterio para anticipar riesgos y alto nivel de rigurosidad documental. Se valoran: liderazgo y desarrollo de equipos en terreno; planificación, priorización y seguimiento; rigurosidad y control documental; orientación preventiva frente a auditorías y fiscalizaciones; criterio y autonomía; negociación y manejo de conflictos laborales; orientación al negocio y a la continuidad operacional.\n\nCondiciones: faena en la Región de Antofagasta, turno 4x3, presencial (oficina y terreno), industria servicios para la minería, dependencia directa de la Gerencia de Personas.",
+  "keywords_requeridas": [
+    {
+      "keyword": "administración de personal",
+      "relevancia": 10
+    },
+    {
+      "keyword": "Relaciones Laborales",
+      "relevancia": 10
+    },
+    {
+      "keyword": "liderazgo de equipos",
+      "relevancia": 10
+    },
+    {
+      "keyword": "minería",
+      "relevancia": 10
+    },
+    {
+      "keyword": "legislación laboral chilena",
+      "relevancia": 10
+    },
+    {
+      "keyword": "control documental",
+      "relevancia": 10
+    },
+    {
+      "keyword": "Ingeniería en Recursos Humanos",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Administración de Empresas mención RR.HH.",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Ingeniería Comercial",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Ingeniería Civil Industrial",
+      "relevancia": 9
+    },
+    {
+      "keyword": "gestión de dotaciones",
+      "relevancia": 9
+    },
+    {
+      "keyword": "auditorías laborales",
+      "relevancia": 9
+    },
+    {
+      "keyword": "acreditación minera",
+      "relevancia": 9
+    },
+    {
+      "keyword": "remuneraciones",
+      "relevancia": 9
+    },
+    {
+      "keyword": "legislación previsional chilena",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Ley N.º 20.123",
+      "relevancia": 9
+    },
+    {
+      "keyword": "anticipar riesgos laborales",
+      "relevancia": 9
+    },
+    {
+      "keyword": "jornadas excepcionales",
+      "relevancia": 8
+    },
+    {
+      "keyword": "procesos disciplinarios",
+      "relevancia": 8
+    },
+    {
+      "keyword": "negociación colectiva",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Reglamento Interno",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Ley Karin",
+      "relevancia": 8
+    },
+    {
+      "keyword": "WebControl",
+      "relevancia": 8
+    },
+    {
+      "keyword": "SIGA",
+      "relevancia": 8
+    },
+    {
+      "keyword": "ERP de personas",
+      "relevancia": 8
+    },
+    {
+      "keyword": "portal Mi DT",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Excel avanzado",
+      "relevancia": 7
+    }
+  ],
+  "keywords_deseables": [
+    {
+      "keyword": "desarrollo de equipos en terreno",
+      "relevancia": 6
+    },
+    {
+      "keyword": "negociación y manejo de conflictos laborales",
+      "relevancia": 6
+    }
+  ],
+  "nivel_posicion": "jefatura",
+  "industria": "servicios para minería",
+  "descartadas": [],
+  "usage": {
+    "input_tokens": 1933,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 839,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
