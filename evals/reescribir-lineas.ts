@@ -1,11 +1,11 @@
 /**
- * Eval de reescribirLinea (app/lib/reescritor-contextual.ts): 10 líneas del CV de Pedro × las ofertas guardadas.
+ * Eval de reescribirLinea (app/lib/reescritor-contextual.ts): 10 líneas del CV de cada caso × su oferta guardada.
  * Usa las salidas guardadas del extractor (evals/competencias/) y del parser (evals/ofertas/), como mapear-jd.ts.
  *
  * Uso:
  *   npx tsx evals/reescribir-lineas.ts [caso ...]             # --dry-run (por defecto): qué líneas llamarían a la API, sin gastar
  *   npx tsx evals/reescribir-lineas.ts [caso ...] --ejecutar  # llama a Haiku, una vez por línea con keywords (más reintentos)
- *   Sin casos: pedro_cencomalls y pedro_xepelin (mismo CV, dos ofertas).
+ *   Sin casos: todos los de evals/casos/. Las líneas salen del CV de cada caso (lineasDelCaso).
  */
 
 import * as fs from "fs";
@@ -22,19 +22,15 @@ const PRECIO_IN = 1, PRECIO_OUT = 5;
 const CHARS_POR_TOKEN = 2.1;
 const TOKENS_OUT = 120;
 
-// 10 líneas reales del CV (perfil, bullets de experiencia y competencias).
-const LINEAS = [
-  "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento. Orientado a resultados, con habilidades de comunicación, trabajo en equipo y manejo de herramientas digitales. Inglés avanzado.",
-  "- Ejecución de activaciones de marca en puntos de venta para Hellmann's.",
-  "- Demostración de producto e impulso de ventas mediante atención directa al cliente.",
-  "- Participación en 3 campañas promocionales con distintos equipos de trabajo.",
-  "- Co fundé y operé un emprendimiento de snacks y alimentos para perros como proyecto académico universitario.",
-  "- Gestioné actividades de producción, ventas directas en plazas y espacios públicos, y creación de anuncios publicitarios.",
-  "- Desarrollé habilidades de emprendimiento end-to-end: desde la producción hasta la comercialización del producto.",
-  "- Microsoft Excel (nivel intermedio): análisis de datos, tablas, fórmulas.",
-  "- Ventas directas y atención al cliente.",
-  "- Pensamiento analítico y orientación a resultados.",
-];
+// Las 10 primeras líneas de contenido del CV del caso: párrafo de perfil y viñetas, con al menos 6 palabras.
+const N_LINEAS = 10;
+function lineasDelCaso(cv: string): string[] {
+  return cv.split("\n").map(l => l.trimEnd()).filter(l => {
+    const t = l.trim();
+    if (/^[-•]\s+/.test(t)) return t.split(/\s+/).length >= 6;
+    return t.length > 120; // párrafo de perfil
+  }).slice(0, N_LINEAS).map(l => l.trim());
+}
 
 function loadEnv() {
   const envPath = path.join(process.cwd(), ".env.local");
@@ -76,7 +72,7 @@ async function main() {
   const args = process.argv.slice(2);
   const ejecutar = args.includes("--ejecutar");
   const pedidos = args.filter(a => !a.startsWith("--"));
-  const casos = pedidos.length > 0 ? pedidos : ["pedro_cencomalls", "pedro_xepelin"];
+  const casos = pedidos.length > 0 ? pedidos : fs.readdirSync(path.join(process.cwd(), "evals/casos")).filter(f => f.endsWith(".json")).map(f => f.slice(0, -5)).sort();
   if (ejecutar) loadEnv();
 
   const resultados: { caso: string; r: ResultadoLinea; mentira: string[] }[] = [];
@@ -87,7 +83,7 @@ async function main() {
     if (typeof ctx === "string") { console.log(`\n⚠️  ${caso}: ${ctx} — se omite\n`); continue; }
     console.log(`\n═══ ${caso} · ${ctx.mapeo.matches_directos.length} directos, ${ctx.mapeo.matches_relacionados.length} relacionados, ${ctx.mapeo.gap_keywords.length} brechas ═══`);
 
-    for (const [i, linea] of LINEAS.entries()) {
+    for (const [i, linea] of lineasDelCaso(ctx.cv).entries()) {
       const input = { lineaOriginal: linea, cvCompleto: ctx.cv, mapeo: ctx.mapeo, keywordsJD: ctx.keywordsJD };
       const permitidas = planificarLinea(input);
       console.log(`\n[${i + 1}] ${corta(linea)}`);
