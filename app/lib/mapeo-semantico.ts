@@ -84,6 +84,7 @@ export const RAICES_GENERICAS = new Set([
   "inter", "publi",
 ]);
 export const RELEVANCIA_MIN_SEMANTICO = 0.75;
+export const RELEVANCIA_MIN_SEMANTICO_RELACIONADO = 0.8; // un relacionado semántico necesita más certeza que un directo
 export const MODELO_MAPEO = "claude-haiku-4-5-20251001";
 
 // Nombres de carreras chilenas frecuentes en ofertas, sobre texto normalizado.
@@ -342,7 +343,9 @@ export function promptSemantico(brechas: { keyword: string }[], cvTexto: string)
   return `KEYWORDS SIN MATCH:\n${brechas.map(b => `- ${b.keyword}`).join("\n")}\n\nCV:\n${cvTexto}`;
 }
 
-export interface Rechazo { keyword: string; cita: string; motivo: string }
+export interface Rechazo { keyword: string; cita: string; motivo: string; relevancia?: number }
+// Lo que propuso el modelo, tal cual: se guarda para re-aplicar los filtros sin volver a llamar a la API.
+export interface PropuestaSemantica { keyword: string; cita: string; nivel?: string; relevancia?: number | null }
 
 const colapsar = (s: string) => s.replace(/\s+/g, " ").trim();
 
@@ -359,17 +362,21 @@ export function filtrarSemanticos(
   for (const m of Array.isArray(propuestos) ? propuestos : []) {
     const keyword = typeof m?.keyword === "string" ? m.keyword.trim() : "";
     const cita = typeof m?.cita === "string" ? colapsar(m.cita) : "";
-    const relevancia = Number(m?.relevancia);
-    const rechazar = (motivo: string) => rechazos.push({ keyword, cita, motivo });
+    const relevancia = m?.relevancia == null ? NaN : Number(m.relevancia);
+    const rechazar = (motivo: string) => rechazos.push({ keyword, cita, motivo, ...(Number.isFinite(relevancia) ? { relevancia } : {}) });
     const brecha = brechas.find(b => normalizarParaComparar(b.keyword) === normalizarParaComparar(keyword));
     if (!brecha) { rechazar("keyword que no era brecha"); continue; }
     if (aceptados.some(a => a.keyword_jd === brecha.keyword)) continue;
     if (!cita || !cv.includes(cita)) { rechazar("la cita no existe literal en el CV"); continue; }
-    if (!Number.isFinite(relevancia) || relevancia < relevanciaMin) { rechazar(`relevancia ${m?.relevancia} < ${relevanciaMin}`); continue; }
     // Si keyword y cita comparten raíces y todas son genéricas, es un parecido de palabras, no un match.
     const rk = new Set(palabras(brecha.keyword).map(raiz));
     const comunes = [...new Set(palabras(cita).map(raiz))].filter(r => rk.has(r));
     if (comunes.length > 0 && comunes.every(r => RAICES_GENERICAS.has(r))) { rechazar(`solo comparte raíces genéricas (${comunes.join(", ")})`); continue; }
+    if (!Number.isFinite(relevancia) || relevancia < relevanciaMin) { rechazar(`relevancia ${m?.relevancia} < ${relevanciaMin}`); continue; }
+    if (m?.nivel !== "directo" && relevancia < RELEVANCIA_MIN_SEMANTICO_RELACIONADO) {
+      rechazar(`relacionado con relevancia ${relevancia} < ${RELEVANCIA_MIN_SEMANTICO_RELACIONADO}`);
+      continue;
+    }
     const nivel = m?.nivel === "directo" ? "directo" : "relacionado";
     aceptados.push({
       competencia_cv: cita, keyword_jd: brecha.keyword, tipo: brecha.tipo, nivel,
@@ -386,9 +393,9 @@ export async function mapearSemantico(
   keywordsJD: KeywordsJD,
   cvTexto: string,
   opts: { client?: Anthropic; relevanciaMin?: number } = {},
-): Promise<{ resultado: ResultadoMapeo; rechazos: Rechazo[]; usage?: Anthropic.Usage }> {
+): Promise<{ resultado: ResultadoMapeo; rechazos: Rechazo[]; propuestos: PropuestaSemantica[]; usage?: Anthropic.Usage }> {
   const brechas = literal.gap_keywords.filter(g => !esCarrera(g.keyword));
-  if (brechas.length === 0) return { resultado: literal, rechazos: [] };
+  if (brechas.length === 0) return { resultado: literal, rechazos: [], propuestos: [] };
   const client = opts.client ?? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const res = await client.messages.create(
     {
@@ -401,15 +408,27 @@ export async function mapearSemantico(
     { timeout: 30_000, maxRetries: 1 },
   );
   const raw = res.content[0]?.type === "text" ? res.content[0].text : "";
-  let propuestos: unknown = [];
+  let propuestos: PropuestaSemantica[] = [];
   try {
     const m = raw.match(/\{[\s\S]*\}/);
-    propuestos = m ? JSON.parse(m[0]).matches : [];
+    propuestos = m && Array.isArray(JSON.parse(m[0]).matches) ? JSON.parse(m[0]).matches : [];
   } catch {
     console.warn("[postulai] Mapeo semántico: respuesta sin JSON válido; se conserva el mapeo literal");
-    return { resultado: literal, rechazos: [], usage: res.usage };
+    return { resultado: literal, rechazos: [], propuestos: [], usage: res.usage };
   }
-  const { aceptados, rechazos } = filtrarSemanticos(propuestos, brechas, cvTexto, opts.relevanciaMin);
+  return { ...aplicarSemanticos(literal, keywordsJD, cvTexto, propuestos, opts.relevanciaMin), propuestos, usage: res.usage };
+}
+
+// Aplica los filtros a propuestas ya obtenidas (del modelo o guardadas) y mueve a matches las brechas aceptadas.
+export function aplicarSemanticos(
+  literal: ResultadoMapeo,
+  keywordsJD: KeywordsJD,
+  cvTexto: string,
+  propuestos: unknown,
+  relevanciaMin?: number,
+): { resultado: ResultadoMapeo; rechazos: Rechazo[] } {
+  const brechas = literal.gap_keywords.filter(g => !esCarrera(g.keyword));
+  const { aceptados, rechazos } = filtrarSemanticos(propuestos, brechas, cvTexto, relevanciaMin);
   const resueltas = new Set(aceptados.map(a => a.keyword_jd));
   const sinNivel = ({ nivel: _n, ...m }: MatchDirecto & { nivel: string }) => m;
   const resultado: ResultadoMapeo = {
@@ -419,7 +438,7 @@ export async function mapearSemantico(
     gap_keywords: literal.gap_keywords.filter(g => !resueltas.has(g.keyword)),
   };
   resultado.score_adaptacion = scoreDesdeResultado(resultado, keywordsJD);
-  return { resultado, rechazos, usage: res.usage };
+  return { resultado, rechazos };
 }
 
 // Recalcula el score desde un resultado ya armado (misma regla que mapearCompetencias).
@@ -436,4 +455,91 @@ export function scoreDesdeResultado(r: ResultadoMapeo, jd: KeywordsJD): number {
   const hayCarreras = requeridas.some(esCarrera);
   const total = requeridas.filter(k => !esCarrera(k)).length + (hayCarreras ? 1 : 0);
   return calcularScore(r, jd, { cubiertas: cubiertas + carreraCob, total });
+}
+
+// ─── score v2 (PED-30, sin API) ──────────────────────────────────────────────
+// Pesos y umbrales fijados antes de mirar los resultados; no se ajustan caso a caso.
+// - Cada keyword requerida pesa su relevancia del parser (1–10). Años y carrera pesan PESO_REQUISITO.
+// - Cobertura: directo o cumple 1; relacionado o afín a revisar 0.5; brecha 0.
+// - Brecha preguntable (leyes/normativas, plataformas/software, sectores, certificaciones): su peso cuenta 50%.
+// - Brecha bloqueante: carrera, años o función central (todo lo que no es preguntable).
+
+export const PESO_REQUISITO = 10;
+export const PESO_BRECHA_PREGUNTABLE = 0.5;
+export const UMBRAL_CLASE = { alto: 0.6, medio: 0.35 }; // alto ≥ 0.60 · medio 0.35–0.60 · bajo < 0.35
+
+export type ClaseBrecha = "bloqueante" | "preguntable";
+export type ClaseFit = "alto" | "medio" | "bajo";
+
+const RE_NORMATIVA = /\b(ley|leyes|normativa|normativas|norma|normas|reglamento|reglamentos|legislacion|compliance|iso|certificacion|certificaciones|certificado|acreditacion)\b/;
+const RE_SOFTWARE = /\b(excel|office|word|powerpoint|power bi|python|sql|sheets|canva|google|microsoft|portal|plataforma|plataformas|software|herramienta|herramientas|erp|crm|sistema|sistemas)\b/;
+const RE_SECTOR = /\b(sector|industria|rubro|fintech|mineria|minera|retail|startup|tecnologia|tecnologico|ciberseguridad|banca|seguros|construccion|faena|experiencia en)\b/;
+
+// Nombre propio de herramienta: sigla en mayúsculas (SAP, SIGA, DAX, M&A) o camelCase (WebControl, BigQuery).
+const pareceHerramienta = (k: string) => k.split(/\s+/).some(t => /^[A-Z0-9&.]{2,}$/.test(t) || /[a-z][A-Z]/.test(t));
+
+export function clasificarBrecha(keyword: string): ClaseBrecha {
+  const n = normalizarParaComparar(keyword);
+  if (RE_NORMATIVA.test(n) || RE_SOFTWARE.test(n) || RE_SECTOR.test(n) || pareceHerramienta(keyword)) return "preguntable";
+  return "bloqueante";
+}
+
+export interface BrechaV2 { descripcion: string; peso: number; clase: ClaseBrecha }
+
+export interface ScoreV2 {
+  score: number;
+  clase: ClaseFit;
+  bloqueantes: BrechaV2[];
+  preguntables: BrechaV2[];
+}
+
+export function claseFit(score: number): ClaseFit {
+  return score >= UMBRAL_CLASE.alto ? "alto" : score >= UMBRAL_CLASE.medio ? "medio" : "bajo";
+}
+
+export function scoreV2(r: ResultadoMapeo, jd: KeywordsJD): ScoreV2 {
+  const cobertura = new Map<string, number>();
+  r.matches_directos.forEach(m => cobertura.set(m.keyword_jd, 1));
+  r.matches_relacionados.forEach(m => { if (!cobertura.has(m.keyword_jd)) cobertura.set(m.keyword_jd, PESO_RELACIONADO_EN_SCORE); });
+
+  let cubierto = 0, total = 0;
+  const bloqueantes: BrechaV2[] = [], preguntables: BrechaV2[] = [];
+  for (const k of jd.requeridas) {
+    const cob = cobertura.get(k.keyword) ?? 0;
+    if (cob > 0) { cubierto += k.relevancia * cob; total += k.relevancia; continue; }
+    const clase = esCarrera(k.keyword) ? "bloqueante" : clasificarBrecha(k.keyword);
+    const peso = k.relevancia * (clase === "preguntable" ? PESO_BRECHA_PREGUNTABLE : 1);
+    total += peso;
+    (clase === "preguntable" ? preguntables : bloqueantes).push({ descripcion: k.keyword, peso: k.relevancia, clase });
+  }
+  for (const q of (r.requisitos ?? []).filter(q => q.tipo === "requerido")) {
+    const cob = COBERTURA_REQUISITO[q.estado];
+    total += PESO_REQUISITO;
+    cubierto += PESO_REQUISITO * cob;
+    if (cob === 0) bloqueantes.push({ descripcion: q.descripcion, peso: PESO_REQUISITO, clase: "bloqueante" });
+  }
+  const score = total === 0 ? 0 : Math.round((cubierto / total) * 100) / 100;
+  return { score, clase: claseFit(score), bloqueantes, preguntables };
+}
+
+// ─── alerta de nivel (no cambia el score) ────────────────────────────────────
+// Rango de años esperado por nivel de la posición. Sobrecalificado: más de 3 años sobre el tope del rango,
+// o al menos el triple del mínimo pedido. Subcalificado: menos que el mínimo pedido o que el piso del rango.
+
+const RANGO_NIVEL: Record<string, [number, number]> = {
+  practicante: [0, 1], junior: [0, 3], "semi-senior": [2, 6], senior: [5, Infinity], jefatura: [5, Infinity],
+};
+
+export type AlertaNivel = "sobrecalificado" | "subcalificado" | null;
+
+export function alertaNivel(cvTexto: string, jd: KeywordsJD, nivelPosicion?: string): { alerta: AlertaNivel; anios_cv: number; detalle: string } {
+  const anios = aniosDeExperiencia(puestosCV(cvTexto));
+  const minimo = Math.max(0, ...(jd.experiencia ?? []).filter(e => e.tipo === "requerido").map(e => e.anios_minimos));
+  const rango = nivelPosicion ? RANGO_NIVEL[nivelPosicion.toLowerCase()] : undefined;
+  const base = `${anios} años en el CV · pide ${minimo || "—"} · nivel ${nivelPosicion ?? "?"}`;
+  if (anios < minimo || (rango && anios < rango[0])) return { alerta: "subcalificado", anios_cv: anios, detalle: base };
+  if ((rango && Number.isFinite(rango[1]) && anios > rango[1] + 3) || (minimo > 0 && anios >= 3 * minimo)) {
+    return { alerta: "sobrecalificado", anios_cv: anios, detalle: base };
+  }
+  return { alerta: null, anios_cv: anios, detalle: base };
 }

@@ -39,6 +39,15 @@ export function competenciasDelCaso(raiz: string, caso: string, cvTexto: string)
   return archivo;
 }
 
+// Oferta de cada caso: la fijada en evals/ofertas/fijadas.json (para que los evals sean deterministas),
+// o la más reciente si el caso no está fijado. Re-parsear no cambia los evals hasta actualizar fijadas.json.
+export function ofertaDelCaso(raiz: string, caso: string): string {
+  const dir = path.join(raiz, "evals/ofertas");
+  const fijadas = path.join(dir, "fijadas.json");
+  const fijada = fs.existsSync(fijadas) ? JSON.parse(fs.readFileSync(fijadas, "utf-8"))[caso] : undefined;
+  return fijada ? path.join(dir, fijada) : masReciente(dir, caso);
+}
+
 export interface ContextoMapeo {
   caso: string;
   casoJson: Record<string, any>;
@@ -46,6 +55,7 @@ export interface ContextoMapeo {
   keywordsJD: KeywordsJD;
   extras: ExtrasCV;
   archivoOferta: string;
+  nivelPosicion?: string;
 }
 
 // Re-aplica fusionarCompetencias y consolidarJD a lo guardado, para que refleje el código actual.
@@ -53,7 +63,7 @@ export function cargarContexto(caso: string, archivoComp?: string, archivoOferta
   const raiz = process.cwd();
   const casoJson = JSON.parse(fs.readFileSync(path.join(raiz, "evals/casos", `${caso}.json`), "utf-8"));
   const comp = JSON.parse(fs.readFileSync(archivoComp ?? competenciasDelCaso(raiz, caso, casoJson.cv_texto), "utf-8"));
-  const arch = archivoOferta ?? masReciente(path.join(raiz, "evals/ofertas"), caso);
+  const arch = archivoOferta ?? ofertaDelCaso(raiz, caso);
   const oferta = JSON.parse(fs.readFileSync(arch, "utf-8"));
   const { competencias } = fusionarCompetencias(comp.competencias);
   const jd = consolidarJD(casoJson.oferta_texto, {
@@ -61,7 +71,7 @@ export function cargarContexto(caso: string, archivoComp?: string, archivoOferta
     experiencia: oferta.experiencia, carreras: oferta.carreras,
   });
   return {
-    caso, casoJson, competencias, archivoOferta: arch,
+    caso, casoJson, competencias, archivoOferta: arch, nivelPosicion: oferta.nivel_posicion,
     keywordsJD: { requeridas: jd.keywords_requeridas, deseables: jd.keywords_deseables, experiencia: jd.experiencia, carreras: jd.carreras },
     extras: { herramientas: comp.herramientas, certificaciones: comp.certificaciones, idiomas: comp.idiomas, cvTexto: casoJson.cv_texto },
   };
@@ -69,7 +79,7 @@ export function cargarContexto(caso: string, archivoComp?: string, archivoOferta
 
 // Casos con oferta parseada guardada.
 export function casosConOferta(): string[] {
-  const ofertas = fs.readdirSync(path.join(process.cwd(), "evals/ofertas"));
+  const ofertas = fs.readdirSync(path.join(process.cwd(), "evals/ofertas")).filter(o => o !== "fijadas.json");
   return fs.readdirSync(path.join(process.cwd(), "evals/casos")).filter(f => f.endsWith(".json")).map(f => f.slice(0, -5))
     .filter(c => ofertas.some(o => o.startsWith(`${c}-`))).sort();
 }
