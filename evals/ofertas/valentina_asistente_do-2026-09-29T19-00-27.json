@@ -1,0 +1,88 @@
+{
+  "caso": "valentina_asistente_do",
+  "ts": "2026-09-29T19-00-27",
+  "costo": 0.004084,
+  "texto_limpio": "Buscamos incorporar a nuestro equipo a un/a profesional recién titulado/a o con hasta un año de experiencia, que tenga interés en desarrollarse en el área de Gestión de Personas y Desarrollo Organizacional. El principal propósito del cargo será apoyar la ejecución, coordinación y seguimiento de los distintos procesos del área, contribuyendo a generar una buena experiencia para nuestros colaboradores. Empresa del rubro de la construcción, Las Condes.\n\nPrincipales funciones:\n- Apoyar la coordinación de capacitaciones, incluyendo convocatorias, inscripciones, asistencia, logística, evaluaciones y seguimiento.\n- Mantener actualizados los registros, bases de datos, documentación e indicadores del área.\n- Apoyar la gestión de beneficios de los colaboradores.\n- Atender y canalizar consultas relacionadas con beneficios y actividades internas.\n- Colaborar en procesos de clima organizacional, evaluación de desempeño e inducción.\n- Apoyar la coordinación de actividades, campañas y eventos internos.\n- Colaborar en la elaboración y difusión de comunicaciones internas.\n- Realizar seguimiento de compromisos del área.\n- Apoyar la actualización de información y procesos en BUK.\n\nRequisitos:\n- Formación en Trabajo Social, Psicología, Ingeniería o Técnico en Recursos Humanos, Ingeniería en Administración de Recursos Humanos, Administración de Empresas o carrera afín.\n- Desde práctica profesional hasta un año de experiencia en Recursos Humanos, Desarrollo Organizacional, Bienestar o áreas similares.\n- Manejo de Excel y herramientas de Microsoft Office.\n- Interés por desarrollarse en Gestión de Personas.\n- Disponibilidad para trabajar presencialmente en Las Condes.\n\nDeseable:\n- Conocimientos o experiencia utilizando BUK (no excluyente)\n- Manejo de Canva u otras herramientas de diseño (no excluyente)\n- Experiencia apoyando actividades, capacitaciones o comunicaciones internas.",
+  "keywords_requeridas": [
+    {
+      "keyword": "coordinación de capacitaciones",
+      "relevancia": 9
+    },
+    {
+      "keyword": "gestión de bases de datos",
+      "relevancia": 8
+    },
+    {
+      "keyword": "gestión de beneficios",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Excel",
+      "relevancia": 8
+    },
+    {
+      "keyword": "clima organizacional",
+      "relevancia": 7
+    },
+    {
+      "keyword": "evaluación de desempeño",
+      "relevancia": 7
+    },
+    {
+      "keyword": "inducción",
+      "relevancia": 7
+    },
+    {
+      "keyword": "comunicaciones internas",
+      "relevancia": 7
+    },
+    {
+      "keyword": "Microsoft Office",
+      "relevancia": 7
+    }
+  ],
+  "keywords_deseables": [
+    {
+      "keyword": "BUK",
+      "relevancia": 7
+    },
+    {
+      "keyword": "Canva",
+      "relevancia": 5
+    },
+    {
+      "keyword": "herramientas de diseño",
+      "relevancia": 5
+    }
+  ],
+  "nivel_posicion": "junior",
+  "industria": "construcción",
+  "experiencia": [],
+  "carreras": [
+    {
+      "carreras": [
+        "Trabajo Social",
+        "Psicología",
+        "Ingeniería",
+        "Técnico en Recursos Humanos",
+        "Ingeniería en Administración de Recursos Humanos",
+        "Administración de Empresas"
+      ],
+      "acepta_afin": true,
+      "tipo": "requerido"
+    }
+  ],
+  "descartadas": [],
+  "usage": {
+    "input_tokens": 1449,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 527,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

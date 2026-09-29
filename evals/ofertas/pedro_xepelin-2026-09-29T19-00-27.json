@@ -1,0 +1,140 @@
+{
+  "caso": "pedro_xepelin",
+  "ts": "2026-09-29T19-00-27",
+  "costo": 0.005657,
+  "texto_limpio": "Strategic Finance Associate — Xepelin\nSantiago, Chile | Full-time | On-site\n\nSOBRE XEPELIN\nXepelin transforma las finanzas corporativas en América Latina entregando una suite de productos que automatizan la gestión financiera y facilitan el acceso a liquidez. Servimos a más de 1 millón de empresas y construimos sistemas de inteligencia de negocios que dan visibilidad sobre métricas financieras y evaluaciones de riesgo.\n\nEL ROL\nSerás pieza clave en decisiones de asignación de capital y estrategia de la compañía. Trabajarás directamente con el liderazgo ejecutivo para construir la tesis financiera que guía el crecimiento de Xepelin.\n\nRESPONSABILIDADES\n– Financial storytelling: construir y defender board decks, investor updates y narrativas de data room que aseguren financiamiento de equity y deuda.\n– Model ownership: ser responsable intelectualmente de los modelos financieros y defender supuestos ante inversionistas y comités de crédito.\n– Análisis estratégico de KPIs: usar datos para responder preguntas de alto impacto sobre valorización, retención de ingresos, márgenes y viabilidad de mercado.\n– Capital transactions: modelar estructuras, diluciones y sensibilidades para levantamientos de capital, M&A y movimientos estratégicos.\n– Desarrollo de tesis financiera: convertir las ambiciones de la compañía en una estrategia financiera a 24 meses con tradeoffs claros.\n– Capital arbitration: evaluar propuestas de inversión competidoras y recomendar decisiones de asignación al liderazgo C-level.\n– Automatización de procesos: rediseñar flujos manuales usando Python, SQL/BigQuery y Sheets para crear dashboards y reportes automatizados.\n\nREQUISITOS\n– 2-4 años de experiencia en investment banking, private equity, consulting, corporate development, strategic finance o FP&A en empresas de crecimiento.\n– Carrera en Ingeniería Comercial, Ingeniería Civil Industrial, Economía, Estadística o afín.\n– Excel / Sheets nivel experto: modelado desde cero.\n– SQL (BigQuery) o disposición a aprenderlo.\n– Sólidos fundamentos de contabilidad y finanzas: balance, flujo de caja, P&L.\n– Mentalidad de builder con sólida capacidad de comunicación.\n– Inglés avanzado.\n\nDESEABLE\n– Experiencia en procesos de levantamiento de capital o M&A.\n– Track record automatizando procesos financieros con resultados medibles.\n– Pasión por fintech o negocios centrados en crédito/riesgo.\n– Comodidad con entornos de crecimiento rápido y altos estándares de desempeño.\n\nBENEFICIOS\n– 15 días hábiles de vacaciones + 1 día adicional por aniversario.\n– 10 días de balance anuales.\n– Puntos de beneficios flexibles en moneda local.\n– Plataforma de formación (Udemy, Google Cloud Skill Boost).\n– Cobertura de salud.\n– Welcome kit.",
+  "keywords_requeridas": [
+    {
+      "keyword": "Financial storytelling",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Model ownership",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Excel",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Sheets",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Análisis estratégico de KPIs",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Capital transactions",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Desarrollo de tesis financiera",
+      "relevancia": 8
+    },
+    {
+      "keyword": "SQL",
+      "relevancia": 8
+    },
+    {
+      "keyword": "BigQuery",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Contabilidad",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Finanzas",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Inglés avanzado",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Capital arbitration",
+      "relevancia": 7
+    },
+    {
+      "keyword": "Balance",
+      "relevancia": 7
+    },
+    {
+      "keyword": "Flujo de caja",
+      "relevancia": 7
+    },
+    {
+      "keyword": "P&L",
+      "relevancia": 7
+    },
+    {
+      "keyword": "Comunicación",
+      "relevancia": 7
+    }
+  ],
+  "keywords_deseables": [
+    {
+      "keyword": "Levantamiento de capital",
+      "relevancia": 7
+    },
+    {
+      "keyword": "M&A",
+      "relevancia": 7
+    },
+    {
+      "keyword": "Automatización de procesos financieros",
+      "relevancia": 7
+    },
+    {
+      "keyword": "Fintech",
+      "relevancia": 6
+    },
+    {
+      "keyword": "Crédito",
+      "relevancia": 6
+    },
+    {
+      "keyword": "Riesgo",
+      "relevancia": 6
+    },
+    {
+      "keyword": "Python",
+      "relevancia": 6
+    }
+  ],
+  "nivel_posicion": "junior",
+  "industria": "Fintech",
+  "experiencia": [
+    {
+      "anios_minimos": 2,
+      "area": "investment banking, private equity, consulting, corporate development, strategic finance o FP&A",
+      "tipo": "requerido"
+    }
+  ],
+  "carreras": [
+    {
+      "carreras": [
+        "Ingeniería Comercial",
+        "Ingeniería Civil Industrial",
+        "Economía",
+        "Estadística"
+      ],
+      "acepta_afin": true,
+      "tipo": "requerido"
+    }
+  ],
+  "descartadas": [],
+  "usage": {
+    "input_tokens": 1702,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 791,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

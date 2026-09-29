@@ -15,7 +15,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { normalizarParaComparar, STOP_WORDS_MATCH } from "./cv-postprocess";
 import { esEncabezado, esLineaCargo, raizVerbo, VERBOS_ESCALADA } from "./cv-verificacion";
-import { esCarrera, type KeywordsJD, type ResultadoMapeo } from "./mapeo-semantico";
+import { esCarrera, RAICES_GENERICAS, type KeywordsJD, type ResultadoMapeo } from "./mapeo-semantico";
 
 export const MODELO_REESCRITOR = "claude-haiku-4-5-20251001";
 export const MAX_PALABRAS_NUEVAS = 4;
@@ -59,11 +59,7 @@ export interface KeywordPermitida {
 
 export interface KeywordDescartada { keyword: string; motivo: string }
 
-// Raíces que no bastan para que una keyword toque una línea: aparecen en cualquier función.
-export const RAICES_GENERICAS = new Set([
-  "gesti", "opera", "desar", "proce", "admin", "manej", "traba", "equip", "servi", "clien", "contr",
-  "imple", "apoya", "apoyo", "estra", "anali", "defin", "plani", "respo", "funci", "activ", "organ",
-]);
+// Raíces que no bastan para que una keyword toque una línea: RAICES_GENERICAS, compartida con el mapeo.
 
 // ─── palabras ────────────────────────────────────────────────────────────────
 
