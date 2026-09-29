@@ -8,6 +8,7 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { herramientaTieneRespaldo, matcheaPalabra, normalizarParaComparar, STOP_WORDS_MATCH } from "./cv-postprocess";
+import { esCarrera } from "./mapeo-semantico";
 
 export const MODELO_JD = "claude-haiku-4-5-20251001";
 
@@ -36,6 +37,7 @@ export interface ResultadoJD {
   keywords_deseables: KeywordJD[];
   nivel_posicion: string;
   industria?: string;
+  cargo?: string; // título del cargo tal como aparece en la oferta
   experiencia: RequisitoExperiencia[];
   carreras: RequisitoCarreras[];
   descartadas: string[]; // keywords del modelo que no aparecen en la oferta
@@ -53,6 +55,7 @@ Cada palabra clave:
 - Excluye el tipo de contrato, la modalidad y la jornada (práctica, part-time, híbrido, full-time).
 - Relevancia de 1 a 10: 10 si es central para el cargo y se repite o encabeza los requisitos; 1 si es secundaria.
 
+cargo: el título del cargo tal como aparece en la oferta ("Practicante de Trade Marketing"), o null si no lo dice.
 nivel: "practicante", "junior", "semi-senior", "senior" o "jefatura", según el cargo y los años de experiencia pedidos.
 industria: el rubro de la empresa en 1 a 3 palabras, o null si la oferta no lo dice.
 
@@ -63,7 +66,7 @@ Años de experiencia y carreras NO son keywords:
 - carreras: las carreras o títulos que la oferta acepta como alternativas, escritos como aparecen, en UN solo requisito ("Derecho, Ingeniería, Psicología o carrera afín" → {"carreras":["Derecho","Ingeniería","Psicología"],"acepta_afin":true}). acepta_afin es true si la oferta dice afín, a fin, similar o equivalente.
 - tipo "requerido" o "deseable" con el mismo criterio de las keywords.
 
-Responde ÚNICAMENTE con un JSON válido: {"requeridas":[{"keyword":"...","relevancia":8}],"deseables":[{"keyword":"...","relevancia":4}],"experiencia":[{"anios_minimos":5,"area":"...","tipo":"requerido"}],"carreras":[{"carreras":["..."],"acepta_afin":true,"tipo":"requerido"}],"nivel":"...","industria":"..."}`;
+Responde ÚNICAMENTE con un JSON válido: {"requeridas":[{"keyword":"...","relevancia":8}],"deseables":[{"keyword":"...","relevancia":4}],"experiencia":[{"anios_minimos":5,"area":"...","tipo":"requerido"}],"carreras":[{"carreras":["..."],"acepta_afin":true,"tipo":"requerido"}],"cargo":"...","nivel":"...","industria":"..."}`;
 
 const esUrl = (s: string) => /^https?:\/\/\S+$/i.test(s.trim());
 
@@ -122,6 +125,22 @@ export function marcadaComoDeseable(keyword: string, texto: string): boolean {
   });
 }
 
+// Palabras de rol o nivel que no describen el área del cargo: "Practicante de Trade Marketing" → "trade marketing".
+const RE_ROL = /^(practicante|pasante|trainee|analista|asistente|ayudante|auxiliar|jefe|jefa|jefe a|gerente|subgerente|encargado|encargada|encargado a|coordinador|coordinadora|coordinador a|especialista|ejecutivo|ejecutiva|ejecutivo a|supervisor|supervisora|director|directora|lider|profesional|junior|senior|semi senior|semisenior|sr|jr|de|del|en|y|para|la|el|los|las|un|una|a)$/;
+
+// Lo que queda del título sin rol ni nivel: el área del cargo. Siempre es keyword requerida de relevancia 10,
+// si tiene entre 1 y 4 palabras y aparece en la oferta.
+export function keywordDelCargo(cargo: string | undefined, ofertaNorm: string): string | null {
+  if (!cargo) return null;
+  const tokens = cargo.replace(/\(.*?\)/g, " ").split(/\s+/).filter(Boolean);
+  let i = 0;
+  while (i < tokens.length && RE_ROL.test(normalizarParaComparar(tokens[i]))) i++;
+  const resto = tokens.slice(i).join(" ").replace(/[,.;:|–—-]+$/, "").trim();
+  const n = resto.split(/\s+/).filter(Boolean).length;
+  if (n === 0 || n > 4 || esCarrera(resto) || !herramientaTieneRespaldo(resto, ofertaNorm)) return null; // la carrera va en `carreras`
+  return resto;
+}
+
 const esKeywordDeAnios = (k: string) => /\d/.test(k) && /\b(anos?|years?)\b/.test(normalizarParaComparar(k));
 const tipoRequisito = (t: unknown): TipoRequisito => (t === "deseable" ? "deseable" : "requerido");
 
@@ -163,8 +182,16 @@ export function consolidarJD(texto: string, respuesta: Record<string, unknown>):
   if (movidas.length > 0) {
     console.warn(`[postulai] Parser JD: requeridas movidas a deseables por la oferta: ${movidas.map(k => k.keyword).join(", ")}`);
   }
-  const keywords_requeridas = requeridasModelo.filter(k => !movidas.includes(k));
+  const cargo = typeof respuesta.cargo === "string" && respuesta.cargo.trim() ? respuesta.cargo.trim() : undefined;
+  const delCargo = keywordDelCargo(cargo, ofertaNorm);
+  let keywords_requeridas = requeridasModelo.filter(k => !movidas.includes(k));
+  if (delCargo) {
+    const clave = normalizarParaComparar(delCargo);
+    keywords_requeridas = [{ keyword: delCargo, relevancia: 10 }, ...keywords_requeridas.filter(k => normalizarParaComparar(k.keyword) !== clave)];
+    vistas.add(clave); // si el modelo la puso en deseables, queda solo como requerida
+  }
   const keywords_deseables = [...movidas, ...limpiarKeywords(respuesta.deseables, ofertaNorm, descartadas, vistas).filter(k => !esKeywordDeAnios(k.keyword))]
+    .filter(k => !delCargo || normalizarParaComparar(k.keyword) !== normalizarParaComparar(delCargo))
     .sort((a, b) => b.relevancia - a.relevancia);
   const industria = typeof respuesta.industria === "string" && respuesta.industria.trim() ? respuesta.industria.trim() : undefined;
   return {
@@ -173,6 +200,7 @@ export function consolidarJD(texto: string, respuesta: Record<string, unknown>):
     keywords_deseables,
     nivel_posicion: typeof respuesta.nivel === "string" ? respuesta.nivel : "desconocido",
     ...(industria ? { industria } : {}),
+    ...(cargo ? { cargo } : {}),
     experiencia,
     carreras,
     descartadas,

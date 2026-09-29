@@ -68,7 +68,7 @@ export function cargarContexto(caso: string, archivoComp?: string, archivoOferta
   const { competencias } = fusionarCompetencias(comp.competencias);
   const jd = consolidarJD(casoJson.oferta_texto, {
     requeridas: oferta.keywords_requeridas, deseables: oferta.keywords_deseables,
-    experiencia: oferta.experiencia, carreras: oferta.carreras,
+    experiencia: oferta.experiencia, carreras: oferta.carreras, cargo: oferta.cargo,
   });
   return {
     caso, casoJson, competencias, archivoOferta: arch, nivelPosicion: oferta.nivel_posicion,

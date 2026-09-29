@@ -1,0 +1,87 @@
+{
+  "caso": "pedro_tricolor",
+  "ts": "2026-09-29T22-20-53",
+  "costo": 0.003466,
+  "texto_limpio": "En TRICOLOR nos encontramos en búsqueda del mejor talento para cubrir la posición de un(a): Practicante de Trade Marketing\n\n¿Cuál es el objetivo principal?\nAsegurar ejecución y visibilidad de las iniciativas de trade marketing de TRICOLOR.\n\n¿Cuáles son las funciones a realizar?\n- Apoyo en la administración de requerimientos (RQ), realizando seguimiento a su estado y coordinando con las áreas involucradas.\n- Distribución de material de Trademarketing hacia los puntos de venta y coordinación con el equipo de ventas.\n- Consolidación de fotos de ejecución en punto de venta, para el control y reporte semanal y mensual.\n\n¿Qué es lo que buscamos?\n- Estudiante de últimos semestres de carreras Ingeniera Comercial, Ingeniería Civil Industrial o carrera a fin.\n- Manejo intermedio de Excel y herramientas de office.\n- Adaptabilidad y orientación al servicio.\n- Disponibilidad para prácticas de 6 meses, en modalidad hibrida (3 días en la oficina).\n- Actitud de aprendizaje y disposición para tareas operativas",
+  "keywords_requeridas": [
+    {
+      "keyword": "Trade Marketing",
+      "relevancia": 10
+    },
+    {
+      "keyword": "administración de requerimientos",
+      "relevancia": 8
+    },
+    {
+      "keyword": "distribución de material",
+      "relevancia": 8
+    },
+    {
+      "keyword": "control y reporte",
+      "relevancia": 8
+    },
+    {
+      "keyword": "seguimiento de estado",
+      "relevancia": 7
+    },
+    {
+      "keyword": "coordinación con equipo de ventas",
+      "relevancia": 7
+    },
+    {
+      "keyword": "consolidación de fotos",
+      "relevancia": 7
+    },
+    {
+      "keyword": "Excel",
+      "relevancia": 7
+    },
+    {
+      "keyword": "adaptabilidad",
+      "relevancia": 7
+    },
+    {
+      "keyword": "orientación al servicio",
+      "relevancia": 7
+    },
+    {
+      "keyword": "actitud de aprendizaje",
+      "relevancia": 7
+    },
+    {
+      "keyword": "herramientas de office",
+      "relevancia": 6
+    },
+    {
+      "keyword": "tareas operativas",
+      "relevancia": 6
+    }
+  ],
+  "keywords_deseables": [],
+  "nivel_posicion": "practicante",
+  "cargo": "Practicante de Trade Marketing",
+  "experiencia": [],
+  "carreras": [
+    {
+      "carreras": [
+        "Ingeniería Comercial",
+        "Ingeniería Civil Industrial"
+      ],
+      "acepta_afin": true,
+      "tipo": "requerido"
+    }
+  ],
+  "descartadas": [],
+  "usage": {
+    "input_tokens": 1241,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 445,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

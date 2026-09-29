@@ -343,6 +343,8 @@ export function promptSemantico(brechas: { keyword: string }[], cvTexto: string)
   return `KEYWORDS SIN MATCH:\n${brechas.map(b => `- ${b.keyword}`).join("\n")}\n\nCV:\n${cvTexto}`;
 }
 
+export const MOTIVO_CITA = "la cita no existe literal en el CV";
+
 export interface Rechazo { keyword: string; cita: string; motivo: string; relevancia?: number }
 // Lo que propuso el modelo, tal cual: se guarda para re-aplicar los filtros sin volver a llamar a la API.
 export interface PropuestaSemantica { keyword: string; cita: string; nivel?: string; relevancia?: number | null }
@@ -367,7 +369,7 @@ export function filtrarSemanticos(
     const brecha = brechas.find(b => normalizarParaComparar(b.keyword) === normalizarParaComparar(keyword));
     if (!brecha) { rechazar("keyword que no era brecha"); continue; }
     if (aceptados.some(a => a.keyword_jd === brecha.keyword)) continue;
-    if (!cita || !cv.includes(cita)) { rechazar("la cita no existe literal en el CV"); continue; }
+    if (!cita || !cv.includes(cita)) { rechazar(MOTIVO_CITA); continue; }
     // Si keyword y cita comparten raíces y todas son genéricas, es un parecido de palabras, no un match.
     const rk = new Set(palabras(brecha.keyword).map(raiz));
     const comunes = [...new Set(palabras(cita).map(raiz))].filter(r => rk.has(r));
@@ -388,35 +390,62 @@ export function filtrarSemanticos(
 
 // Segunda capa: toma el resultado literal y mueve a matches las brechas que el modelo respalda con una cita válida.
 // Las carreras quedan fuera (van por requisitos estructurados o por la lógica literal de carreras).
+// Si alguna cita no existe literal, UN reintento solo para esas keywords pidiendo la cita copiada textual.
+// El filtro no se afloja: la cita del reintento también debe existir literal.
 export async function mapearSemantico(
   literal: ResultadoMapeo,
   keywordsJD: KeywordsJD,
   cvTexto: string,
   opts: { client?: Anthropic; relevanciaMin?: number } = {},
-): Promise<{ resultado: ResultadoMapeo; rechazos: Rechazo[]; propuestos: PropuestaSemantica[]; usage?: Anthropic.Usage }> {
+): Promise<{
+  resultado: ResultadoMapeo; rechazos: Rechazo[]; propuestos: PropuestaSemantica[];
+  reintento: { pedidas: string[]; recuperadas: string[] } | null; usage: { input_tokens: number; output_tokens: number };
+}> {
+  const usage = { input_tokens: 0, output_tokens: 0 };
   const brechas = literal.gap_keywords.filter(g => !esCarrera(g.keyword));
-  if (brechas.length === 0) return { resultado: literal, rechazos: [], propuestos: [] };
+  if (brechas.length === 0) return { resultado: literal, rechazos: [], propuestos: [], reintento: null, usage };
   const client = opts.client ?? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const res = await client.messages.create(
-    {
-      model: MODELO_MAPEO,
-      max_tokens: 1500,
-      temperature: 0,
-      system: SYSTEM_MAPEO_SEMANTICO,
-      messages: [{ role: "user", content: promptSemantico(brechas, cvTexto) }],
-    },
-    { timeout: 30_000, maxRetries: 1 },
-  );
-  const raw = res.content[0]?.type === "text" ? res.content[0].text : "";
-  let propuestos: PropuestaSemantica[] = [];
-  try {
-    const m = raw.match(/\{[\s\S]*\}/);
-    propuestos = m && Array.isArray(JSON.parse(m[0]).matches) ? JSON.parse(m[0]).matches : [];
-  } catch {
-    console.warn("[postulai] Mapeo semántico: respuesta sin JSON válido; se conserva el mapeo literal");
-    return { resultado: literal, rechazos: [], propuestos: [], usage: res.usage };
+
+  const pedir = async (contenido: string): Promise<PropuestaSemantica[] | null> => {
+    const res = await client.messages.create(
+      { model: MODELO_MAPEO, max_tokens: 1500, temperature: 0, system: SYSTEM_MAPEO_SEMANTICO, messages: [{ role: "user", content: contenido }] },
+      { timeout: 30_000, maxRetries: 1 },
+    );
+    usage.input_tokens += res.usage.input_tokens;
+    usage.output_tokens += res.usage.output_tokens;
+    const raw = res.content[0]?.type === "text" ? res.content[0].text : "";
+    try {
+      const m = raw.match(/\{[\s\S]*\}/);
+      const j = m ? JSON.parse(m[0]) : null;
+      return Array.isArray(j?.matches) ? j.matches : [];
+    } catch {
+      console.warn("[postulai] Mapeo semántico: respuesta sin JSON válido");
+      return null;
+    }
+  };
+
+  let propuestos = await pedir(promptSemantico(brechas, cvTexto));
+  if (!propuestos) return { resultado: literal, rechazos: [], propuestos: [], reintento: null, usage };
+  let aplicado = aplicarSemanticos(literal, keywordsJD, cvTexto, propuestos, opts.relevanciaMin);
+
+  const sinCita = aplicado.rechazos.filter(r => r.motivo === MOTIVO_CITA);
+  let reintento: { pedidas: string[]; recuperadas: string[] } | null = null;
+  if (sinCita.length > 0) {
+    const pedidas = sinCita.map(r => r.keyword);
+    const nuevas = await pedir(`${promptSemantico(brechas.filter(b => pedidas.includes(b.keyword)), cvTexto)}
+
+Tus citas anteriores para estas keywords no existen textualmente en el CV:
+${sinCita.map(r => `- ${r.keyword}: "${r.cita}"`).join("\n")}
+Copia la cita carácter por carácter desde el CV (un fragmento continuo, sin saltar palabras). Si no hay un fragmento continuo que la respalde, omite la keyword.`);
+    if (nuevas) {
+      // Las propuestas del reintento reemplazan a las de citas inexistentes; el resto queda igual.
+      propuestos = [...propuestos.filter(p => !pedidas.includes(p.keyword)), ...nuevas.filter(p => pedidas.includes(p.keyword))];
+      aplicado = aplicarSemanticos(literal, keywordsJD, cvTexto, propuestos, opts.relevanciaMin);
+    }
+    const aceptadas = new Set([...aplicado.resultado.matches_directos, ...aplicado.resultado.matches_relacionados].map(m => m.keyword_jd));
+    reintento = { pedidas, recuperadas: pedidas.filter(k => aceptadas.has(k)) };
   }
-  return { ...aplicarSemanticos(literal, keywordsJD, cvTexto, propuestos, opts.relevanciaMin), propuestos, usage: res.usage };
+  return { ...aplicado, propuestos, reintento, usage };
 }
 
 // Aplica los filtros a propuestas ya obtenidas (del modelo o guardadas) y mueve a matches las brechas aceptadas.
@@ -476,7 +505,11 @@ const RE_SOFTWARE = /\b(excel|office|word|powerpoint|power bi|python|sql|sheets|
 const RE_SECTOR = /\b(sector|industria|rubro|fintech|mineria|minera|retail|startup|tecnologia|tecnologico|ciberseguridad|banca|seguros|construccion|faena|experiencia en)\b/;
 
 // Nombre propio de herramienta: sigla en mayúsculas (SAP, SIGA, DAX, M&A) o camelCase (WebControl, BigQuery).
-const pareceHerramienta = (k: string) => k.split(/\s+/).some(t => /^[A-Z0-9&.]{2,}$/.test(t) || /[a-z][A-Z]/.test(t));
+// Las siglas de área (RRHH, RR.HH., RRLL, TI) no son herramientas.
+const SIGLAS_AREA = new Set(["RRHH", "RRLL", "TI", "HR", "DO"]);
+const pareceHerramienta = (k: string) => k.split(/\s+/)
+  .filter(t => !SIGLAS_AREA.has(t.replace(/[.,;:()]/g, "")))
+  .some(t => /^[A-Z0-9&.]{2,}$/.test(t) || /[a-z][A-Z]/.test(t));
 
 export function clasificarBrecha(keyword: string): ClaseBrecha {
   const n = normalizarParaComparar(keyword);
