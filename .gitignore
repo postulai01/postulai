@@ -45,3 +45,6 @@ evals/resultados/*.json
 evals/criticas/
 evals/reparaciones/
 test-results/
+
+# configuración local de Claude Code
+.claude/settings.local.json
