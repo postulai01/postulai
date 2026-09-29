@@ -14,7 +14,7 @@ import { fusionarCompetencias } from "../app/lib/competencia-extractor";
 import { consolidarJD } from "../app/lib/jd-parser";
 import { mapearCompetencias, type KeywordsJD, type ResultadoMapeo } from "../app/lib/mapeo-semantico";
 import {
-  MAX_PALABRAS_NUEVAS, planificarLinea, reescribirLinea, SYSTEM_REESCRITOR, verificarAdaptacion, type ResultadoLinea,
+  MAX_PALABRAS_NUEVAS, planificarLineaDetalle, reescribirLinea, SYSTEM_REESCRITOR, verificarAdaptacion, type ResultadoLinea,
 } from "../app/lib/reescritor-contextual";
 
 // Haiku 4.5: $1 / $5 por MTok
@@ -77,16 +77,19 @@ async function main() {
 
   const resultados: { caso: string; r: ResultadoLinea; mentira: string[] }[] = [];
   let llamadas = 0, costo = 0;
+  const porCaso: { caso: string; llamadas: number; costo: number }[] = [];
 
   for (const caso of casos) {
     const ctx = await contexto(caso);
     if (typeof ctx === "string") { console.log(`\n⚠️  ${caso}: ${ctx} — se omite\n`); continue; }
+    const llamadasAntes = llamadas, costoAntes = costo;
     console.log(`\n═══ ${caso} · ${ctx.mapeo.matches_directos.length} directos, ${ctx.mapeo.matches_relacionados.length} relacionados, ${ctx.mapeo.gap_keywords.length} brechas ═══`);
 
     for (const [i, linea] of lineasDelCaso(ctx.cv).entries()) {
       const input = { lineaOriginal: linea, cvCompleto: ctx.cv, mapeo: ctx.mapeo, keywordsJD: ctx.keywordsJD };
-      const permitidas = planificarLinea(input);
+      const { permitidas, descartadas } = planificarLineaDetalle(input);
       console.log(`\n[${i + 1}] ${corta(linea)}`);
+      if (!ejecutar) for (const d of descartadas) console.log(`      ✗ "${d.keyword}": ${d.motivo}`);
 
       if (!ejecutar) {
         if (permitidas.length === 0) { console.log("    → sin_cambios (no llama a la API)"); continue; }
@@ -94,13 +97,17 @@ async function main() {
         const tokIn = (SYSTEM_REESCRITOR.length + linea.length + permitidas.reduce((s, p) => s + p.keyword.length + p.fuente.length + 40, 0)) / CHARS_POR_TOKEN;
         costo += (tokIn * PRECIO_IN + TOKENS_OUT * PRECIO_OUT) / 1e6;
         console.log("    → llamaría a la API con:");
-        for (const p of permitidas) console.log(`      · "${p.keyword}" (← ${p.competencia_cv}) · fuente: "${corta(p.fuente, 80)}"`);
+        for (const p of permitidas) {
+          const pal = p.tipo_match === "relacionado" ? ` [solo: ${p.palabras.join(", ")}]` : "";
+          console.log(`      · "${p.keyword}" (${p.tipo_match} ← ${p.competencia_cv})${pal} · fuente: "${corta(p.fuente, 80)}"`);
+        }
         continue;
       }
 
       const r = await reescribirLinea(input);
       // Conteo de mentiras independiente del estado: re-verifica la salida final sin el límite de fuerzo.
-      const v = verificarAdaptacion(r.original, r.adaptada, r.keywords_agregadas, ctx.cv, ctx.mapeo, Infinity);
+      const palabras = permitidas.filter(p => r.keywords_agregadas.includes(p.keyword)).flatMap(p => p.palabras);
+      const v = verificarAdaptacion(r.original, r.adaptada, palabras, ctx.cv, ctx.mapeo, Infinity);
       resultados.push({ caso, r, mentira: v.problemas });
       if (r.usage) { llamadas++; costo += (r.usage.input_tokens * PRECIO_IN + r.usage.output_tokens * PRECIO_OUT) / 1e6; }
       console.log(`    estado: ${r.estado}${r.reintentos ? " (1 reintento)" : ""}${r.motivo ? ` · ${r.motivo}` : ""}`);
@@ -111,7 +118,11 @@ async function main() {
       }
       if (v.problemas.length > 0) console.log(`    ❌ MENTIRA: ${v.problemas.join("; ")}`);
     }
+    porCaso.push({ caso, llamadas: llamadas - llamadasAntes, costo: costo - costoAntes });
   }
+
+  console.log(`\n${ejecutar ? "Costo real" : "Costo estimado (sin reintentos)"} por CV:`);
+  for (const c of porCaso) console.log(`  ${c.caso.padEnd(26)} ${String(c.llamadas).padStart(2)} líneas a la API · $${c.costo.toFixed(4)}`);
 
   if (!ejecutar) {
     console.log(`\nDry-run: ${llamadas} líneas llamarían a la API (+ reintentos si superan ${MAX_PALABRAS_NUEVAS} palabras nuevas).`);

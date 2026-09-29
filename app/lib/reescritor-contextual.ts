@@ -47,7 +47,21 @@ export interface OpcionesReescritor {
   maxPalabrasNuevas?: number;
 }
 
-export interface KeywordPermitida { keyword: string; competencia_cv: string; fuente: string }
+export interface KeywordPermitida {
+  keyword: string;
+  competencia_cv: string;
+  fuente: string;
+  tipo_match: "directo" | "relacionado";
+  palabras: string[]; // palabras de la keyword que se pueden insertar (en relacionados, solo las respaldadas en el CV)
+}
+
+export interface KeywordDescartada { keyword: string; motivo: string }
+
+// Raíces que no bastan para que una keyword toque una línea: aparecen en cualquier función.
+export const RAICES_GENERICAS = new Set([
+  "gesti", "opera", "desar", "proce", "admin", "manej", "traba", "equip", "servi", "clien", "contr",
+  "imple", "apoya", "apoyo", "estra", "anali", "defin", "plani", "respo", "funci", "activ", "organ",
+]);
 
 // ─── palabras ────────────────────────────────────────────────────────────────
 
@@ -69,6 +83,11 @@ function indice(texto: string) {
   return { set: new Set(ps), raices: new Set(ps.filter(p => p.length >= 6).map(raiz)) };
 }
 
+// Presencia estricta: la palabra o su plural, sin tolerar flexión por raíz ("operations" no respalda en "operaciones").
+function presenteEstricto(p: string, conjunto: Set<string>): boolean {
+  return conjunto.has(p) || conjunto.has(p.replace(/s$/, "")) || conjunto.has(p + "s");
+}
+
 const lineasCV = (cv: string) => cv.split("\n").map(l => l.replace(/^\s*[-•]\s+/, "").trim()).filter(Boolean);
 
 // Primera línea del CV (distinta de la actual si se puede) que contiene todas las palabras del término.
@@ -84,31 +103,50 @@ function fuenteDe(termino: string, cv: string, lineaActual: string): string | nu
 
 // ─── plan (sin API) ──────────────────────────────────────────────────────────
 
-// Keywords del mapeo que tocan esta línea y que todavía no están escritas en ella, con su fuente en el CV.
-export function planificarLinea(input: InputLinea): KeywordPermitida[] {
+// Keywords del mapeo que tocan esta línea y que todavía no están escritas en ella, con su fuente en el CV,
+// y las descartadas con su motivo (para el dry-run).
+export function planificarLineaDetalle(input: InputLinea): { permitidas: KeywordPermitida[]; descartadas: KeywordDescartada[] } {
   const { lineaOriginal, cvCompleto, mapeo } = input;
+  const permitidas: KeywordPermitida[] = [];
+  const descartadas: KeywordDescartada[] = [];
   const pl = palabrasContenido(lineaOriginal);
-  if (pl.length < MIN_PALABRAS_LINEA) return [];
+  if (pl.length < MIN_PALABRAS_LINEA) return { permitidas, descartadas };
   const ixLinea = indice(lineaOriginal);
   const raicesLinea = new Set(pl.map(raiz));
+  const cvSet = indice(cvCompleto).set;
 
-  const permitidas: KeywordPermitida[] = [];
-  for (const m of [...mapeo.matches_directos, ...mapeo.matches_relacionados]) {
-    if (esCarrera(m.keyword_jd)) continue; // la carrera va en Educación, no se inyecta en bullets
+  const matches = [
+    ...mapeo.matches_directos.map(m => ({ ...m, tipo_match: "directo" as const })),
+    ...mapeo.matches_relacionados.map(m => ({ ...m, tipo_match: "relacionado" as const })),
+  ];
+  for (const m of matches) {
+    if (permitidas.some(p => p.keyword === m.keyword_jd)) continue;
     const kw = palabrasContenido(m.keyword_jd);
     if (kw.length === 0) continue;
-    if (kw.every(p => presente(p, ixLinea.set, ixLinea.raices))) continue; // ya está escrita
-    // Toca la línea si comparte una raíz con la keyword o con la competencia del CV que la respalda.
     const comp = m.competencia_cv === "(texto del CV)" ? [] : palabrasContenido(m.competencia_cv);
-    if (![...kw, ...comp].some(p => raicesLinea.has(raiz(p)))) continue;
-    const fuente = fuenteDe(m.keyword_jd, cvCompleto, lineaOriginal)
-      ?? (comp.length > 0 ? fuenteDe(m.competencia_cv, cvCompleto, lineaOriginal) : null);
-    if (!fuente) continue; // sin fragmento que la respalde no se usa
-    if (!permitidas.some(p => p.keyword === m.keyword_jd)) {
-      permitidas.push({ keyword: m.keyword_jd, competencia_cv: m.competencia_cv, fuente });
+    const compartidas = [...kw, ...comp].map(raiz).filter(r => raicesLinea.has(r));
+    if (compartidas.length === 0) continue; // no toca la línea: no se reporta
+    const descartar = (motivo: string) => descartadas.push({ keyword: m.keyword_jd, motivo });
+
+    if (esCarrera(m.keyword_jd)) { descartar("carrera: va en Educación"); continue; }
+    if (kw.every(p => presente(p, ixLinea.set, ixLinea.raices))) { descartar("ya está escrita"); continue; }
+    if (compartidas.every(r => RAICES_GENERICAS.has(r))) {
+      descartar(`solo comparte raíz genérica (${[...new Set(compartidas)].join(", ")})`);
+      continue;
     }
+    // En relacionados, solo las palabras de la keyword con respaldo literal en el CV se pueden insertar.
+    const palabras = m.tipo_match === "directo" ? kw : kw.filter(p => presenteEstricto(p, cvSet));
+    if (palabras.length === 0) { descartar("relacionado sin ninguna palabra respaldada en el CV"); continue; }
+    const fuente = fuenteDe(palabras.join(" "), cvCompleto, lineaOriginal)
+      ?? (comp.length > 0 ? fuenteDe(m.competencia_cv, cvCompleto, lineaOriginal) : null);
+    if (!fuente) { descartar("sin fragmento del CV que la respalde"); continue; }
+    permitidas.push({ keyword: m.keyword_jd, competencia_cv: m.competencia_cv, fuente, tipo_match: m.tipo_match, palabras });
   }
-  return permitidas;
+  return { permitidas, descartadas };
+}
+
+export function planificarLinea(input: InputLinea): KeywordPermitida[] {
+  return planificarLineaDetalle(input).permitidas;
 }
 
 // ─── verificación local (sin API) ────────────────────────────────────────────
@@ -122,7 +160,7 @@ export interface Verificacion {
 export function verificarAdaptacion(
   original: string,
   adaptada: string,
-  keywordsAgregadas: string[],
+  palabrasPermitidas: string[], // palabras de las keywords agregadas que se pueden insertar (KeywordPermitida.palabras)
   cvCompleto: string,
   mapeo: ResultadoMapeo,
   maxPalabrasNuevas = MAX_PALABRAS_NUEVAS,
@@ -130,12 +168,18 @@ export function verificarAdaptacion(
   const problemas: string[] = [];
   const ixOrig = indice(original);
   const ixCV = indice(cvCompleto);
-  const ixKw = indice(keywordsAgregadas.join(" "));
+  const ixKw = indice(palabrasPermitidas.join(" "));
   const nuevas = palabrasContenido(adaptada).filter(p => !presente(p, ixOrig.set, ixOrig.raices));
   const nuevasUnicas = [...new Set(nuevas)];
 
   const sinRespaldo = nuevasUnicas.filter(p => !presente(p, ixCV.set, ixCV.raices) && !presente(p, ixKw.set, ixKw.raices));
   if (sinRespaldo.length > 0) problemas.push(`palabras sin respaldo en el CV: ${sinRespaldo.join(", ")}`);
+
+  // Palabras de keywords relacionadas sin respaldo literal en el CV ("people" de "people operations").
+  const cvSet = ixCV.set;
+  const kwSinRespaldo = [...new Set(mapeo.matches_relacionados.flatMap(m => palabrasContenido(m.keyword_jd)))]
+    .filter(p => !presenteEstricto(p, cvSet) && !presenteEstricto(p, ixKw.set) && nuevasUnicas.includes(p));
+  if (kwSinRespaldo.length > 0) problemas.push(`palabras de keyword relacionada sin respaldo: ${kwSinRespaldo.join(", ")}`);
 
   const cifras = nuevasUnicas.filter(p => /\d/.test(p));
   if (cifras.length > 0) problemas.push(`cifras nuevas: ${cifras.join(", ")}`);
@@ -173,7 +217,10 @@ Reglas:
 Responde SOLO con JSON: {"adaptada": "...", "keywords_agregadas": ["..."]}`;
 
 function promptLinea(linea: string, permitidas: KeywordPermitida[], motivo?: string): string {
-  const kws = permitidas.map(p => `- "${p.keyword}" — respaldo en el CV: "${p.fuente}"`).join("\n");
+  const kws = permitidas.map(p => p.tipo_match === "directo"
+    ? `- "${p.keyword}" — respaldo en el CV: "${p.fuente}"`
+    : `- "${p.keyword}" (relacionada: solo puedes usar las palabras ${p.palabras.map(w => `"${w}"`).join(", ")}) — respaldo en el CV: "${p.fuente}"`,
+  ).join("\n");
   const reintento = motivo ? `\n\nTu intento anterior fue rechazado (${motivo}). Cambia menos y usa solo lo respaldado.` : "";
   return `LÍNEA:\n${linea}\n\nKEYWORDS PERMITIDAS:\n${kws}${reintento}`;
 }
@@ -237,7 +284,7 @@ export async function reescribirLinea(input: InputLinea, opts: OpcionesReescrito
 
     const fuera = r.keywords_agregadas.filter(k => !permitidas.some(p => normalizarParaComparar(p.keyword) === normalizarParaComparar(k)));
     const kws = permitidas.filter(p => r.keywords_agregadas.some(k => normalizarParaComparar(k) === normalizarParaComparar(p.keyword)));
-    const v = verificarAdaptacion(cuerpo, r.adaptada, kws.map(k => k.keyword), cvCompleto, mapeo, max);
+    const v = verificarAdaptacion(cuerpo, r.adaptada, kws.flatMap(k => k.palabras), cvCompleto, mapeo, max);
     const problemas = [...v.problemas, ...(fuera.length > 0 ? [`keywords no permitidas: ${fuera.join(", ")}`] : [])];
 
     if (problemas.length === 0) {
