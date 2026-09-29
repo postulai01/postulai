@@ -14,7 +14,7 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { normalizarParaComparar, STOP_WORDS_MATCH } from "./cv-postprocess";
-import { raizVerbo, VERBOS_ESCALADA } from "./cv-verificacion";
+import { esEncabezado, esLineaCargo, raizVerbo, VERBOS_ESCALADA } from "./cv-verificacion";
 import { esCarrera, type KeywordsJD, type ResultadoMapeo } from "./mapeo-semantico";
 
 export const MODELO_REESCRITOR = "claude-haiku-4-5-20251001";
@@ -104,6 +104,30 @@ function fuenteDe(termino: string, cv: string, lineaActual: string, estricto = f
   return candidatas.find(l => l !== lineaActual.replace(/^\s*[-•]\s+/, "").trim()) ?? candidatas[0] ?? null;
 }
 
+// ─── bloques del CV ──────────────────────────────────────────────────────────
+
+export interface BloqueCV {
+  tipo: "resumen" | "puesto" | "otro";
+  titulo: string;   // línea de empresa/cargo en los puestos
+  lineas: string[]; // sin viñeta; en un puesto incluye su título y el cargo bajo él
+}
+
+// Resumen: todo lo anterior al primer puesto (perfil, Áreas de Expertise, stack). Un bloque por puesto: la línea
+// "Empresa — fechas" más las líneas siguientes (cargo y viñetas) hasta el próximo puesto o encabezado de sección.
+// Lo que viene después de un encabezado que corta la experiencia (educación, habilidades) va en "otro".
+export function bloquesCV(cv: string): BloqueCV[] {
+  const bloques: BloqueCV[] = [{ tipo: "resumen", titulo: "", lineas: [] }];
+  for (const cruda of cv.split("\n")) {
+    const l = cruda.replace(/^\s*[-•]\s+/, "").trim();
+    if (!l) continue;
+    const actual = bloques[bloques.length - 1];
+    if (esLineaCargo(cruda)) bloques.push({ tipo: "puesto", titulo: l, lineas: [l] });
+    else if (esEncabezado(cruda) && actual.tipo === "puesto") bloques.push({ tipo: "otro", titulo: l, lineas: [] });
+    else if (!esEncabezado(cruda)) actual.lineas.push(l);
+  }
+  return bloques;
+}
+
 // ─── plan (sin API) ──────────────────────────────────────────────────────────
 
 // Keywords del mapeo que tocan esta línea y que todavía no están escritas en ella, con su fuente en el CV,
@@ -117,6 +141,11 @@ export function planificarLineaDetalle(input: InputLinea): { permitidas: Keyword
   const ixLinea = indice(lineaOriginal);
   const raicesLinea = new Set(pl.map(raiz));
   const cvSet = indice(cvCompleto).set;
+  // Viñeta de un puesto: cada palabra insertada debe estar respaldada en el mismo puesto.
+  const textoLinea = lineaOriginal.replace(/^\s*[-•]\s+/, "").trim();
+  const bloque = bloquesCV(cvCompleto).find(b => b.lineas.includes(textoLinea));
+  const respaldo = bloque?.tipo === "puesto" ? bloque.lineas.join("\n") : cvCompleto;
+  const ixBloque = indice(respaldo);
 
   const matches = [
     ...mapeo.matches_directos.map(m => ({ ...m, tipo_match: "directo" as const })),
@@ -142,10 +171,15 @@ export function planificarLineaDetalle(input: InputLinea): { permitidas: Keyword
     if (palabras.length === 0) { descartar("relacionado sin ninguna palabra respaldada en el CV"); continue; }
     // Si ninguna línea respalda las palabras juntas, se muestra la línea que respalda cada una.
     const estricto = m.tipo_match === "relacionado";
-    const porPalabra = palabras.map(w => fuenteDe(w, cvCompleto, lineaOriginal, estricto));
-    const fuente = fuenteDe(palabras.join(" "), cvCompleto, lineaOriginal, estricto)
+    const insertadas = palabras.filter(w => !presenteEstricto(w, ixLinea.set));
+    if (bloque?.tipo === "puesto" && !insertadas.every(w => (estricto ? presenteEstricto(w, ixBloque.set) : presente(w, ixBloque.set, ixBloque.raices)))) {
+      descartar("respaldo en otro puesto");
+      continue;
+    }
+    const porPalabra = palabras.map(w => fuenteDe(w, respaldo, lineaOriginal, estricto));
+    const fuente = fuenteDe(palabras.join(" "), respaldo, lineaOriginal, estricto)
       ?? (porPalabra.every(Boolean) ? [...new Set(porPalabra)].join(" | ") : null)
-      ?? (comp.length > 0 ? fuenteDe(m.competencia_cv, cvCompleto, lineaOriginal) : null);
+      ?? (comp.length > 0 ? fuenteDe(m.competencia_cv, respaldo, lineaOriginal) : null);
     if (!fuente) { descartar("sin fragmento del CV que la respalde"); continue; }
     permitidas.push({ keyword: m.keyword_jd, competencia_cv: m.competencia_cv, fuente, tipo_match: m.tipo_match, palabras });
   }
@@ -190,7 +224,8 @@ export function verificarAdaptacion(
 
   // Términos del original que desaparecen (reordenar está bien: se compara por conjunto de palabras).
   const ixAdaptada = indice(adaptada);
-  const borradas = [...new Set(palabrasContenido(original))].filter(p => !presente(p, ixAdaptada.set, ixAdaptada.raices));
+  // Presencia estricta: "estrategia" no queda cubierta por "estratégicos".
+  const borradas = [...new Set(palabrasContenido(original))].filter(p => !presenteEstricto(p, ixAdaptada.set));
   if (borradas.length > 0) problemas.push(`borra términos del original: ${borradas.join(", ")}`);
 
   const cifras = nuevasUnicas.filter(p => /\d/.test(p));
