@@ -14,7 +14,7 @@ import { fusionarCompetencias } from "../app/lib/competencia-extractor";
 import { consolidarJD } from "../app/lib/jd-parser";
 import { mapearCompetencias, type KeywordsJD, type ResultadoMapeo } from "../app/lib/mapeo-semantico";
 import {
-  MAX_PALABRAS_NUEVAS, planificarLineaDetalle, reescribirLinea, SYSTEM_REESCRITOR, verificarAdaptacion, type ResultadoLinea,
+  MAX_PALABRAS_NUEVAS, MAX_USOS_KEYWORD, planificarLineaDetalle, reescribirCV, SYSTEM_REESCRITOR, verificarAdaptacion, type ResultadoLinea,
 } from "../app/lib/reescritor-contextual";
 
 // Haiku 4.5: $1 / $5 por MTok
@@ -85,7 +85,10 @@ async function main() {
     const llamadasAntes = llamadas, costoAntes = costo;
     console.log(`\n═══ ${caso} · ${ctx.mapeo.matches_directos.length} directos, ${ctx.mapeo.matches_relacionados.length} relacionados, ${ctx.mapeo.gap_keywords.length} brechas ═══`);
 
-    for (const [i, linea] of lineasDelCaso(ctx.cv).entries()) {
+    const lineas = lineasDelCaso(ctx.cv);
+    // Con --ejecutar se usa reescribirCV, que aplica el límite de MAX_USOS_KEYWORD por keyword.
+    const reescritas = ejecutar ? await reescribirCV(lineas, { cvCompleto: ctx.cv, mapeo: ctx.mapeo, keywordsJD: ctx.keywordsJD }) : [];
+    for (const [i, linea] of lineas.entries()) {
       const input = { lineaOriginal: linea, cvCompleto: ctx.cv, mapeo: ctx.mapeo, keywordsJD: ctx.keywordsJD };
       const { permitidas, descartadas } = planificarLineaDetalle(input);
       console.log(`\n[${i + 1}] ${corta(linea)}`);
@@ -104,12 +107,13 @@ async function main() {
         continue;
       }
 
-      const r = await reescribirLinea(input);
+      const r = reescritas[i];
       // Conteo de mentiras independiente del estado: re-verifica la salida final sin el límite de fuerzo.
       const palabras = permitidas.filter(p => r.keywords_agregadas.includes(p.keyword)).flatMap(p => p.palabras);
       const v = verificarAdaptacion(r.original, r.adaptada, palabras, ctx.cv, ctx.mapeo, Infinity);
       resultados.push({ caso, r, mentira: v.problemas });
       if (r.usage) { llamadas++; costo += (r.usage.input_tokens * PRECIO_IN + r.usage.output_tokens * PRECIO_OUT) / 1e6; }
+      if (r.estado === "adaptada" || r.estado === "rechazada_forzada") console.log(`    original: ${linea}`);
       console.log(`    estado: ${r.estado}${r.reintentos ? " (1 reintento)" : ""}${r.motivo ? ` · ${r.motivo}` : ""}`);
       if (r.estado === "adaptada") {
         console.log(`    adaptada: ${r.adaptada}`);
@@ -134,6 +138,10 @@ async function main() {
   const mentiras = resultados.filter(x => x.mentira.length > 0).length;
   console.log(`\nResumen (${resultados.length} iteraciones): adaptadas ${cuenta("adaptada")} · sin_cambios ${cuenta("sin_cambios")} · rechazadas ${cuenta("rechazada_forzada")} · reintentos ${resultados.filter(x => x.r.reintentos).length}`);
   console.log(`Líneas enviadas a la API: ${llamadas} · costo real: $${costo.toFixed(4)}`);
+  const usos = new Map<string, number>();
+  for (const x of resultados) for (const k of x.r.keywords_agregadas) usos.set(`${x.caso}: ${k}`, (usos.get(`${x.caso}: ${k}`) ?? 0) + 1);
+  const excedidas = [...usos].filter(([, n]) => n > MAX_USOS_KEYWORD);
+  console.log(`Usos por keyword: ${[...usos].map(([k, n]) => `${k} ×${n}`).join(" · ") || "—"}${excedidas.length ? ` ❌ exceden ${MAX_USOS_KEYWORD}` : ""}`);
   console.log(`Mentiras: ${mentiras} ${mentiras === 0 ? "✅" : "❌"}\n`);
 
   const dir = path.join(process.cwd(), "evals/resultados");

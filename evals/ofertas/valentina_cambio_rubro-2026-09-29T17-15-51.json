@@ -1,0 +1,105 @@
+{
+  "caso": "valentina_cambio_rubro",
+  "ts": "2026-09-29T17-15-51",
+  "costo": 0.003988,
+  "texto_limpio": "CARGO: People Operations Specialist\nEMPRESA: Pagos Ágiles SpA — startup de pagos digitales B2B, Serie A, 80 colaboradores en crecimiento acelerado.\n\nDESCRIPCIÓN:\nBuscamos nuestra primera People Operations Specialist para construir los procesos de gestión de personas desde cero. Este rol es clave para escalar la cultura y los procesos de talento de Pagos Ágiles de 80 a 200 personas en los próximos 18 meses. Reporta directamente al CEO.\n\nRESPONSABILIDADES:\n- Diseñar e implementar los procesos de people operations: onboarding, offboarding, evaluación de desempeño y encuestas de clima organizacional.\n- Gestionar el proceso de reclutamiento y selección para perfiles técnicos y comerciales en crecimiento acelerado.\n- Administrar la plataforma de RRHH (BUK) y los indicadores de dotación, retención y ausentismo.\n- Diseñar el programa de desarrollo de liderazgo y planes de carrera para el equipo.\n- Construir y mantener la cultura de la empresa durante el proceso de escalamiento.\n- Generar reportes de people analytics para el equipo directivo.\n\nREQUISITOS:\n- Experiencia demostrada en gestión de personas o people operations, especialmente con dotaciones en crecimiento.\n- Capacidad para estructurar y escalar procesos de RRHH desde cero.\n- Experiencia en reclutamiento, onboarding y desarrollo de equipos.\n- Manejo de plataformas de RRHH (BUK u otras) e indicadores de people analytics.\n- Orientación a datos: cómoda trabajando con métricas de retención, rotación y clima.\n- Se valora experiencia previa gestionando dotaciones de más de 100 personas.\n- Deseable: experiencia en entornos de startup o tecnología.",
+  "keywords_requeridas": [
+    {
+      "keyword": "gestión de personas",
+      "relevancia": 10
+    },
+    {
+      "keyword": "people operations",
+      "relevancia": 10
+    },
+    {
+      "keyword": "procesos de RRHH",
+      "relevancia": 9
+    },
+    {
+      "keyword": "reclutamiento",
+      "relevancia": 9
+    },
+    {
+      "keyword": "onboarding",
+      "relevancia": 9
+    },
+    {
+      "keyword": "desarrollo de equipos",
+      "relevancia": 8
+    },
+    {
+      "keyword": "BUK",
+      "relevancia": 8
+    },
+    {
+      "keyword": "people analytics",
+      "relevancia": 8
+    },
+    {
+      "keyword": "escalamiento de procesos",
+      "relevancia": 8
+    },
+    {
+      "keyword": "métricas de retención",
+      "relevancia": 7
+    },
+    {
+      "keyword": "métricas de rotación",
+      "relevancia": 7
+    },
+    {
+      "keyword": "evaluación de desempeño",
+      "relevancia": 7
+    },
+    {
+      "keyword": "encuestas de clima organizacional",
+      "relevancia": 7
+    },
+    {
+      "keyword": "offboarding",
+      "relevancia": 7
+    },
+    {
+      "keyword": "indicadores de dotación",
+      "relevancia": 7
+    }
+  ],
+  "keywords_deseables": [
+    {
+      "keyword": "gestión de dotaciones de más de 100 personas",
+      "relevancia": 7
+    },
+    {
+      "keyword": "experiencia en startup",
+      "relevancia": 6
+    },
+    {
+      "keyword": "experiencia en tecnología",
+      "relevancia": 6
+    },
+    {
+      "keyword": "planes de carrera",
+      "relevancia": 6
+    },
+    {
+      "keyword": "programa de desarrollo de liderazgo",
+      "relevancia": 6
+    }
+  ],
+  "nivel_posicion": "semi-senior",
+  "industria": "fintech, pagos digitales",
+  "descartadas": [],
+  "usage": {
+    "input_tokens": 1093,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 579,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

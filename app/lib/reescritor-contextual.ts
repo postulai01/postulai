@@ -19,6 +19,7 @@ import { esCarrera, type KeywordsJD, type ResultadoMapeo } from "./mapeo-semanti
 
 export const MODELO_REESCRITOR = "claude-haiku-4-5-20251001";
 export const MAX_PALABRAS_NUEVAS = 4;
+export const MAX_USOS_KEYWORD = 2; // en reescribirCV, cada keyword se agrega en a lo más 2 líneas
 const MIN_PALABRAS_LINEA = 4; // encabezados, nombre y contacto no se reescriben
 
 export type EstadoLinea = "adaptada" | "sin_cambios" | "rechazada_forzada";
@@ -45,6 +46,7 @@ export interface InputLinea {
 export interface OpcionesReescritor {
   client?: Anthropic;
   maxPalabrasNuevas?: number;
+  keywordsAgotadas?: Set<string>; // keywords que ya alcanzaron MAX_USOS_KEYWORD en el CV
 }
 
 export interface KeywordPermitida {
@@ -91,12 +93,13 @@ function presenteEstricto(p: string, conjunto: Set<string>): boolean {
 const lineasCV = (cv: string) => cv.split("\n").map(l => l.replace(/^\s*[-•]\s+/, "").trim()).filter(Boolean);
 
 // Primera línea del CV (distinta de la actual si se puede) que contiene todas las palabras del término.
-function fuenteDe(termino: string, cv: string, lineaActual: string): string | null {
+// Con estricto, sin tolerar flexión por raíz ("sindicales" no respalda "sindicatos").
+function fuenteDe(termino: string, cv: string, lineaActual: string, estricto = false): string | null {
   const t = palabrasContenido(termino);
   if (t.length === 0) return null;
   const candidatas = lineasCV(cv).filter(l => {
     const ix = indice(l);
-    return t.every(p => presente(p, ix.set, ix.raices));
+    return t.every(p => (estricto ? presenteEstricto(p, ix.set) : presente(p, ix.set, ix.raices)));
   });
   return candidatas.find(l => l !== lineaActual.replace(/^\s*[-•]\s+/, "").trim()) ?? candidatas[0] ?? null;
 }
@@ -137,7 +140,11 @@ export function planificarLineaDetalle(input: InputLinea): { permitidas: Keyword
     // En relacionados, solo las palabras de la keyword con respaldo literal en el CV se pueden insertar.
     const palabras = m.tipo_match === "directo" ? kw : kw.filter(p => presenteEstricto(p, cvSet));
     if (palabras.length === 0) { descartar("relacionado sin ninguna palabra respaldada en el CV"); continue; }
-    const fuente = fuenteDe(palabras.join(" "), cvCompleto, lineaOriginal)
+    // Si ninguna línea respalda las palabras juntas, se muestra la línea que respalda cada una.
+    const estricto = m.tipo_match === "relacionado";
+    const porPalabra = palabras.map(w => fuenteDe(w, cvCompleto, lineaOriginal, estricto));
+    const fuente = fuenteDe(palabras.join(" "), cvCompleto, lineaOriginal, estricto)
+      ?? (porPalabra.every(Boolean) ? [...new Set(porPalabra)].join(" | ") : null)
       ?? (comp.length > 0 ? fuenteDe(m.competencia_cv, cvCompleto, lineaOriginal) : null);
     if (!fuente) { descartar("sin fragmento del CV que la respalde"); continue; }
     permitidas.push({ keyword: m.keyword_jd, competencia_cv: m.competencia_cv, fuente, tipo_match: m.tipo_match, palabras });
@@ -181,6 +188,11 @@ export function verificarAdaptacion(
     .filter(p => !presenteEstricto(p, cvSet) && !presenteEstricto(p, ixKw.set) && nuevasUnicas.includes(p));
   if (kwSinRespaldo.length > 0) problemas.push(`palabras de keyword relacionada sin respaldo: ${kwSinRespaldo.join(", ")}`);
 
+  // Términos del original que desaparecen (reordenar está bien: se compara por conjunto de palabras).
+  const ixAdaptada = indice(adaptada);
+  const borradas = [...new Set(palabrasContenido(original))].filter(p => !presente(p, ixAdaptada.set, ixAdaptada.raices));
+  if (borradas.length > 0) problemas.push(`borra términos del original: ${borradas.join(", ")}`);
+
   const cifras = nuevasUnicas.filter(p => /\d/.test(p));
   if (cifras.length > 0) problemas.push(`cifras nuevas: ${cifras.join(", ")}`);
 
@@ -212,6 +224,7 @@ Reglas:
 - Puedes incorporar SOLO keywords de la lista permitida, y solo si el fragmento del CV que la respalda lo justifica para esta línea.
 - Prohibido agregar habilidades, herramientas, cifras, logros o responsabilidades que no estén en el CV.
 - Prohibido cambiar el verbo por uno de mayor responsabilidad (coordiné, lideré, dirigí, gestioné, supervisé, administré).
+- No borres ninguna palabra de la línea original: solo agrega o reordena.
 - Cambia lo mínimo: a lo más 4 palabras nuevas. Mantén el tiempo verbal y el largo aproximado.
 - Si no hay una mejora honesta, devuelve la línea igual y keywords_agregadas vacío.
 Responde SOLO con JSON: {"adaptada": "...", "keywords_agregadas": ["..."]}`;
@@ -268,7 +281,7 @@ export async function reescribirLinea(input: InputLinea, opts: OpcionesReescrito
     palabras_nuevas: 0, reintentos, estado, ...(motivo ? { motivo } : {}),
   });
 
-  const permitidas = planificarLinea(input);
+  const permitidas = planificarLinea(input).filter(p => !opts.keywordsAgotadas?.has(p.keyword));
   if (permitidas.length === 0) return sinCambios("sin_cambios", 0);
 
   // Viñeta y sangría se conservan fuera del modelo.
@@ -282,8 +295,14 @@ export async function reescribirLinea(input: InputLinea, opts: OpcionesReescrito
     const r = await pedirAdaptacion(client, cuerpo, permitidas, motivo, usage);
     if (!r) { motivo = "respuesta sin JSON válido"; continue; }
 
-    const fuera = r.keywords_agregadas.filter(k => !permitidas.some(p => normalizarParaComparar(p.keyword) === normalizarParaComparar(k)));
-    const kws = permitidas.filter(p => r.keywords_agregadas.some(k => normalizarParaComparar(k) === normalizarParaComparar(p.keyword)));
+    // El modelo puede reportar solo la parte permitida ("sindicatos" de "sindicatos industriales"):
+    // una keyword reportada corresponde a la permitida si todas sus palabras están en la keyword.
+    const corresponde = (k: string, p: KeywordPermitida) => {
+      const pk = palabrasContenido(k);
+      return pk.length > 0 && pk.every(w => palabrasContenido(p.keyword).includes(w));
+    };
+    const fuera = r.keywords_agregadas.filter(k => !permitidas.some(p => corresponde(k, p)));
+    const kws = permitidas.filter(p => r.keywords_agregadas.some(k => corresponde(k, p)));
     const v = verificarAdaptacion(cuerpo, r.adaptada, kws.flatMap(k => k.palabras), cvCompleto, mapeo, max);
     const problemas = [...v.problemas, ...(fuera.length > 0 ? [`keywords no permitidas: ${fuera.join(", ")}`] : [])];
 
@@ -305,11 +324,22 @@ export async function reescribirLinea(input: InputLinea, opts: OpcionesReescrito
   return { ...sinCambios("rechazada_forzada", 1, motivo), usage };
 }
 
+// Las viñetas (experiencia) van primero para que usen las keywords antes que el perfil; cada keyword se agrega
+// en a lo más MAX_USOS_KEYWORD líneas. Secuencial, porque cada línea depende de los usos de las anteriores.
 export async function reescribirCV(
   lineas: string[],
   ctx: Omit<InputLinea, "lineaOriginal">,
   opts: OpcionesReescritor = {},
 ): Promise<ResultadoLinea[]> {
   const client = opts.client ?? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  return Promise.all(lineas.map(lineaOriginal => reescribirLinea({ ...ctx, lineaOriginal }, { ...opts, client })));
+  const orden = lineas.map((_, i) => i).sort((a, b) => Number(!/^\s*[-•]\s+/.test(lineas[a])) - Number(!/^\s*[-•]\s+/.test(lineas[b])));
+  const usos = new Map<string, number>();
+  const resultados: ResultadoLinea[] = new Array(lineas.length);
+  for (const i of orden) {
+    const agotadas = new Set([...usos].filter(([, n]) => n >= MAX_USOS_KEYWORD).map(([k]) => k));
+    const r = await reescribirLinea({ ...ctx, lineaOriginal: lineas[i] }, { ...opts, client, keywordsAgotadas: agotadas });
+    for (const k of r.keywords_agregadas) usos.set(k, (usos.get(k) ?? 0) + 1);
+    resultados[i] = r;
+  }
+  return resultados;
 }
