@@ -1,0 +1,81 @@
+{
+  "caso": "andres_vallenar",
+  "ts": "2026-09-29T18-49-26",
+  "costo": 0.003142,
+  "texto_limpio": "Empresa de exploración Minera (mandante), en fase de Exploración, busca un/a Jefe de Relaciones Laborales, para Faena ubicada a 150 km al sur este de Vallenar, a 4000 mts de altura, en la cordillera. Turno 8x6.\n\nResponsabilidades:\n- Asesorar y ser referente técnico en materia de relaciones laborales, políticas internas y normativas legales\n- Monitorear y verificar la correcta aplicación de la ley, políticas y procedimientos internos con relación a los trabajadores y contratistas\n- Involucrarse en todas las oportunidades, ocasiones o casos relacionados con trabajadores, contratistas y entidades externas, que puedan afectar a la organización\n- Impulsar y apoyar todas las aplicaciones de las políticas y procedimientos asociados a su materia\n- Capacitar a quien corresponda en materia de relaciones laborales\n\nRequisitos:\n- Titulo profesional de Derecho, Ingeniería, Psicología o carrera afín\n- Al menos 10 años de experiencia profesional en áreas relacionadas y mínimo 5 años en cargos de relaciones laborales idealmente en faena\n- Deseable especialización en relaciones laborales\n- Conocimiento de legislación laboral, tendencias, resolución de casos en otras empresas\n- Experiencia en gestión y revisión de políticas internas o reglamentos\n- Conocimiento y manejo de la ley de subcontratación, Ley Karin y otras",
+  "keywords_requeridas": [
+    {
+      "keyword": "Derecho",
+      "relevancia": 10
+    },
+    {
+      "keyword": "Ingeniería",
+      "relevancia": 10
+    },
+    {
+      "keyword": "Psicología",
+      "relevancia": 10
+    },
+    {
+      "keyword": "10 años experiencia profesional",
+      "relevancia": 10
+    },
+    {
+      "keyword": "5 años relaciones laborales",
+      "relevancia": 10
+    },
+    {
+      "keyword": "legislación laboral",
+      "relevancia": 9
+    },
+    {
+      "keyword": "ley de subcontratación",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Ley Karin",
+      "relevancia": 9
+    },
+    {
+      "keyword": "gestión de políticas internas",
+      "relevancia": 8
+    },
+    {
+      "keyword": "revisión de reglamentos",
+      "relevancia": 8
+    },
+    {
+      "keyword": "resolución de casos laborales",
+      "relevancia": 8
+    }
+  ],
+  "keywords_deseables": [
+    {
+      "keyword": "especialización en relaciones laborales",
+      "relevancia": 7
+    },
+    {
+      "keyword": "experiencia en faena",
+      "relevancia": 7
+    },
+    {
+      "keyword": "conocimiento de tendencias laborales",
+      "relevancia": 6
+    }
+  ],
+  "nivel_posicion": "jefatura",
+  "industria": "minería",
+  "descartadas": [],
+  "usage": {
+    "input_tokens": 1007,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 427,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
