@@ -1,24 +1,25 @@
 {
   "caso": "pedro_conectatalentos",
   "oferta": "pedro_conectatalentos-2026-09-29T19-00-27.json",
-  "costo": 0.008947,
+  "costo": 0.007135,
   "respuestas": [
     {
-      "perfil": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas y atención al cliente, demostrando habilidades de comunicación efectiva y orientación a resultados. Ha participado en activaciones de marca y comercialización directa de productos. Competente en trabajo en equipo, pensamiento analítico y manejo de herramientas digitales. Inglés avanzado.",
-      "afirmaciones": [
+      "oraciones": [
         {
-          "frase": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
-          "citas": [
-            "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez"
+          "texto": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
+          "lineas": [
+            3,
+            31,
+            33
           ],
           "keywords": []
         },
         {
-          "frase": "Con experiencia en ventas directas y atención al cliente, demostrando habilidades de comunicación efectiva.",
-          "citas": [
-            "experiencia en ventas directas",
-            "Demostración de producto e impulso de ventas mediante atención directa al cliente",
-            "Trabajo en equipo y comunicación efectiva"
+          "texto": "Con experiencia en ventas directas, donde ha ejecutado activaciones de marca, demostración de productos e impulso de ventas mediante atención directa al cliente.",
+          "lineas": [
+            9,
+            15,
+            17
           ],
           "keywords": [
             "venta directa B2B",
@@ -26,50 +27,55 @@
           ]
         },
         {
-          "frase": "Ha participado en activaciones de marca y comercialización directa de productos en puntos de venta y espacios públicos.",
-          "citas": [
-            "Ejecución de activaciones de marca en puntos de venta",
-            "ventas directas en plazas y espacios públicos"
+          "texto": "Ha participado en campañas promocionales con distintos equipos de trabajo y gestionado ventas directas en espacios públicos como cofundador de un emprendimiento.",
+          "lineas": [
+            19,
+            25,
+            27
           ],
           "keywords": [
             "venta directa B2B"
           ]
         },
         {
-          "frase": "Orientado a resultados con competencias en pensamiento analítico, trabajo en equipo y manejo de herramientas digitales.",
-          "citas": [
-            "Orientado a resultados",
-            "Pensamiento analítico y orientación a resultados",
-            "manejo de herramientas digitales"
+          "texto": "Posee habilidades de comunicación efectiva, trabajo en equipo y pensamiento analítico orientado a resultados.",
+          "lineas": [
+            63,
+            65
           ],
-          "keywords": []
+          "keywords": [
+            "comunicación con clientes"
+          ]
         },
         {
-          "frase": "Domina inglés avanzado, con formación en educación bilingüe.",
-          "citas": [
-            "Inglés avanzado",
-            "Formación en inglés como idioma de instrucción durante toda la educación secundaria"
+          "texto": "Maneja herramientas digitales como Microsoft Excel a nivel intermedio, Microsoft Office y cuenta con inglés avanzado.",
+          "lineas": [
+            49,
+            51,
+            57
           ],
           "keywords": []
         }
       ]
     },
     {
-      "perfil": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas y promoción de productos. Orientado a resultados, con habilidades de comunicación con clientes, trabajo en equipo y manejo de herramientas digitales. Inglés avanzado.",
-      "afirmaciones": [
+      "oraciones": [
         {
-          "frase": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
-          "citas": [
-            "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez"
+          "texto": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
+          "lineas": [
+            3,
+            31,
+            33
           ],
           "keywords": []
         },
         {
-          "frase": "Con experiencia en ventas directas y promoción de productos.",
-          "citas": [
-            "experiencia en ventas directas, promoción de productos",
-            "Demostración de producto e impulso de ventas mediante atención directa al cliente",
-            "ventas directas en plazas y espacios públicos"
+          "texto": "Con experiencia en ventas directas mediante ejecución de activaciones de marca, demostración de productos e impulso de ventas con atención directa al cliente.",
+          "lineas": [
+            13,
+            15,
+            17,
+            25
           ],
           "keywords": [
             "venta directa B2B",
@@ -77,20 +83,34 @@
           ]
         },
         {
-          "frase": "Orientado a resultados, con habilidades de comunicación con clientes, trabajo en equipo y manejo de herramientas digitales.",
-          "citas": [
-            "Orientado a resultados, con habilidades de comunicación",
-            "Trabajo en equipo y comunicación efectiva",
-            "manejo de herramientas digitales"
+          "texto": "Ha participado en campañas promocionales y operado un emprendimiento de comercialización de productos en espacios públicos.",
+          "lineas": [
+            19,
+            21,
+            25
+          ],
+          "keywords": [
+            "venta directa B2B"
+          ]
+        },
+        {
+          "texto": "Orientado a resultados, con habilidades de comunicación efectiva, trabajo en equipo y manejo de herramientas digitales como Microsoft Excel y Office.",
+          "lineas": [
+            63,
+            65,
+            49,
+            51
           ],
           "keywords": [
             "comunicación con clientes"
           ]
         },
         {
-          "frase": "Inglés avanzado.",
-          "citas": [
-            "Inglés avanzado"
+          "texto": "Posee inglés avanzado adquirido en formación bilingüe.",
+          "lineas": [
+            37,
+            43,
+            57
           ],
           "keywords": []
         }

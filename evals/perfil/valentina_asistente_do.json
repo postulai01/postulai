@@ -1,118 +1,12 @@
 {
   "caso": "valentina_asistente_do",
   "oferta": "valentina_asistente_do-2026-09-29T19-00-27.json",
-  "costo": 0.009665,
+  "costo": 0.003585,
   "respuestas": [
     {
-      "perfil": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail. Ha liderado equipos de hasta 240 personas, administrando presupuestos operacionales de hasta MM$ 12 anuales. Posee experiencia en coordinación de capacitaciones y formación de equipos, implementación de modelos de evaluación de desempeño, gestión de clima laboral, inducción de colaboradores y comunicación ejecutiva. Domina Excel y BUK. Especializada en construcción de culturas de alto rendimiento a escala regional.",
-      "afirmaciones": [
+      "oraciones": [
         {
-          "frase": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail",
-          "lineas": [
-            5,
-            9,
-            16,
-            22
-          ],
-          "keywords": []
-        },
-        {
-          "frase": "Ha liderado equipos de hasta 240 personas",
-          "lineas": [
-            10
-          ],
-          "keywords": []
-        },
-        {
-          "frase": "administrando presupuestos operacionales de hasta MM$ 12 anuales",
-          "lineas": [
-            5,
-            13
-          ],
-          "keywords": []
-        },
-        {
-          "frase": "Posee experiencia en coordinación de capacitaciones y formación de equipos",
-          "lineas": [
-            11,
-            12,
-            20,
-            25
-          ],
-          "keywords": [
-            "coordinación de capacitaciones"
-          ]
-        },
-        {
-          "frase": "implementación de modelos de evaluación de desempeño",
-          "lineas": [
-            14
-          ],
-          "keywords": [
-            "evaluación de desempeño"
-          ]
-        },
-        {
-          "frase": "gestión de clima laboral",
-          "lineas": [
-            18
-          ],
-          "keywords": [
-            "clima organizacional"
-          ]
-        },
-        {
-          "frase": "inducción de colaboradores",
-          "lineas": [
-            25
-          ],
-          "keywords": [
-            "inducción"
-          ]
-        },
-        {
-          "frase": "comunicación ejecutiva",
-          "lineas": [
-            33
-          ],
-          "keywords": [
-            "comunicaciones internas"
-          ]
-        },
-        {
-          "frase": "Domina Excel y BUK",
-          "lineas": [
-            32
-          ],
-          "keywords": [
-            "Excel",
-            "BUK"
-          ]
-        },
-        {
-          "frase": "Especializada en construcción de culturas de alto rendimiento a escala regional",
-          "lineas": [
-            5
-          ],
-          "keywords": []
-        }
-      ]
-    },
-    {
-      "perfil": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales. Coordina capacitaciones y formación de equipos, implementa evaluación de desempeño e inducción de nuevos colaboradores. Gestiona clima laboral y comunicación ejecutiva para construir culturas de alto rendimiento a escala regional. Maneja Excel y BUK.",
-      "afirmaciones": [
-        {
-          "frase": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail",
-          "lineas": [
-            5,
-            9,
-            16,
-            22
-          ],
-          "keywords": []
-        },
-        {
-          "frase": "liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales",
+          "texto": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales.",
           "lineas": [
             5,
             10,
@@ -121,7 +15,7 @@
           "keywords": []
         },
         {
-          "frase": "Coordina capacitaciones y formación de equipos",
+          "texto": "Especializada en formación de equipos y coordinación de capacitaciones, incluyendo procesos de inducción y desarrollo de líderes internos.",
           "lineas": [
             11,
             12,
@@ -129,42 +23,25 @@
             25
           ],
           "keywords": [
-            "coordinación de capacitaciones"
-          ]
-        },
-        {
-          "frase": "implementa evaluación de desempeño e inducción de nuevos colaboradores",
-          "lineas": [
-            14,
-            25
-          ],
-          "keywords": [
-            "evaluación de desempeño",
+            "coordinación de capacitaciones",
             "inducción"
           ]
         },
         {
-          "frase": "Gestiona clima laboral y comunicación ejecutiva",
+          "texto": "Implementa modelos de evaluación de desempeño alineados a objetivos organizacionales y gestiona el clima organizacional mediante programas de bienestar y comunicaciones internas.",
           "lineas": [
+            14,
             18,
             33
           ],
           "keywords": [
+            "evaluación de desempeño",
             "clima organizacional",
             "comunicaciones internas"
           ]
         },
         {
-          "frase": "construye culturas de alto rendimiento a escala regional",
-          "lineas": [
-            5,
-            12,
-            20
-          ],
-          "keywords": []
-        },
-        {
-          "frase": "Maneja Excel y BUK",
+          "texto": "Domina herramientas de análisis y gestión como Excel Avanzado y BUK para la administración operacional y de personas.",
           "lineas": [
             32
           ],

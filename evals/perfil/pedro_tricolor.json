@@ -1,13 +1,12 @@
 {
   "caso": "pedro_tricolor",
   "oferta": "pedro_tricolor-2026-09-29T22-20-53.json",
-  "costo": 0.008288,
+  "costo": 0.008308,
   "respuestas": [
     {
-      "perfil": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento, demostrando capacidad para ejecutar activaciones de marca y gestionar actividades operativas en puntos de venta. Posee habilidades en trabajo en equipo, comunicación efectiva y manejo de herramientas digitales como Microsoft Excel y Office. Adaptable ante distintos contextos de trabajo, orientado a resultados y con inglés avanzado.",
-      "afirmaciones": [
+      "oraciones": [
         {
-          "frase": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez",
+          "texto": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
           "lineas": [
             3,
             31,
@@ -16,34 +15,39 @@
           "keywords": []
         },
         {
-          "frase": "Con experiencia en ventas directas, promoción de productos y emprendimiento",
+          "texto": "Con experiencia en ventas directas, promoción de productos y emprendimiento, demostrando capacidad para ejecutar actividades operativas en puntos de venta y gestionar proyectos end-to-end.",
           "lineas": [
             9,
             13,
             15,
             17,
             21,
-            25
-          ],
-          "keywords": []
-        },
-        {
-          "frase": "demostrando capacidad para ejecutar activaciones de marca y gestionar actividades operativas en puntos de venta",
-          "lineas": [
-            15,
-            17,
-            25
+            23,
+            25,
+            27
           ],
           "keywords": [
             "tareas operativas"
           ]
         },
         {
-          "frase": "Posee habilidades en trabajo en equipo, comunicación efectiva y manejo de herramientas digitales como Microsoft Excel y Office",
+          "texto": "Orientado a resultados con habilidades de comunicación y trabajo en equipo, respaldadas por participación en múltiples campañas promocionales con distintos equipos de trabajo.",
           "lineas": [
+            9,
+            19,
+            63,
+            65
+          ],
+          "keywords": [
+            "orientación al servicio"
+          ]
+        },
+        {
+          "texto": "Maneja herramientas digitales incluyendo Microsoft Excel a nivel intermedio para análisis de datos y fórmulas, así como Microsoft Office (Word, PowerPoint).",
+          "lineas": [
+            9,
             49,
-            51,
-            63
+            51
           ],
           "keywords": [
             "Excel",
@@ -51,19 +55,21 @@
           ]
         },
         {
-          "frase": "Adaptable ante distintos contextos de trabajo, orientado a resultados",
+          "texto": "Demuestra adaptabilidad y gestión multifuncional en contextos de producción, ventas y comercialización.",
           "lineas": [
-            67,
-            65
+            25,
+            27,
+            67
           ],
           "keywords": [
             "adaptabilidad"
           ]
         },
         {
-          "frase": "con inglés avanzado",
+          "texto": "Posee inglés avanzado, certificado por formación en colegio bilingüe y exención universitaria.",
           "lineas": [
             37,
+            43,
             57
           ],
           "keywords": []
@@ -71,10 +77,9 @@
       ]
     },
     {
-      "perfil": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento. Orientado a resultados, con habilidades de comunicación, trabajo en equipo y manejo de Microsoft Excel y herramientas de Office. Adaptable en contextos multifuncionales. Inglés avanzado.",
-      "afirmaciones": [
+      "oraciones": [
         {
-          "frase": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
+          "texto": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
           "lineas": [
             3,
             31,
@@ -83,27 +88,26 @@
           "keywords": []
         },
         {
-          "frase": "Con experiencia en ventas directas, promoción de productos y emprendimiento.",
+          "texto": "Con experiencia en ventas directas, promoción de productos y emprendimiento, incluyendo ejecución de activaciones de marca en puntos de venta y gestión end-to-end de proyectos.",
           "lineas": [
-            13,
             15,
             17,
-            21,
-            23,
-            25
+            25,
+            27
           ],
           "keywords": []
         },
         {
-          "frase": "Orientado a resultados, con habilidades de comunicación y trabajo en equipo.",
+          "texto": "Orientado a resultados con habilidades de comunicación y trabajo en equipo, desarrolladas a través de participación en múltiples campañas promocionales.",
           "lineas": [
-            65,
-            63
+            19,
+            63,
+            65
           ],
           "keywords": []
         },
         {
-          "frase": "Manejo de Microsoft Excel y herramientas de Office.",
+          "texto": "Maneja Microsoft Excel a nivel intermedio para análisis de datos y fórmulas, así como Microsoft Office (Word, PowerPoint).",
           "lineas": [
             49,
             51
@@ -114,8 +118,10 @@
           ]
         },
         {
-          "frase": "Adaptable en contextos multifuncionales.",
+          "texto": "Demuestra adaptabilidad y gestión multifuncional en actividades de producción, ventas y comercialización.",
           "lineas": [
+            25,
+            27,
             67
           ],
           "keywords": [
@@ -123,9 +129,10 @@
           ]
         },
         {
-          "frase": "Inglés avanzado.",
+          "texto": "Inglés avanzado, adquirido a través de formación en colegio bilingüe y exención universitaria por dominio del idioma.",
           "lineas": [
             37,
+            43,
             57
           ],
           "keywords": []
