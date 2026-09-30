@@ -1,0 +1,20 @@
+{
+  "caso": "valentina_teamwork",
+  "oferta": "valentina_teamwork-2026-09-30T19-13-49.json",
+  "costo": 0.0011,
+  "respuesta": [
+    {
+      "vineta": 2,
+      "keywords": [
+        "contratación",
+        "seguimiento de candidatos"
+      ]
+    },
+    {
+      "vineta": 8,
+      "keywords": [
+        "contratación"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "caso": "roberto_mercadolibre",
+  "oferta": "roberto_mercadolibre-2026-09-30T19-13-49.json",
+  "costo": 0.002656,
+  "reintento": null,
+  "propuestos": [
+    {
+      "keyword": "análisis de causa raíz",
+      "cita": "Analicé datos de producción para identificar cuellos de botella",
+      "nivel": "relacionado",
+      "relevancia": 0.6
+    },
+    {
+      "keyword": "Gemba",
+      "cita": "Diseñé e implementé kaizenes que generaron ahorros de MM$ 45",
+      "nivel": "relacionado",
+      "relevancia": 0.5
+    }
+  ]
+}

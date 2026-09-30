@@ -1,0 +1,20 @@
+{
+  "caso": "valentina_teamwork",
+  "oferta": "valentina_teamwork-2026-09-30T19-13-49.json",
+  "costo": 0.002112,
+  "reintento": null,
+  "propuestos": [
+    {
+      "keyword": "seguimiento de candidatos",
+      "cita": "Gestioné los procesos de reclutamiento masivo para temporadas altas, contratando a más de 60 colaboradores estacionales",
+      "nivel": "relacionado",
+      "relevancia": 0.6
+    },
+    {
+      "keyword": "contratación",
+      "cita": "Gestioné los procesos de reclutamiento masivo para temporadas altas, contratando a más de 60 colaboradores estacionales por período",
+      "nivel": "directo",
+      "relevancia": 0.8
+    }
+  ]
+}

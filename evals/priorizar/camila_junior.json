@@ -1,0 +1,51 @@
+{
+  "caso": "camila_junior",
+  "oferta": "camila_junior-2026-09-30T19-13-49.json",
+  "costo": 0.001617,
+  "respuesta": [
+    {
+      "vineta": 1,
+      "keywords": [
+        "Selección y Reclutamiento",
+        "reclutamiento y selección"
+      ]
+    },
+    {
+      "vineta": 2,
+      "keywords": [
+        "pruebas psicológicas",
+        "entrevistas por competencias"
+      ]
+    },
+    {
+      "vineta": 3,
+      "keywords": [
+        "BUK"
+      ]
+    },
+    {
+      "vineta": 4,
+      "keywords": [
+        "indicadores de selección"
+      ]
+    },
+    {
+      "vineta": 5,
+      "keywords": [
+        "onboarding"
+      ]
+    },
+    {
+      "vineta": 6,
+      "keywords": [
+        "onboarding"
+      ]
+    },
+    {
+      "vineta": 8,
+      "keywords": [
+        "gestión de bases de datos de candidatos"
+      ]
+    }
+  ]
+}

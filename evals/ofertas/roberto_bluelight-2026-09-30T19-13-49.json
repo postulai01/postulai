@@ -1,0 +1,158 @@
+{
+  "caso": "roberto_bluelight",
+  "ts": "2026-09-30T19-13-49",
+  "costo": 0.006029,
+  "texto_limpio": "Senior Business Analyst - Latin America, Remote\nSantiago, Chile\nOperations – General /\nFull-Time /\nRemote\n\n\nBluelight is a leading software consultancy dedicated to designing and developing innovative technology that enhances users' lives. With a steadfast commitment to delivering exceptional service to our clients, Bluelight excels in its focus on quality and customer satisfaction. Our mission is not only to create cutting-edge applications but also to foster a collaborative and enriching work environment where each team member can grow and thrive. With a presence across the United States and Central/South America, Bluelight is in an exciting phase of expansion, continually seeking exceptional talent to join its dynamic and diverse community.\n\nWe're looking for a Business Analyst to turn business problems into clear, buildable requirements. You'll sit between our clients, our product team, and our engineers: running discovery, mapping processes, writing user stories and acceptance criteria, and making sure what we ship actually solves the problem it was meant to solve.\nYou'll work across a mix of client builds, client maintenance engagements, and Bluelight's internal products, and you'll play a key role when new projects are being scoped and estimated.\n\nResponsibilities\n\n- Lead stakeholder interviews and workshops with clients and internal teams to understand goals, current workflows, and pain points.\n- Document current-state and future-state processes, business rules, data definitions, and edge cases.\n- Support new-project sizing by breaking scope into epics and stories that engineering can estimate with confidence.\n- Identify assumptions, risks, dependencies, and open questions early, and drive them to resolution.\n- Write clear user stories with testable acceptance criteria in Jira.\n- Partner with the Product Manager to prioritize and groom the backlog ahead of each two-week sprint.\n- Work with UI/UX design in Figma to make sure flows and screens match the requirements, and flag gaps before development starts.\n- Answer engineering questions during the sprint and keep requirements current as decisions are made.\n- Work with QA to make sure acceptance criteria translate into solid test coverage.\n- Support sprint demos and coordinate user acceptance testing with clients.\n- Keep requirements documentation organized in Google Drive so decisions and their rationale are easy to find later.\n- Make sure compliance, security, and audit requirements (including SOC 2 considerations) are captured as explicit requirements, not afterthoughts.\n- Act as a trusted point of contact for clients on scope and requirements questions.\n- Translate between business and technical audiences clearly and without jargon in either direction.\n- Surface scope changes early and help the team and client understand the tradeoffs.\n\nRequirements\n\n- 3+ years as a Business Analyst, Product Analyst, or similar role on software projects.\n- Strong experience writing user stories and acceptance criteria in an agile/Scrum environment.\n- Proven ability to run discovery sessions and turn ambiguous input into structured requirements.\n- Comfort with process mapping and data modeling at a business level (flows, entities, relationships, rules).\n- Hands-on experience with Jira; familiarity with Figma and collaborative docs.\n- Excellent written and spoken English; comfortable leading client meetings with U.S. stakeholders.\n- Enough technical literacy to have productive conversations with engineers about APIs, integrations, databases, and system constraints.\n\nNice to Have\n\n- Experience in an agency, consultancy, or software services environment juggling multiple clients.\n- Exposure to regulated or compliance-heavy domains (e.g., SOC 2, telecom/outbound compliance, education, fintech).\n- Experience writing requirements for integrations with third-party platforms.\n- Familiarity with web application stacks (e.g., Laravel, React) and AWS.\n- Experience supporting estimation or proposal work for new projects.",
+  "keywords_requeridas": [
+    {
+      "keyword": "Business Analyst",
+      "relevancia": 10
+    },
+    {
+      "keyword": "user stories",
+      "relevancia": 10
+    },
+    {
+      "keyword": "acceptance criteria",
+      "relevancia": 10
+    },
+    {
+      "keyword": "agile",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Scrum",
+      "relevancia": 9
+    },
+    {
+      "keyword": "discovery sessions",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Jira",
+      "relevancia": 9
+    },
+    {
+      "keyword": "English",
+      "relevancia": 9
+    },
+    {
+      "keyword": "stakeholder interviews",
+      "relevancia": 9
+    },
+    {
+      "keyword": "process mapping",
+      "relevancia": 8
+    },
+    {
+      "keyword": "data modeling",
+      "relevancia": 8
+    },
+    {
+      "keyword": "requirements documentation",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Figma",
+      "relevancia": 7
+    },
+    {
+      "keyword": "APIs",
+      "relevancia": 7
+    },
+    {
+      "keyword": "integrations",
+      "relevancia": 7
+    },
+    {
+      "keyword": "databases",
+      "relevancia": 7
+    },
+    {
+      "keyword": "SOC 2",
+      "relevancia": 7
+    },
+    {
+      "keyword": "compliance requirements",
+      "relevancia": 7
+    },
+    {
+      "keyword": "Google Drive",
+      "relevancia": 6
+    }
+  ],
+  "keywords_deseables": [
+    {
+      "keyword": "agency environment",
+      "relevancia": 7
+    },
+    {
+      "keyword": "consultancy environment",
+      "relevancia": 7
+    },
+    {
+      "keyword": "multiple clients",
+      "relevancia": 7
+    },
+    {
+      "keyword": "regulated domains",
+      "relevancia": 6
+    },
+    {
+      "keyword": "third-party integrations",
+      "relevancia": 6
+    },
+    {
+      "keyword": "AWS",
+      "relevancia": 6
+    },
+    {
+      "keyword": "estimation",
+      "relevancia": 6
+    },
+    {
+      "keyword": "proposal work",
+      "relevancia": 6
+    },
+    {
+      "keyword": "telecom compliance",
+      "relevancia": 5
+    },
+    {
+      "keyword": "fintech",
+      "relevancia": 5
+    },
+    {
+      "keyword": "Laravel",
+      "relevancia": 5
+    },
+    {
+      "keyword": "React",
+      "relevancia": 5
+    }
+  ],
+  "nivel_posicion": "senior",
+  "industria": "software consultancy",
+  "cargo": "Senior Business Analyst - Latin America",
+  "experiencia": [
+    {
+      "anios_minimos": 3,
+      "area": "Business Analyst, Product Analyst, o rol similar en proyectos de software",
+      "tipo": "requerido"
+    }
+  ],
+  "carreras": [],
+  "descartadas": [],
+  "usage": {
+    "input_tokens": 1764,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 853,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

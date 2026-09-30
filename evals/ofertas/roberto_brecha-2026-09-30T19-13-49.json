@@ -1,0 +1,95 @@
+{
+  "caso": "roberto_brecha",
+  "ts": "2026-09-30T19-13-49",
+  "costo": 0.003855,
+  "texto_limpio": "CARGO: Analista Sr. de Mejora Continua y Procesos\nEMPRESA: Textil Cordillera S.A. — empresa manufacturera de textiles técnicos con planta productiva en la Región Metropolitana y dotación de 450 operarios.\n\nDESCRIPCIÓN:\nBuscamos un Analista Senior de Mejora Continua para impulsar la eficiencia operacional de nuestra planta de producción. El rol tiene alta visibilidad en la Gerencia de Operaciones y autonomía para liderar proyectos de mejora con impacto directo en costos y calidad.\n\nRESPONSABILIDADES:\n- Liderar proyectos de mejora continua aplicando Lean Manufacturing, Kaizen y Six Sigma en líneas de producción.\n- Analizar indicadores operacionales (OEE, tiempos de ciclo, tasa de rechazo) e identificar oportunidades de mejora.\n- Diseñar e implementar estándares de trabajo (SOPs) y herramientas de gestión visual.\n- Capacitar y desarrollar al equipo productivo en metodologías de mejora continua.\n- Reportar avances de proyectos y KPIs de mejora continua a la Gerencia de Operaciones.\n- Coordinar la implementación de proyectos de mejora con supervisores de planta y equipos de mantención.\n\nREQUISITOS:\n- Ingeniero Industrial, en Ejecución Industrial o afín con 5-8 años de experiencia en mejora continua en manufactura.\n- Dominio demostrado de metodologías Lean Manufacturing, Kaizen y Six Sigma.\n- Experiencia en indicadores OEE y análisis de datos productivos.\n- Certificación Green Belt o Black Belt valorada.\n- Manejo de SAP y Power BI para análisis de indicadores de planta.\n- Disponibilidad para trabajar en planta (turno diurno).",
+  "keywords_requeridas": [
+    {
+      "keyword": "Mejora Continua y Procesos",
+      "relevancia": 10
+    },
+    {
+      "keyword": "Lean Manufacturing",
+      "relevancia": 10
+    },
+    {
+      "keyword": "Kaizen",
+      "relevancia": 10
+    },
+    {
+      "keyword": "Six Sigma",
+      "relevancia": 10
+    },
+    {
+      "keyword": "OEE",
+      "relevancia": 9
+    },
+    {
+      "keyword": "indicadores operacionales",
+      "relevancia": 9
+    },
+    {
+      "keyword": "estándares de trabajo",
+      "relevancia": 8
+    },
+    {
+      "keyword": "gestión visual",
+      "relevancia": 8
+    },
+    {
+      "keyword": "SAP",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Power BI",
+      "relevancia": 8
+    },
+    {
+      "keyword": "análisis de datos productivos",
+      "relevancia": 8
+    }
+  ],
+  "keywords_deseables": [
+    {
+      "keyword": "Certificación Green Belt",
+      "relevancia": 7
+    },
+    {
+      "keyword": "Certificación Black Belt",
+      "relevancia": 7
+    }
+  ],
+  "nivel_posicion": "senior",
+  "industria": "manufactura textil",
+  "cargo": "Analista Sr. de Mejora Continua y Procesos",
+  "experiencia": [
+    {
+      "anios_minimos": 5,
+      "area": "mejora continua en manufactura",
+      "tipo": "requerido"
+    }
+  ],
+  "carreras": [
+    {
+      "carreras": [
+        "Ingeniero Industrial",
+        "Ejecución Industrial"
+      ],
+      "acepta_afin": true,
+      "tipo": "requerido"
+    }
+  ],
+  "descartadas": [],
+  "usage": {
+    "input_tokens": 1405,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 490,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
