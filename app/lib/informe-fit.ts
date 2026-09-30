@@ -70,7 +70,7 @@ export const MAX_PREGUNTAS = 5;
 // ─── clasificación calibrada ─────────────────────────────────────────────────
 
 const RE_NORMATIVA_EXTRA = /\b(ley|subcontrat\w*|fiscalizacion\w*|disciplinari\w*|jornadas? excepcional\w*)\b/;
-const RE_BLANDA = /\b(actitud|adaptabilidad|orientacion al servicio|proactiv\w*|trabajo en equipo|comunicacion)\b/;
+const RE_BLANDA = /\b(actitud|adaptabilidad|orientacion al servicio|proactiv\w*|trabajo en equipo|comunicacion|disposicion|tareas operativas|iniciativa|responsabilidad)\b/;
 const RE_CONCEPTO = /(p&l|\bebitda\b|\bbalance\b|flujo de caja|\bkpis?\b|estado de resultados|\bcontabilidad\b)/i;
 
 const singular = (p: string) => p.replace(/ciones$/, "cion").replace(/([aeiou])s$/, "$1");
@@ -147,6 +147,27 @@ const recortar = (s: string, max = 140, foco: string[] = []) => {
   return `${ini > 0 ? "…" : ""}${t.slice(ini, fin).trim()}${fin < t.length ? "…" : ""}`;
 };
 
+// Para citas dentro de preguntas: la(s) cláusula(s) completa(s) (entre comas, puntos o dos puntos) de la línea del
+// CV que contienen el fragmento. Si pasan de MAX_CITA_PREGUNTA, queda solo la cláusula con más solapamiento: el corte
+// siempre cae en un límite de cláusula, nunca a mitad de frase.
+const MAX_CITA_PREGUNTA = 120;
+function clausulaCompleta(cv: string, fragmento: string): string {
+  const frag = colapsar(fragmento);
+  const linea = cv.split("\n").map(l => colapsar(l.replace(/^\s*[-•]\s*/, ""))).find(l => l.includes(frag));
+  if (!linea) return frag;
+  const ini = linea.indexOf(frag), fin = ini + frag.length;
+  const clausulas: { a: number; b: number }[] = [];
+  let a = 0;
+  for (const m of linea.matchAll(/[,;:.](?=\s|$)/g)) { clausulas.push({ a, b: m.index! }); a = m.index! + 1; }
+  if (a < linea.length) clausulas.push({ a, b: linea.length });
+  const toca = clausulas.filter(c => c.b > ini && c.a < fin);
+  const texto = (cs: typeof clausulas) => linea.slice(cs[0].a, cs[cs.length - 1].b).trim();
+  if (toca.length === 0) return frag;
+  if (texto(toca).length <= MAX_CITA_PREGUNTA || toca.length === 1) return texto(toca);
+  const solape = (c: { a: number; b: number }) => Math.min(c.b, fin) - Math.max(c.a, ini);
+  return texto([toca.reduce((x, y) => (solape(y) > solape(x) ? y : x))]);
+}
+
 const evidencia = (e: { texto: string; foco: string[] }) => `«${recortar(e.texto, 140, e.foco)}»`;
 
 // ─── informe ─────────────────────────────────────────────────────────────────
@@ -179,7 +200,7 @@ export function informeFit(input: InputInforme): InformeFit {
       const x = recortar(e.texto, 140, e.foco);
       relacionado.push({
         requisito: m.keyword_jd, evidencia: `«${x}»`,
-        texto: `Tu «${x}» se relaciona con ${m.keyword_jd}, que pide la oferta. Si de verdad hiciste ${m.keyword_jd}, nómbralo; si no, no lo agregues.`,
+        texto: `Tu «${x}» se relaciona con ${m.keyword_jd}, que pide la oferta. Si de verdad tienes experiencia en ${m.keyword_jd}, nómbralo así; si no, no lo agregues.`,
       });
     }
   }
@@ -265,7 +286,7 @@ export function informeFit(input: InputInforme): InformeFit {
     texto: a.alerta === "sobrecalificado"
       ? `Tus ${a.anios_cv} años de experiencia superan lo que suele pedir ${nivelTxt}. No resta puntos: es para que lo consideres (sueldo, expectativas) al postular.`
       : a.alerta === "subcalificado"
-        ? `Tus ${a.anios_cv} años de experiencia están bajo lo que pide ${nivelTxt}. No resta puntos aparte: es para que lo tengas en cuenta.`
+        ? `Tus ${a.anios_cv} años de experiencia están bajo lo que pide ${nivelTxt}. No resta puntos: es para que lo tengas en cuenta al postular.`
         : null,
   };
 
@@ -287,13 +308,13 @@ function redactarPregunta(keyword: string, tipo: TipoPregunta, cv: string, etiqu
     case "herramienta": return `¿Has usado ${keyword}? ${si}`;
     case "sector": return `¿Tienes experiencia en ${keyword.replace(/^experiencia en\s+/i, "")}? ${si}`;
     case "funcion": return `¿Has hecho ${keyword} en algún trabajo, práctica o proyecto? ${si}`;
-    case "semantico": return `¿Tu «${recortar(cita!, 100)}» cuenta como ${keyword}? Si es así, nómbralo así en el CV.`;
+    case "semantico": return `¿Tu «${clausulaCompleta(cv, cita!)}» cuenta como ${keyword}? Si es así, nómbralo así en el CV.`;
     case "area_cargo": {
       // Contexto: la viñeta que el priorizador etiquetó con esta keyword (solo para preguntar).
       const lineas = cv.split("\n");
       const idx = Object.entries(etiquetas ?? {}).find(([, kws]) => kws.includes(keyword))?.[0];
       const linea = idx !== undefined ? lineas[Number(idx)] : undefined;
-      if (linea) return `¿Tu experiencia en «${recortar(linea, 100)}» fue trabajo de ${keyword}? Si es así, nómbralo así en el CV.`;
+      if (linea) return `¿Tu experiencia en «${clausulaCompleta(cv, linea.replace(/^\s*[-•]\s*/, "").trim())}» fue trabajo de ${keyword}? Si es así, nómbralo así en el CV.`;
       return `¿Has hecho trabajo de ${keyword}, aunque no se llamara así? ${si}`;
     }
     default: return `¿Tienes ${keyword}? ${si}`;

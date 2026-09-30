@@ -51,9 +51,10 @@ async function main() {
     const problemas = [
       ...todas.filter(p => !esPregunta(p.texto)).map(p => `pregunta redactada como afirmación: ${p.texto}`),
       ...todas.filter(p => p.tipo === "funcion" || p.tipo === "blanda").map(p => `función o habilidad blanda como pregunta: ${p.texto}`),
+      ...todas.filter(p => /«…|…»/.test(p.texto)).map(p => `cita cortada dentro de una pregunta: ${p.texto}`),
       ...todas.filter(p => /demostrado/.test(p.texto)).map(p => `redacción antigua: ${p.texto}`),
       ...(informe.preguntas.length > MAX_PREGUNTAS ? [`${informe.preguntas.length} preguntas visibles (máx. ${MAX_PREGUNTAS})`] : []),
-      ...informe.relacionado.filter(r => !evidenciaEnCV(r.evidencia, cv) || !/si no, no lo agregues/.test(r.texto)).map(r => `relacionado sin evidencia o sin advertencia: ${r.requisito}`),
+      ...informe.relacionado.filter(r => !evidenciaEnCV(r.evidencia, cv) || !/nómbralo así; si no, no lo agregues/.test(r.texto)).map(r => `relacionado sin evidencia o sin advertencia: ${r.requisito}`),
       ...informe.cumples.filter(c => /\(en parte\)/.test(c.requisito)).map(c => `"en parte" en cumples: ${c.requisito}`),
       ...(caso === "andres_datos_personales"
         ? (["nacimiento", "estado_civil", "hijos"] as const).filter(t => !informe.limpieza.some(l => l.tema === t)).map(t => `limpieza no detecta ${t}`)
