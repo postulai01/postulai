@@ -8,11 +8,13 @@
  *   Las reglas se fijaron antes de correr esto; el número se registra, no se optimiza.
  * - Chequeos automáticos: toda pregunta es pregunta (empieza con "¿" y su primera oración termina en "?"),
  *   y todo "cumples" tiene evidencia que existe en el CV.
+ * - Parte 2: máximo 5 preguntas visibles; ni funciones de práctica ni habilidades blandas como pregunta; "relacionado"
+ *   con su advertencia; limpieza de andres_datos_personales (nacimiento, estado civil, hijos).
  * - Imprime el informe completo de cada caso para revisión manual.
  */
 import * as fs from "fs";
 import * as path from "path";
-import { informeFit, type InformeFit } from "../app/lib/informe-fit";
+import { informeFit, MAX_PREGUNTAS, type InformeFit } from "../app/lib/informe-fit";
 import { scoreV2 } from "../app/lib/mapeo-semantico";
 import { filtrarEtiquetas, vinetasParaEtiquetar, type EtiquetasOrden } from "../app/lib/priorizador";
 import { casosConOferta, mapeoDelCaso } from "./lib-casos";
@@ -21,7 +23,7 @@ const colapsar = (s: string) => s.replace(/\s+/g, " ").trim();
 
 // Citas «…» de la evidencia; cada una (sin el "…" final de recorte) debe existir en el CV.
 function evidenciaEnCV(evidencia: string, cv: string): boolean {
-  const citas = [...evidencia.matchAll(/«([^»]+)»/g)].map(m => colapsar(m[1].replace(/…$/, "")));
+  const citas = [...evidencia.matchAll(/«([^»]+)»/g)].map(m => colapsar(m[1].replace(/^…|…$/g, "")));
   return citas.length > 0 && citas.every(c => colapsar(cv).includes(c));
 }
 
@@ -34,7 +36,7 @@ async function main() {
   const filas: { caso: string; fit: string; antes: string; informe: InformeFit; problemas: string[] }[] = [];
 
   for (const caso of casos) {
-    const { ctx, resultado } = await mapeoDelCaso(caso);
+    const { ctx, resultado, rechazos } = await mapeoDelCaso(caso);
     const cv: string = ctx.casoJson.cv_texto;
     const oferta = JSON.parse(fs.readFileSync(ctx.archivoOferta, "utf-8"));
     const cargo: string | undefined = oferta.cargo ?? ctx.casoJson.cargo_oferta;
@@ -44,19 +46,28 @@ async function main() {
       const g = JSON.parse(fs.readFileSync(archEt, "utf-8"));
       if (g.oferta === path.basename(ctx.archivoOferta)) etiquetas = filtrarEtiquetas(g.respuesta, vinetasParaEtiquetar(cv), ctx.keywordsJD);
     }
-    const informe = informeFit({ cv, mapeo: resultado, keywordsJD: ctx.keywordsJD, nivelPosicion: ctx.nivelPosicion, cargo, etiquetas });
+    const informe = informeFit({ cv, mapeo: resultado, keywordsJD: ctx.keywordsJD, nivelPosicion: ctx.nivelPosicion, cargo, etiquetas, rechazadas: rechazos });
+    const todas = [...informe.preguntas, ...informe.otras_preguntas];
     const problemas = [
-      ...informe.preguntas.filter(p => !esPregunta(p.texto)).map(p => `pregunta redactada como afirmación: ${p.texto}`),
+      ...todas.filter(p => !esPregunta(p.texto)).map(p => `pregunta redactada como afirmación: ${p.texto}`),
+      ...todas.filter(p => p.tipo === "funcion" || p.tipo === "blanda").map(p => `función o habilidad blanda como pregunta: ${p.texto}`),
+      ...todas.filter(p => /demostrado/.test(p.texto)).map(p => `redacción antigua: ${p.texto}`),
+      ...(informe.preguntas.length > MAX_PREGUNTAS ? [`${informe.preguntas.length} preguntas visibles (máx. ${MAX_PREGUNTAS})`] : []),
+      ...informe.relacionado.filter(r => !evidenciaEnCV(r.evidencia, cv) || !/si no, no lo agregues/.test(r.texto)).map(r => `relacionado sin evidencia o sin advertencia: ${r.requisito}`),
+      ...informe.cumples.filter(c => /\(en parte\)/.test(c.requisito)).map(c => `"en parte" en cumples: ${c.requisito}`),
+      ...(caso === "andres_datos_personales"
+        ? (["nacimiento", "estado_civil", "hijos"] as const).filter(t => !informe.limpieza.some(l => l.tema === t)).map(t => `limpieza no detecta ${t}`)
+        : []),
       ...informe.cumples.filter(c => !c.evidencia || !evidenciaEnCV(c.evidencia, cv)).map(c => `cumple sin evidencia en el CV: ${c.requisito} ← ${c.evidencia}`),
     ];
     filas.push({ caso, fit: ctx.casoJson.fit_esperado ?? "?", antes: scoreV2(resultado, ctx.keywordsJD).clase, informe, problemas });
   }
 
   const ok = (clase: string, fit: string) => `${clase} ${clase === fit ? "✓" : "✗"}`;
-  console.log(`\n${"caso".padEnd(25)} ${"fit esp.".padEnd(8)} ${"antes".padEnd(8)} ${"ahora".padEnd(8)} score  cumples  bloq  preg  alerta`);
+  console.log(`\n${"caso".padEnd(25)} ${"fit esp.".padEnd(8)} ${"antes".padEnd(8)} ${"ahora".padEnd(8)} score  cumples  relac  bloq  preg vis/otras  entrev  aprende  alerta`);
   for (const f of filas) {
     const i = f.informe;
-    console.log(`${f.caso.padEnd(25)} ${f.fit.padEnd(8)} ${ok(f.antes, f.fit).padEnd(8)} ${ok(i.fit.clase, f.fit).padEnd(8)} ${i.fit.score.toFixed(2)}  ${String(i.cumples.length).padStart(7)}  ${String(i.bloqueantes.length).padStart(4)}  ${String(i.preguntas.length).padStart(4)}  ${i.alerta.nivel ?? "—"}`);
+    console.log(`${f.caso.padEnd(25)} ${f.fit.padEnd(8)} ${ok(f.antes, f.fit).padEnd(8)} ${ok(i.fit.clase, f.fit).padEnd(8)} ${i.fit.score.toFixed(2)}  ${String(i.cumples.length).padStart(7)}  ${String(i.relacionado.length).padStart(5)}  ${String(i.bloqueantes.length).padStart(4)}  ${`${i.preguntas.length}/${i.otras_preguntas.length}`.padStart(13)}  ${String(i.para_la_entrevista.length).padStart(6)}  ${(i.aprenderas_en_el_cargo ? "sí" : "—").padStart(7)}  ${i.alerta.nivel ?? "—"}`);
   }
   const n = (k: "antes" | "ahora") => filas.filter(f => (k === "antes" ? f.antes : f.informe.fit.clase) === f.fit).length;
   console.log(`\nEn su clase: antes ${n("antes")}/${filas.length} · ahora ${n("ahora")}/${filas.length}`);
@@ -69,10 +80,17 @@ async function main() {
     console.log(`\n${"═".repeat(90)}\n${f.caso} · fit ${i.fit.clase} (${i.fit.score.toFixed(2)}) · esperado ${f.fit}\n${i.fit.frase}`);
     console.log(`\n  Cumples (${i.cumples.length}):`);
     i.cumples.forEach(c => console.log(`    ✓ ${c.requisito}\n        ${c.evidencia}`));
+    console.log(`\n  Relacionado (${i.relacionado.length}):`);
+    i.relacionado.forEach(r => console.log(`    ~ ${r.texto}`));
     console.log(`\n  Brechas (${i.bloqueantes.length}):`);
     i.bloqueantes.forEach(b => console.log(`    • ${b.texto}`));
     console.log(`\n  Preguntas (${i.preguntas.length}):`);
     i.preguntas.forEach(p => console.log(`    ? [${p.tipo}] ${p.texto}`));
+    console.log(`\n  Otras preguntas, plegadas (${i.otras_preguntas.length}):`);
+    i.otras_preguntas.forEach(p => console.log(`    ? [${p.tipo}] ${p.texto}`));
+    console.log(`\n  Aprenderás en el cargo: ${i.aprenderas_en_el_cargo ?? "—"}`);
+    console.log(`\n  Para la entrevista (${i.para_la_entrevista.length}):`);
+    i.para_la_entrevista.forEach(t => console.log(`    ◦ ${t}`));
     console.log(`\n  Alerta de nivel: ${i.alerta.texto ?? "—"}`);
     console.log(`\n  Limpieza del CV (${i.limpieza.length}):`);
     i.limpieza.forEach(l => console.log(`    - ${l.texto}\n        línea: «${l.linea}»`));

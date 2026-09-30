@@ -143,7 +143,8 @@ async function main() {
     .readdirSync(casosDir)
     .filter((f) => f.endsWith(".json"))
     .sort()
-    .map((f) => JSON.parse(fs.readFileSync(path.join(casosDir, f), "utf-8")));
+    .map((f) => JSON.parse(fs.readFileSync(path.join(casosDir, f), "utf-8")))
+    .filter((c) => !c.solo_informe); // casos solo para evals sin API (informe-fit.ts)
 
   const resultadosDir = path.join(process.cwd(), "evals/resultados");
   const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
