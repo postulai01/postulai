@@ -500,14 +500,14 @@ export const UMBRAL_CLASE = { alto: 0.6, medio: 0.35 }; // alto ≥ 0.60 · medi
 export type ClaseBrecha = "bloqueante" | "preguntable";
 export type ClaseFit = "alto" | "medio" | "bajo";
 
-const RE_NORMATIVA = /\b(ley|leyes|normativa|normativas|norma|normas|reglamento|reglamentos|legislacion|compliance|iso|certificacion|certificaciones|certificado|acreditacion)\b/;
-const RE_SOFTWARE = /\b(excel|office|word|powerpoint|power bi|python|sql|sheets|canva|google|microsoft|portal|plataforma|plataformas|software|herramienta|herramientas|erp|crm|sistema|sistemas)\b/;
-const RE_SECTOR = /\b(sector|industria|rubro|fintech|mineria|minera|retail|startup|tecnologia|tecnologico|ciberseguridad|banca|seguros|construccion|faena|experiencia en)\b/;
+export const RE_NORMATIVA = /\b(ley|leyes|normativa|normativas|norma|normas|reglamento|reglamentos|legislacion|compliance|iso|certificacion|certificaciones|certificado|acreditacion)\b/;
+export const RE_SOFTWARE = /\b(excel|office|word|powerpoint|power bi|python|sql|sheets|canva|google|microsoft|portal|plataforma|plataformas|software|herramienta|herramientas|erp|crm|sistema|sistemas)\b/;
+export const RE_SECTOR = /\b(sector|industria|rubro|fintech|mineria|minera|retail|startup|tecnologia|tecnologico|ciberseguridad|banca|seguros|construccion|faena|experiencia en)\b/;
 
 // Nombre propio de herramienta: sigla en mayúsculas (SAP, SIGA, DAX, M&A) o camelCase (WebControl, BigQuery).
 // Las siglas de área (RRHH, RR.HH., RRLL, TI) no son herramientas.
 const SIGLAS_AREA = new Set(["RRHH", "RRLL", "TI", "HR", "DO"]);
-const pareceHerramienta = (k: string) => k.split(/\s+/)
+export const pareceHerramienta = (k: string) => k.split(/\s+/)
   .filter(t => !SIGLAS_AREA.has(t.replace(/[.,;:()]/g, "")))
   .some(t => /^[A-Z0-9&.]{2,}$/.test(t) || /[a-z][A-Z]/.test(t));
 
@@ -530,7 +530,8 @@ export function claseFit(score: number): ClaseFit {
   return score >= UMBRAL_CLASE.alto ? "alto" : score >= UMBRAL_CLASE.medio ? "medio" : "bajo";
 }
 
-export function scoreV2(r: ResultadoMapeo, jd: KeywordsJD): ScoreV2 {
+// `clasificar` permite otra clasificación de brechas (PED-33, informe-fit.ts) con los mismos pesos y umbrales.
+export function scoreV2(r: ResultadoMapeo, jd: KeywordsJD, clasificar: (keyword: string) => ClaseBrecha = clasificarBrecha): ScoreV2 {
   const cobertura = new Map<string, number>();
   r.matches_directos.forEach(m => cobertura.set(m.keyword_jd, 1));
   r.matches_relacionados.forEach(m => { if (!cobertura.has(m.keyword_jd)) cobertura.set(m.keyword_jd, PESO_RELACIONADO_EN_SCORE); });
@@ -540,7 +541,7 @@ export function scoreV2(r: ResultadoMapeo, jd: KeywordsJD): ScoreV2 {
   for (const k of jd.requeridas) {
     const cob = cobertura.get(k.keyword) ?? 0;
     if (cob > 0) { cubierto += k.relevancia * cob; total += k.relevancia; continue; }
-    const clase = esCarrera(k.keyword) ? "bloqueante" : clasificarBrecha(k.keyword);
+    const clase = esCarrera(k.keyword) ? "bloqueante" : clasificar(k.keyword);
     const peso = k.relevancia * (clase === "preguntable" ? PESO_BRECHA_PREGUNTABLE : 1);
     total += peso;
     (clase === "preguntable" ? preguntables : bloqueantes).push({ descripcion: k.keyword, peso: k.relevancia, clase });

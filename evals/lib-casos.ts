@@ -5,7 +5,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { fusionarCompetencias, type Competencia } from "../app/lib/competencia-extractor";
 import { consolidarJD } from "../app/lib/jd-parser";
-import { aplicarSemanticos, mapearCompetencias, type ExtrasCV, type KeywordsJD, type ResultadoMapeo } from "../app/lib/mapeo-semantico";
+import { aplicarSemanticos, mapearCompetencias, type ExtrasCV, type KeywordsJD, type Rechazo, type ResultadoMapeo } from "../app/lib/mapeo-semantico";
 
 export function loadEnv() {
   const envPath = path.join(process.cwd(), ".env.local");
@@ -86,11 +86,12 @@ export function casosConOferta(): string[] {
 
 // Mapeo completo de un caso sin API: capa literal + requisitos, más las propuestas semánticas guardadas en
 // evals/semantico/ (si las hay), re-filtradas con el código actual.
-export async function mapeoDelCaso(caso: string): Promise<{ ctx: ContextoMapeo; resultado: ResultadoMapeo; semantico: boolean }> {
+export async function mapeoDelCaso(caso: string): Promise<{ ctx: ContextoMapeo; resultado: ResultadoMapeo; semantico: boolean; rechazos: Rechazo[] }> {
   const ctx = cargarContexto(caso);
   const literal = await mapearCompetencias(ctx.competencias, ctx.keywordsJD, ctx.extras);
   const cache = path.join(process.cwd(), "evals/semantico", `${caso}.json`);
-  if (!fs.existsSync(cache)) return { ctx, resultado: literal, semantico: false };
+  if (!fs.existsSync(cache)) return { ctx, resultado: literal, semantico: false, rechazos: [] };
   const { propuestos } = JSON.parse(fs.readFileSync(cache, "utf-8"));
-  return { ctx, resultado: aplicarSemanticos(literal, ctx.keywordsJD, ctx.casoJson.cv_texto, propuestos).resultado, semantico: true };
+  const { resultado, rechazos } = aplicarSemanticos(literal, ctx.keywordsJD, ctx.casoJson.cv_texto, propuestos);
+  return { ctx, resultado, semantico: true, rechazos };
 }
