@@ -1,54 +1,49 @@
 {
   "caso": "pedro_tricolor",
   "oferta": "pedro_tricolor-2026-09-29T22-20-53.json",
-  "costo": 0.010174,
+  "costo": 0.008288,
   "respuestas": [
     {
-      "perfil": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento, demostrando capacidad para ejecutar activaciones de marca y gestionar actividades end-to-end. Orientado a resultados con habilidades de comunicación, trabajo en equipo, adaptabilidad y manejo de herramientas digitales como Microsoft Excel y Office. Inglés avanzado.",
+      "perfil": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento, demostrando capacidad para ejecutar activaciones de marca y gestionar actividades operativas en puntos de venta. Posee habilidades en trabajo en equipo, comunicación efectiva y manejo de herramientas digitales como Microsoft Excel y Office. Adaptable ante distintos contextos de trabajo, orientado a resultados y con inglés avanzado.",
       "afirmaciones": [
         {
-          "frase": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
-          "citas": [
-            "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez"
+          "frase": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez",
+          "lineas": [
+            3,
+            31,
+            33
           ],
           "keywords": []
         },
         {
-          "frase": "Con experiencia en ventas directas y promoción de productos, ejecutando activaciones de marca en puntos de venta.",
-          "citas": [
-            "experiencia en ventas directas, promoción de productos",
-            "Ejecución de activaciones de marca en puntos de venta para Hellmann's",
-            "Demostración de producto e impulso de ventas mediante atención directa al cliente"
-          ],
-          "keywords": [
-            "orientación al servicio"
-          ]
-        },
-        {
-          "frase": "Desarrolló habilidades de emprendimiento end-to-end gestionando actividades de producción, ventas y comercialización.",
-          "citas": [
-            "Gestioné actividades de producción, ventas directas en plazas y espacios públicos, y creación de anuncios publicitarios",
-            "Desarrollé habilidades de emprendimiento end-to-end: desde la producción hasta la comercialización del producto"
+          "frase": "Con experiencia en ventas directas, promoción de productos y emprendimiento",
+          "lineas": [
+            9,
+            13,
+            15,
+            17,
+            21,
+            25
           ],
           "keywords": []
         },
         {
-          "frase": "Orientado a resultados con habilidades de comunicación, trabajo en equipo y adaptabilidad en contextos multifuncionales.",
-          "citas": [
-            "Orientado a resultados",
-            "habilidades de comunicación, trabajo en equipo",
-            "Adaptabilidad y gestión multifuncional"
+          "frase": "demostrando capacidad para ejecutar activaciones de marca y gestionar actividades operativas en puntos de venta",
+          "lineas": [
+            15,
+            17,
+            25
           ],
           "keywords": [
-            "adaptabilidad",
-            "orientación al servicio"
+            "tareas operativas"
           ]
         },
         {
-          "frase": "Maneja herramientas digitales incluyendo Microsoft Excel a nivel intermedio para análisis de datos y Microsoft Office.",
-          "citas": [
-            "Microsoft Excel (nivel intermedio): análisis de datos, tablas, fórmulas",
-            "Microsoft Office (Word, PowerPoint)"
+          "frase": "Posee habilidades en trabajo en equipo, comunicación efectiva y manejo de herramientas digitales como Microsoft Excel y Office",
+          "lineas": [
+            49,
+            51,
+            63
           ],
           "keywords": [
             "Excel",
@@ -56,45 +51,62 @@
           ]
         },
         {
-          "frase": "Inglés avanzado, con formación en colegio bilingüe y exención universitaria por dominio del idioma.",
-          "citas": [
-            "Inglés avanzado",
-            "Exención de inglés universitario por dominio del idioma"
+          "frase": "Adaptable ante distintos contextos de trabajo, orientado a resultados",
+          "lineas": [
+            67,
+            65
+          ],
+          "keywords": [
+            "adaptabilidad"
+          ]
+        },
+        {
+          "frase": "con inglés avanzado",
+          "lineas": [
+            37,
+            57
           ],
           "keywords": []
         }
       ]
     },
     {
-      "perfil": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento. Orientado a resultados, con habilidades de comunicación y trabajo en equipo. Domina Microsoft Excel y herramientas de Office. Adaptable en entornos multifuncionales. Inglés avanzado.",
+      "perfil": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento. Orientado a resultados, con habilidades de comunicación, trabajo en equipo y manejo de Microsoft Excel y herramientas de Office. Adaptable en contextos multifuncionales. Inglés avanzado.",
       "afirmaciones": [
         {
           "frase": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
-          "citas": [
-            "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez"
+          "lineas": [
+            3,
+            31,
+            33
           ],
           "keywords": []
         },
         {
           "frase": "Con experiencia en ventas directas, promoción de productos y emprendimiento.",
-          "citas": [
-            "experiencia en ventas directas, promoción de productos y emprendimiento"
+          "lineas": [
+            13,
+            15,
+            17,
+            21,
+            23,
+            25
           ],
           "keywords": []
         },
         {
           "frase": "Orientado a resultados, con habilidades de comunicación y trabajo en equipo.",
-          "citas": [
-            "Orientado a resultados",
-            "habilidades de comunicación, trabajo en equipo"
+          "lineas": [
+            65,
+            63
           ],
           "keywords": []
         },
         {
-          "frase": "Domina Microsoft Excel para análisis de datos y herramientas de Office como Word y PowerPoint.",
-          "citas": [
-            "Microsoft Excel (nivel intermedio): análisis de datos, tablas, fórmulas",
-            "Microsoft Office (Word, PowerPoint)"
+          "frase": "Manejo de Microsoft Excel y herramientas de Office.",
+          "lineas": [
+            49,
+            51
           ],
           "keywords": [
             "Excel",
@@ -102,9 +114,9 @@
           ]
         },
         {
-          "frase": "Adaptable en entornos multifuncionales.",
-          "citas": [
-            "Adaptabilidad y gestión multifuncional"
+          "frase": "Adaptable en contextos multifuncionales.",
+          "lineas": [
+            67
           ],
           "keywords": [
             "adaptabilidad"
@@ -112,8 +124,9 @@
         },
         {
           "frase": "Inglés avanzado.",
-          "citas": [
-            "Inglés: avanzado"
+          "lineas": [
+            37,
+            57
           ],
           "keywords": []
         }

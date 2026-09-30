@@ -88,9 +88,9 @@ async function main() {
 
   if (estimar) { console.log(`\nCosto estimado de --ejecutar: ~$${estimado.toFixed(4)} sin reintentos, ~$${(estimado * 2).toFixed(4)} con todos\n`); return; }
 
-  console.log(`\n${"caso".padEnd(26)} fit    estado      reint  afirm  citas mal  cobertura req. antes → después`);
+  console.log(`\n${"caso".padEnd(26)} fit    estado      reint  afirm  citas mal  kw fuera  cobertura req. antes → después`);
   for (const f of filas) {
-    console.log(`${f.caso.padEnd(26)} ${f.fit.padEnd(6)} ${f.r.estado.padEnd(11)} ${String(f.r.reintentos).padStart(5)}  ${String(f.r.afirmaciones.length).padStart(5)}  ${String(f.citasInvalidas).padStart(9)}  ${f.antes.length}/${f.total} → ${f.despues.length}/${f.total}`);
+    console.log(`${f.caso.padEnd(26)} ${f.fit.padEnd(6)} ${f.r.estado.padEnd(11)} ${String(f.r.reintentos).padStart(5)}  ${String(f.r.afirmaciones.length).padStart(5)}  ${String(f.citasInvalidas).padStart(9)}  ${String(f.r.keywordsEliminadas ?? 0).padStart(8)}  ${f.antes.length}/${f.total} → ${f.despues.length}/${f.total}`);
   }
 
   for (const f of filas) {
@@ -102,8 +102,9 @@ async function main() {
     if (f.r.problemas.length) console.log(`  problemas del último intento: ${f.r.problemas.join(" | ")}`);
     for (const a of f.r.afirmaciones) {
       console.log(`  · ${a.frase}`);
-      for (const c of a.citas) console.log(`      cita: "${c}"`);
+      a.citas.forEach((c, k) => console.log(`      cita${a.lineas ? ` (línea ${a.lineas[k]})` : ""}: "${c}"`));
       if (a.keywords.length) console.log(`      keywords: ${a.keywords.join(", ")}`);
+      if (a.keywordsEliminadas?.length) console.log(`      eliminadas de la traza: ${a.keywordsEliminadas.join(", ")}`);
     }
     const ganadas = f.despues.filter(k => !f.antes.includes(k)), perdidas = f.antes.filter(k => !f.despues.includes(k));
     console.log(`  keywords requeridas: +${ganadas.join(", ") || "—"} · −${perdidas.join(", ") || "—"}`);

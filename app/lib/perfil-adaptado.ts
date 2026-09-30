@@ -15,7 +15,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { cifrasSinRespaldo } from "./cv-postprocess";
 import { norm, raizVerbo, VERBOS_ESCALADA } from "./cv-verificacion";
-import type { KeywordsJD, ResultadoMapeo } from "./mapeo-semantico";
+import { RAICES_GENERICAS, type KeywordsJD, type ResultadoMapeo } from "./mapeo-semantico";
 import { bloquesCV, indice, palabrasContenido, presente } from "./reescritor-contextual";
 
 export const MODELO_PERFIL = "claude-haiku-4-5-20251001";
@@ -24,7 +24,13 @@ const MIN_PALABRAS_PERFIL = 20;
 
 export type EstadoPerfil = "adaptado" | "rechazado" | "sin_perfil";
 
-export interface Afirmacion { frase: string; citas: string[]; keywords: string[] }
+export interface Afirmacion {
+  frase: string;
+  lineas?: number[];            // números de línea del CV (1-based) que cita el modelo
+  citas: string[];              // texto de esas líneas, armado por el código (literal por construcción)
+  keywords: string[];           // traza verificada: solo keywords que la frase contiene
+  keywordsEliminadas?: string[]; // keywords que el modelo asignó pero la frase no contiene
+}
 
 export interface RespuestaPerfil { perfil: string; afirmaciones: Afirmacion[] }
 
@@ -36,6 +42,7 @@ export interface ResultadoPerfil {
   afirmaciones: Afirmacion[];
   reintentos: 0 | 1;
   problemas: string[];          // del último intento
+  keywordsEliminadas?: number;  // keywords sacadas de la traza porque la frase no las contiene
   respuestas: unknown[];        // crudas, para re-verificar sin API
   usage: { input_tokens: number; output_tokens: number };
 }
@@ -62,24 +69,43 @@ export function detectarPerfil(cv: string): { texto: string; indice: number } | 
 
 const colapsar = (s: string) => s.replace(/\s+/g, " ").trim();
 const contarPalabras = (s: string) => s.split(/\s+/).filter(Boolean).length;
+const raiz5 = (p: string) => p.slice(0, 5);
+
+// Conectores neutros que no necesitan respaldo en el CV.
+const RELLENO_NEUTRO = /^(posee|poseo|poseen|cuenta|cuento|cuentan|experiencia|orientad[oa]s?)$/;
+// Intensificadores de nivel: solo si el CV ya los dice (la palabra o su variante de género/número).
+const INTENSIFICADOR = /^(domin|solid|ampli|profund|expert|especialista|avanzad)/;
+const variantes = (p: string) => { const b = p.replace(/(as|os|a|o|es|s)$/, ""); return [p, b, b + "a", b + "o", b + "as", b + "os", b + "es", b + "s"]; };
+
+// Palabras de contenido que comparten (igual o raíz no genérica) dos textos.
+function compartenContenido(a: string, b: string): boolean {
+  const ib = indice(b);
+  return palabrasContenido(a).some(p => ib.set.has(p) || (p.length >= 6 && !RAICES_GENERICAS.has(raiz5(p)) && ib.raices.has(raiz5(p))));
+}
 
 export function verificarPerfil(original: string, r: RespuestaPerfil, input: InputPerfil): string[] {
   const { cv, mapeo } = input;
   const problemas: string[] = [];
   const cvCol = colapsar(cv);
 
-  // Afirmaciones: cada una con al menos una cita, y cada cita literal en el CV.
+  // Afirmaciones: cada una con al menos una cita, cada cita literal en el CV y, si viene por número de línea, la
+  // línea comparte contenido con la frase.
   const sinCita = r.afirmaciones.filter(a => a.citas.length === 0).map(a => a.frase);
   if (sinCita.length > 0) problemas.push(`afirmaciones sin cita: ${sinCita.join(" | ")}`);
   const citasMalas = r.afirmaciones.flatMap(a => a.citas).filter(c => !cvCol.includes(colapsar(c)));
   if (citasMalas.length > 0) problemas.push(`citas que no existen literal en el CV: ${citasMalas.map(c => `"${c}"`).join(" | ")}`);
+  const lineasAjenas = r.afirmaciones.flatMap(a => (a.lineas ? a.citas.filter(c => !compartenContenido(c, a.frase)).map(c => `"${a.frase}" ← "${c}"`) : []));
+  if (lineasAjenas.length > 0) problemas.push(`líneas citadas que no comparten contenido con la frase: ${lineasAjenas.join(" | ")}`);
 
   // Palabras: en el CV o en una keyword con match (literal o semántico).
   const ixCV = indice(cv);
   const ixKw = indice([...mapeo.matches_directos, ...mapeo.matches_relacionados].map(m => m.keyword_jd).join(" "));
   const sinRespaldo = [...new Set(palabrasContenido(r.perfil))]
-    .filter(p => !/\d/.test(p) && !presente(p, ixCV.set, ixCV.raices) && !presente(p, ixKw.set, ixKw.raices));
+    .filter(p => !/\d/.test(p) && !RELLENO_NEUTRO.test(p) && !presente(p, ixCV.set, ixCV.raices) && !presente(p, ixKw.set, ixKw.raices));
   if (sinRespaldo.length > 0) problemas.push(`palabras sin respaldo en el CV: ${sinRespaldo.join(", ")}`);
+  const intensificadores = [...new Set(palabrasContenido(r.perfil))]
+    .filter(p => INTENSIFICADOR.test(p) && !variantes(p).some(v => ixCV.set.has(v)));
+  if (intensificadores.length > 0) problemas.push(`intensificadores sin respaldo en el CV: ${intensificadores.join(", ")}`);
 
   const cifras = cifrasSinRespaldo(r.perfil, cv);
   if (cifras.length > 0) problemas.push(`cifras que no están en el CV: ${cifras.join(", ")}`);
@@ -109,6 +135,35 @@ export function verificarPerfil(original: string, r: RespuestaPerfil, input: Inp
   return problemas;
 }
 
+// ─── traza de keywords (sin API) ──────────────────────────────────────────────
+
+// Una keyword queda en la traza de una afirmación solo si la frase la contiene: sus palabras de raíz no genérica
+// (igual o misma raíz), o la mitad de las palabras de la cita de un match semántico ya aceptado.
+export function verificarTraza(afirmaciones: Afirmacion[], mapeo: ResultadoMapeo): { afirmaciones: Afirmacion[]; eliminadas: number } {
+  const semanticos = [...mapeo.matches_directos, ...mapeo.matches_relacionados].filter(m => m.origen === "semantico" && m.cita);
+  let eliminadas = 0;
+  const out = afirmaciones.map(a => {
+    const ix = indice(a.frase);
+    const esta = (w: string) => ix.set.has(w) || (w.length >= 6 && ix.raices.has(raiz5(w)));
+    const contiene = (k: string) => {
+      const ps = palabrasContenido(k);
+      const propias = ps.filter(p => !RAICES_GENERICAS.has(raiz5(p)));
+      if (ps.length === 0) return false;
+      if ((propias.length ? propias : ps).every(esta)) return true;
+      return semanticos.some(m => {
+        if (m.keyword_jd !== k) return false;
+        const pc = palabrasContenido(m.cita!).filter(p => !RAICES_GENERICAS.has(raiz5(p)));
+        return pc.length > 0 && pc.filter(esta).length >= pc.length / 2;
+      });
+    };
+    const keywords = a.keywords.filter(contiene);
+    const fuera = a.keywords.filter(k => !keywords.includes(k));
+    eliminadas += fuera.length;
+    return { ...a, keywords, ...(fuera.length ? { keywordsEliminadas: fuera } : {}) };
+  });
+  return { afirmaciones: out, eliminadas };
+}
+
 // ─── llamada a modelo ────────────────────────────────────────────────────────
 
 export const SYSTEM_PERFIL = `Reescribes el párrafo de PERFIL PROFESIONAL de un CV en español para una oferta de trabajo, sin inventar nada.
@@ -120,8 +175,9 @@ Reglas:
 - Largo: entre -20% y +20% de las palabras del perfil original.
 - Mantén los términos del perfil original que calzan con keywords de la oferta.
 - Mismo registro y persona gramatical que el original. Frases naturales, sin listas de keywords pegadas.
-- Divide el perfil en afirmaciones. Cada afirmación trae una o más citas COPIADAS LITERALMENTE del CV (fragmentos continuos, sin cambiar nada) que la respaldan, y las keywords de la oferta que cubre.
-Responde SOLO con JSON: {"perfil":"...","afirmaciones":[{"frase":"...","citas":["..."],"keywords":["..."]}]}`;
+- No uses intensificadores de nivel (domina, sólida, amplia, profunda, experto, especialista, avanzado) salvo que el CV ya los diga.
+- Divide el perfil en afirmaciones. Cada afirmación indica los NÚMEROS DE LÍNEA del CV (el CV viene numerado) que la respaldan, y las keywords de la oferta que la frase contiene.
+Responde SOLO con JSON: {"perfil":"...","afirmaciones":[{"frase":"...","lineas":[12,40],"keywords":["..."]}]}`;
 
 export function promptPerfil(original: string, input: InputPerfil, problemasPrevios?: string[]): string {
   const { cv, mapeo, keywordsJD } = input;
@@ -152,19 +208,32 @@ ${cumplidos}
 BRECHAS (prohibido mencionarlas):
 ${brechas}
 
-CV COMPLETO:
-${cv}${reintento}`;
+CV COMPLETO (numerado por línea):
+${numerarCV(cv)}${reintento}`;
 }
 
-// Parsea y normaliza la respuesta; null si no es JSON válido con perfil.
-export function parsearRespuesta(raw: unknown): RespuestaPerfil | null {
+export function numerarCV(cv: string): string {
+  return cv.split("\n").map((l, i) => (l.trim() ? `${i + 1}| ${l.trim()}` : "")).filter(Boolean).join("\n");
+}
+
+// Parsea y normaliza la respuesta; null si no es JSON válido con perfil. Con "lineas", las citas se arman desde el
+// CV (literal por construcción); un número fuera de rango o de una línea vacía queda como cita vacía (inválida).
+// Las respuestas antiguas con "citas" en texto se aceptan tal cual (se verifican igual).
+export function parsearRespuesta(raw: unknown, cv: string): RespuestaPerfil | null {
+  const lineasCV = cv.split("\n");
   const j = raw as { perfil?: unknown; afirmaciones?: unknown } | null;
   if (!j || typeof j.perfil !== "string" || !j.perfil.trim()) return null;
-  const afirmaciones = (Array.isArray(j.afirmaciones) ? j.afirmaciones : []).map((a: Record<string, unknown>) => ({
-    frase: typeof a?.frase === "string" ? a.frase : "",
-    citas: Array.isArray(a?.citas) ? a.citas.filter((c: unknown): c is string => typeof c === "string" && c.trim().length > 0) : [],
-    keywords: Array.isArray(a?.keywords) ? a.keywords.filter((k: unknown): k is string => typeof k === "string") : [],
-  }));
+  const afirmaciones = (Array.isArray(j.afirmaciones) ? j.afirmaciones : []).map((a: Record<string, unknown>): Afirmacion => {
+    const frase = typeof a?.frase === "string" ? a.frase : "";
+    const keywords = Array.isArray(a?.keywords) ? a.keywords.filter((k: unknown): k is string => typeof k === "string") : [];
+    if (Array.isArray(a?.lineas)) {
+      const lineas = a.lineas.map(Number).filter(Number.isInteger);
+      const citas = lineas.map(n => (n >= 1 && n <= lineasCV.length ? lineasCV[n - 1].replace(/^\s*[-•]\s+/, "").trim() : ""));
+      return { frase, lineas, citas: citas.length ? citas : [], keywords };
+    }
+    const citas = Array.isArray(a?.citas) ? a.citas.filter((c: unknown): c is string => typeof c === "string" && c.trim().length > 0) : [];
+    return { frase, citas, keywords };
+  });
   return { perfil: colapsar(j.perfil), afirmaciones };
 }
 
@@ -175,10 +244,11 @@ export function evaluarRespuestas(input: InputPerfil, respuestas: unknown[]): Om
   if (!det) return { ...base, estado: "sin_perfil", perfil: null, afirmaciones: [], reintentos: 0, problemas: [] };
   let problemas: string[] = [];
   for (const [k, raw] of respuestas.slice(0, 2).entries()) {
-    const r = parsearRespuesta(raw);
+    const r = parsearRespuesta(raw, input.cv);
     problemas = r ? verificarPerfil(det.texto, r, input) : ["respuesta sin JSON válido"];
     if (r && problemas.length === 0) {
-      return { ...base, estado: "adaptado", perfil: r.perfil, afirmaciones: r.afirmaciones, reintentos: k as 0 | 1, problemas };
+      const traza = verificarTraza(r.afirmaciones, input.mapeo);
+      return { ...base, estado: "adaptado", perfil: r.perfil, afirmaciones: traza.afirmaciones, reintentos: k as 0 | 1, problemas, keywordsEliminadas: traza.eliminadas };
     }
   }
   return { ...base, estado: "rechazado", perfil: det.texto, afirmaciones: [], reintentos: respuestas.length > 1 ? 1 : 0, problemas };
@@ -206,7 +276,7 @@ export async function adaptarPerfil(input: InputPerfil, opts: { client?: Anthrop
       json = m ? JSON.parse(m[0]) : null;
     } catch { /* se registra como respuesta inválida */ }
     respuestas.push(json);
-    const r = parsearRespuesta(json);
+    const r = parsearRespuesta(json, input.cv);
     problemas = r ? verificarPerfil(det.texto, r, input) : ["respuesta sin JSON válido"];
     if (problemas.length === 0) break;
   }

@@ -1,15 +1,16 @@
 {
   "caso": "andres_asap_antofagasta",
   "oferta": "andres_asap_antofagasta-2026-09-29T19-00-27.json",
-  "costo": 0.01708,
+  "costo": 0.015012,
   "respuestas": [
     {
-      "perfil": "Ejecutivo Senior con 18 años de trayectoria liderando Relaciones Laborales y administración de personal en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores. Especialista en el diseño e implementación de estrategias de gestión de personas alineadas a los objetivos del negocio, transformación cultural y optimización de estructuras de compensaciones de alto impacto financiero. Experto en la conducción exitosa de negociaciones colectivas, liderazgo de equipos directivos de alto desempeño, auditorías laborales, control documental y gestión de dotaciones en sectores industriales y de minería. Domina la implementación de sistemas ERP de personas y posee sólida experiencia en relaciones sindicales complejas y desarrollo de equipos bajo enfoques de eficiencia operacional.",
+      "perfil": "Ejecutivo Senior con 18 años de trayectoria en Relaciones Laborales y administración de personal en corporaciones de alta complejidad operativa, con gestión de dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Responsable del diseño e implementación de estrategias de capital humano alineadas a objetivos del negocio, transformación cultural y optimización de estructuras de remuneraciones con impacto en resultados financieros. Con experiencia en liderazgo de equipos, conducción de negociaciones colectivas, implementación de sistemas ERP de personas, auditorías laborales y control documental en entornos industriales y de minería. Desarrolla equipos directivos bajo enfoques de eficiencia operacional y gestión de crisis.",
       "afirmaciones": [
         {
-          "frase": "Ejecutivo Senior con 18 años de trayectoria liderando Relaciones Laborales y administración de personal en corporaciones de alta complejidad operativa.",
-          "citas": [
-            "18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa"
+          "frase": "Ejecutivo Senior con 18 años de trayectoria en Relaciones Laborales y administración de personal",
+          "lineas": [
+            5,
+            7
           ],
           "keywords": [
             "Relaciones Laborales",
@@ -17,117 +18,212 @@
           ]
         },
         {
-          "frase": "Especialista en el diseño e implementación de estrategias de gestión de personas alineadas a los objetivos del negocio, transformación cultural y optimización de estructuras de compensaciones de alto impacto financiero.",
-          "citas": [
-            "Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural",
-            "optimización de estructuras de compensaciones de alto impacto en la última línea financiera"
+          "frase": "en corporaciones de alta complejidad operativa, con gestión de dotaciones de hasta 5.000 colaboradores",
+          "lineas": [
+            5
           ],
           "keywords": [
-            "administración de personal",
+            "gestión de dotaciones"
+          ]
+        },
+        {
+          "frase": "Responsable del diseño e implementación de estrategias de capital humano alineadas a objetivos del negocio",
+          "lineas": [
+            5,
+            17
+          ],
+          "keywords": [
+            "administración de personal"
+          ]
+        },
+        {
+          "frase": "transformación cultural y optimización de estructuras de remuneraciones con impacto en resultados financieros",
+          "lineas": [
+            5,
+            25
+          ],
+          "keywords": [
             "remuneraciones"
           ]
         },
         {
-          "frase": "Experto en la conducción exitosa de negociaciones colectivas, liderazgo de equipos directivos de alto desempeño, auditorías laborales, control documental y gestión de dotaciones en sectores industriales y de minería.",
-          "citas": [
-            "Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas",
-            "desarrollo de equipos directivos de alto desempeño",
-            "implementación de tecnología para los procesos de auditorías laborales",
-            "rediseño y optimización de procesos críticos de gestión de personas",
-            "Responsable de la estrategia y ejecución de relaciones laborales a nivel nacional",
-            "Servicios de Minería"
+          "frase": "Con experiencia en liderazgo de equipos",
+          "lineas": [
+            5,
+            24
           ],
           "keywords": [
-            "negociación colectiva",
-            "liderazgo de equipos",
-            "auditorías laborales",
-            "control documental",
-            "gestión de dotaciones",
-            "minería",
-            "desarrollo de equipos"
+            "liderazgo de equipos"
           ]
         },
         {
-          "frase": "Domina la implementación de sistemas ERP de personas y posee sólida experiencia en relaciones sindicales complejas y desarrollo de equipos bajo enfoques de eficiencia operacional.",
-          "citas": [
-            "Lideré la puesta en marcha e implementación integral del módulo de Recursos Humanos en el sistema ERP corporativo",
-            "Dirigí la migración e implementación exitosa del nuevo modelo de pago de remuneraciones sobre la plataforma SAP",
-            "Gestioné de forma directa las comunicaciones corporativas, las relaciones sindicales y los comités de gestión de crisis",
-            "eficiencia operacional"
+          "frase": "conducción de negociaciones colectivas",
+          "lineas": [
+            5,
+            34,
+            47,
+            53
           ],
           "keywords": [
-            "ERP de personas",
-            "negociación colectiva",
-            "desarrollo de equipos"
+            "negociación colectiva"
+          ]
+        },
+        {
+          "frase": "implementación de sistemas ERP de personas",
+          "lineas": [
+            11,
+            12,
+            41,
+            52,
+            61
+          ],
+          "keywords": [
+            "ERP de personas"
+          ]
+        },
+        {
+          "frase": "auditorías laborales y control documental en entornos industriales y de minería",
+          "lineas": [
+            18,
+            19,
+            37,
+            40
+          ],
+          "keywords": [
+            "auditorías laborales",
+            "control documental",
+            "minería"
+          ]
+        },
+        {
+          "frase": "Desarrolla equipos directivos bajo enfoques de eficiencia operacional y gestión de crisis",
+          "lineas": [
+            5,
+            27,
+            28
+          ],
+          "keywords": [
+            "desarrollo de equipos",
+            "liderazgo de equipos"
           ]
         }
       ]
     },
     {
-      "perfil": "Ejecutivo Senior con 18 años de trayectoria en Relaciones Laborales y administración de personal en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores. Especialista en el diseño e implementación de estrategias de gestión de personas alineadas a los objetivos del negocio, transformación cultural y optimización de estructuras de compensaciones de alto impacto financiero. Experto en la conducción de negociaciones colectivas estratégicas, gestión de crisis, desarrollo de equipos directivos de alto desempeño y liderazgo de equipos en servicios industriales y minería, bajo enfoques de eficiencia operacional y control documental estricto.",
+      "perfil": "Ejecutivo Senior con 18 años de trayectoria en Relaciones Laborales y administración de personal en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores. Responsable de la estrategia y ejecución de relaciones laborales en entornos industriales y de minería, liderando equipos en procesos transaccionales, operacionales y de desarrollo. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural y optimización de estructuras de remuneraciones. Experiencia en la conducción exitosa de negociaciones colectivas, gestión de auditorías laborales, control documental, implementación de sistemas ERP de personas y desarrollo de equipos directivos bajo enfoques de eficiencia operacional.",
       "afirmaciones": [
         {
-          "frase": "Ejecutivo Senior con 18 años de trayectoria en Relaciones Laborales y administración de personal en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores.",
-          "citas": [
-            "18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales",
-            "corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores"
+          "frase": "Ejecutivo Senior con 18 años de trayectoria en Relaciones Laborales y administración de personal",
+          "lineas": [
+            5,
+            7
           ],
           "keywords": [
             "Relaciones Laborales",
-            "administración de personal",
+            "administración de personal"
+          ]
+        },
+        {
+          "frase": "en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores",
+          "lineas": [
+            5
+          ],
+          "keywords": [
             "gestión de dotaciones"
           ]
         },
         {
-          "frase": "Especialista en el diseño e implementación de estrategias de gestión de personas alineadas a los objetivos del negocio, transformación cultural y optimización de estructuras de compensaciones de alto impacto financiero.",
-          "citas": [
-            "diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural",
-            "optimización de estructuras de compensaciones de alto impacto en la última línea financiera"
+          "frase": "Responsable de la estrategia y ejecución de relaciones laborales en entornos industriales y de minería",
+          "lineas": [
+            39,
+            37
           ],
           "keywords": [
-            "administración de personal",
-            "remuneraciones",
+            "Relaciones Laborales",
+            "minería"
+          ]
+        },
+        {
+          "frase": "liderando equipos en procesos transaccionales, operacionales y de desarrollo",
+          "lineas": [
+            17,
+            24,
+            25
+          ],
+          "keywords": [
+            "liderazgo de equipos"
+          ]
+        },
+        {
+          "frase": "Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio",
+          "lineas": [
+            5,
+            17,
+            24
+          ],
+          "keywords": [
+            "administración de personal"
+          ]
+        },
+        {
+          "frase": "transformación cultural y optimización de estructuras de remuneraciones",
+          "lineas": [
+            5,
+            25,
+            33,
+            40,
+            45
+          ],
+          "keywords": [
+            "remuneraciones"
+          ]
+        },
+        {
+          "frase": "Experiencia en la conducción exitosa de negociaciones colectivas",
+          "lineas": [
+            5,
+            34,
+            47,
+            53
+          ],
+          "keywords": [
+            "negociación colectiva"
+          ]
+        },
+        {
+          "frase": "gestión de auditorías laborales, control documental",
+          "lineas": [
+            18,
+            19,
+            40
+          ],
+          "keywords": [
+            "auditorías laborales",
             "control documental"
           ]
         },
         {
-          "frase": "Experto en la conducción de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño.",
-          "citas": [
-            "conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis",
-            "desarrollo de equipos directivos de alto desempeño"
+          "frase": "implementación de sistemas ERP de personas",
+          "lineas": [
+            11,
+            12,
+            41,
+            52,
+            61
           ],
           "keywords": [
-            "negociación colectiva",
-            "desarrollo de equipos",
-            "liderazgo de equipos"
+            "ERP de personas"
           ]
         },
         {
-          "frase": "Con experiencia en liderazgo de equipos en servicios industriales y minería, implementando auditorías laborales, tecnología para procesos transaccionales y control documental estricto.",
-          "citas": [
-            "Apoyar la implementación de tecnología para los procesos de auditorías laborales",
-            "rediseño y optimización de procesos críticos de gestión de personas para empresas industriales, maximizando la eficiencia operativa y documental",
-            "Servicios de Minería",
-            "Rediseñé y controlé el plan maestro de reclutamiento masivo, administración de remuneraciones, presupuestos por proyecto y control documental estricto"
+          "frase": "desarrollo de equipos directivos bajo enfoques de eficiencia operacional",
+          "lineas": [
+            5,
+            28,
+            35
           ],
           "keywords": [
-            "minería",
-            "auditorías laborales",
-            "control documental",
-            "liderazgo de equipos"
-          ]
-        },
-        {
-          "frase": "Experiencia en implementación de sistemas ERP de personas, estrategias de relaciones laborales y mesas de diálogo social para mitigar riesgos de conflicto.",
-          "citas": [
-            "Lideré la puesta en marcha e implementación integral del módulo de Recursos Humanos en el sistema ERP corporativo",
-            "Lideré la migración e implementación exitosa del nuevo modelo de pago de remuneraciones sobre la plataforma SAP",
-            "diseño e implementación de mesas de diálogo social y estrategias avanzadas de relaciones laborales, mitigando riesgos de conflicto"
-          ],
-          "keywords": [
-            "ERP de personas",
-            "Relaciones Laborales",
-            "negociación colectiva"
+            "desarrollo de equipos"
           ]
         }
       ]

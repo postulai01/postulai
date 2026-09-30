@@ -1,50 +1,75 @@
 {
   "caso": "andres_senior",
   "oferta": "andres_senior-2026-09-29T19-00-27.json",
-  "costo": 0.019824,
+  "costo": 0.015315,
   "respuestas": [
     {
-      "perfil": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa. Especialista en el diseño e implementación de estrategia de capital humano alineada a objetivos del negocio, transformación cultural y transformación digital mediante automatización con IA. Experto en la conducción exitosa de negociaciones colectivas estratégicas, gestión de crisis y optimización de compensaciones con impacto financiero. Domina plataformas tecnológicas clave (BUK, Talana, SAP) y herramientas de automatización e integración (Gemini, Claude, n8n), aplicando HR Analytics para la toma de decisiones. Responsable de presupuestos y control de gestión en operaciones con hasta 5.000 colaboradores.",
+      "perfil": "Ejecutivo Senior con 18 años de trayectoria liderando Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Diseña e implementa estrategias de capital humano alineadas a objetivos del negocio, transformación cultural y automatización de procesos RRHH mediante Inteligencia Artificial. Optimiza estructuras de compensaciones con impacto en resultados financieros y gestiona presupuestos y control de gestión. Conduce negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos bajo enfoques de eficiencia operacional. Domina plataformas tecnológicas como BUK, Talana, SAP, HR Analytics, Gemini, Claude y n8n para transformación digital de procesos transaccionales y de desarrollo organizacional.",
       "afirmaciones": [
         {
-          "frase": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa.",
-          "citas": [
-            "18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa"
+          "frase": "Ejecutivo Senior con 18 años de trayectoria liderando Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150.",
+          "lineas": [
+            5,
+            22,
+            23,
+            30,
+            31,
+            37,
+            38,
+            43,
+            44,
+            49,
+            50,
+            55,
+            56
           ],
           "keywords": [
             "relaciones laborales"
           ]
         },
         {
-          "frase": "Especialista en el diseño e implementación de estrategia de capital humano alineada a objetivos del negocio.",
-          "citas": [
-            "diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio",
-            "Comandé la estrategia integral de la gerencia, redefiniendo las políticas operacionales y transaccionales para alinearlas con la rentabilidad de la compañía"
+          "frase": "Diseña e implementa estrategias de capital humano alineadas a objetivos del negocio, transformación cultural y automatización de procesos RRHH mediante Inteligencia Artificial.",
+          "lineas": [
+            5,
+            7,
+            10,
+            17,
+            24,
+            25
           ],
           "keywords": [
-            "estrategia de capital humano"
-          ]
-        },
-        {
-          "frase": "Experto en transformación cultural y transformación digital mediante automatización con IA.",
-          "citas": [
-            "transformación cultural, automatización digital mediante Inteligencia Artificial",
-            "Lideré el proceso integral de transformación cultural del grupo, digitalizando y automatizando los flujos transaccionales y de desarrollo organizacional",
-            "Automatización & IA: Inteligencia Artificial (Gemini/Claude) y plataformas de integración ágil (n8n)"
-          ],
-          "keywords": [
+            "estrategia de capital humano",
             "transformación cultural",
-            "transformación digital",
-            "automatización con IA",
-            "automatización de procesos RRHH"
+            "automatización de procesos RRHH",
+            "automatización con IA"
           ]
         },
         {
-          "frase": "Experto en la conducción exitosa de negociaciones colectivas estratégicas y gestión de crisis.",
-          "citas": [
-            "conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis",
-            "Encabecé los procesos de negociación colectiva con múltiples sindicatos complejos, alcanzando acuerdos sustentables",
-            "Gestioné de forma directa las comunicaciones corporativas, las relaciones sindicales y los comités de gestión de crisis"
+          "frase": "Optimiza estructuras de compensaciones con impacto en resultados financieros y gestiona presupuestos y control de gestión.",
+          "lineas": [
+            5,
+            7,
+            28,
+            33,
+            40,
+            45,
+            46,
+            57,
+            60
+          ],
+          "keywords": [
+            "compensaciones",
+            "gestión de presupuesto"
+          ]
+        },
+        {
+          "frase": "Conduce negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos bajo enfoques de eficiencia operacional.",
+          "lineas": [
+            5,
+            27,
+            34,
+            47,
+            53
           ],
           "keywords": [
             "negociaciones colectivas",
@@ -52,135 +77,130 @@
           ]
         },
         {
-          "frase": "Especialista en optimización de compensaciones con impacto en la línea financiera y control presupuestario.",
-          "citas": [
-            "optimización de estructuras de compensaciones de alto impacto en la última línea financiera",
-            "Transformé el modelo corporativo de administración de Compensaciones y Beneficios de la clínica, logrando un equilibrio óptimo entre la equidad interna, la competitividad de mercado y el control del presupuesto",
-            "Diseñé la matriz de capacitación, entrenamiento y evaluación del desempeño bajo un estricto control presupuestario fundamentado en HR Analytics"
-          ],
-          "keywords": [
-            "compensaciones",
-            "gestión de presupuesto",
-            "HR Analytics"
-          ]
-        },
-        {
-          "frase": "Domina plataformas tecnológicas clave de gestión de personas (BUK, Talana, SAP) y herramientas de automatización e integración (Gemini, Claude, n8n).",
-          "citas": [
-            "Sistemas de Gestión de Personas: BUK, Talana, Zenda, Payroll, Softland",
-            "Plataformas ERP Corporativas: SAP, Meta4, Manager",
-            "Automatización & IA: Inteligencia Artificial (Gemini/Claude) y plataformas de integración ágil (n8n)"
+          "frase": "Domina plataformas tecnológicas como BUK, Talana, SAP, HR Analytics, Gemini, Claude y n8n para transformación digital de procesos transaccionales y de desarrollo organizacional.",
+          "lineas": [
+            10,
+            11,
+            12,
+            25,
+            28
           ],
           "keywords": [
             "BUK",
             "Talana",
             "SAP",
+            "HR Analytics",
             "Gemini",
             "Claude",
-            "n8n"
-          ]
-        },
-        {
-          "frase": "Responsable de presupuestos y control de gestión en operaciones con hasta 5.000 colaboradores.",
-          "citas": [
-            "dotaciones de hasta 5.000 colaboradores",
-            "Presupuestos y Control de Gestión"
-          ],
-          "keywords": [
-            "gestión de presupuesto"
+            "n8n",
+            "transformación digital"
           ]
         }
       ]
     },
     {
-      "perfil": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural y automatización digital mediante Inteligencia Artificial. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y optimización de estructuras de compensaciones con impacto en la rentabilidad. Domina plataformas tecnológicas clave como SAP, BUK, Talana y HR Analytics para automatizar flujos transaccionales y de desarrollo organizacional.",
+      "perfil": "Ejecutivo Senior con 18 años de trayectoria en Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa. Ha liderado la estrategia de capital humano en empresas industriales y de servicios, alineando políticas y procesos transaccionales con objetivos de negocio. Especializado en transformación cultural y automatización digital mediante Inteligencia Artificial, con dominio de plataformas como BUK, Talana, SAP y herramientas de integración ágil (n8n, Gemini, Claude). Experto en conducción de negociaciones colectivas estratégicas, gestión de crisis y optimización de estructuras de compensaciones con impacto en la línea financiera. Posee experiencia en HR Analytics, presupuestos y control de gestión, así como en desarrollo de equipos directivos bajo enfoques de eficiencia operacional y sustentabilidad.",
       "afirmaciones": [
         {
-          "frase": "Cuenta con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa.",
-          "citas": [
-            "18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa"
+          "frase": "Ejecutivo Senior con 18 años de trayectoria en Recursos Humanos y Relaciones Laborales",
+          "lineas": [
+            5,
+            23,
+            31,
+            38,
+            44,
+            50,
+            56
           ],
           "keywords": [
             "relaciones laborales"
           ]
         },
         {
-          "frase": "Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio.",
-          "citas": [
-            "Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio",
-            "Comandé la estrategia integral de la gerencia, redefiniendo las políticas operacionales y transaccionales para alinearlas con la rentabilidad de la compañía"
+          "frase": "en corporaciones de alta complejidad operativa",
+          "lineas": [
+            5,
+            22,
+            30,
+            37,
+            43,
+            49,
+            55
+          ],
+          "keywords": []
+        },
+        {
+          "frase": "Ha liderado la estrategia de capital humano en empresas industriales y de servicios, alineando políticas y procesos transaccionales con objetivos de negocio",
+          "lineas": [
+            5,
+            17,
+            24,
+            32,
+            39,
+            45,
+            51
           ],
           "keywords": [
             "estrategia de capital humano"
           ]
         },
         {
-          "frase": "Experto en transformación cultural, liderando procesos integrales de transformación digital y automatizando los flujos transaccionales y de desarrollo organizacional.",
-          "citas": [
-            "transformación cultural",
-            "Lideré el proceso integral de transformación cultural del grupo, digitalizando y automatizando los flujos transaccionales y de desarrollo organizacional"
+          "frase": "Especializado en transformación cultural y automatización digital mediante Inteligencia Artificial",
+          "lineas": [
+            5,
+            10,
+            25
           ],
           "keywords": [
             "transformación cultural",
-            "transformación digital",
-            "automatización de procesos RRHH"
+            "automatización con IA",
+            "transformación digital"
           ]
         },
         {
-          "frase": "Especialista en la conducción y cierre exitoso de negociaciones colectivas estratégicas, encabezando procesos con múltiples sindicatos complejos.",
-          "citas": [
-            "Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas",
-            "Encabecé los procesos de negociación colectiva con múltiples sindicatos complejos, alcanzando acuerdos sustentables"
+          "frase": "con dominio de plataformas como BUK, Talana, SAP y herramientas de integración ágil (n8n, Gemini, Claude)",
+          "lineas": [
+            10,
+            11,
+            12
           ],
           "keywords": [
-            "negociaciones colectivas"
-          ]
-        },
-        {
-          "frase": "Experto en gestión de crisis, manteniendo un clima laboral óptimo y libre de paralizaciones mediante la gestión directa de comités de gestión de crisis.",
-          "citas": [
-            "Gestioné de forma directa las comunicaciones corporativas, las relaciones sindicales y los comités de gestión de crisis, manteniendo un clima laboral óptimo y libre de paralizaciones"
-          ],
-          "keywords": [
-            "gestión de crisis"
-          ]
-        },
-        {
-          "frase": "Especialista en optimización de estructuras de compensaciones con impacto en la rentabilidad, rediseñando modelos de compensaciones y bandas salariales.",
-          "citas": [
-            "optimización de estructuras de compensaciones de alto impacto en la última línea financiera",
-            "Transformé el modelo corporativo de administración de Compensaciones y Beneficios de la clínica, logrando un equilibrio óptimo entre la equidad interna, la competitividad de mercado y el control del presupuesto",
-            "Rediseñé estructuralmente el modelo de compensaciones y las bandas salariales para la fuerza de ventas publicitarias de todas las marcas del grupo"
-          ],
-          "keywords": [
-            "compensaciones",
-            "gestión de presupuesto"
-          ]
-        },
-        {
-          "frase": "Domina plataformas tecnológicas clave como SAP, BUK, Talana y HR Analytics para la gestión de personas y análisis de datos.",
-          "citas": [
-            "Dirigí la migración e implementación exitosa del nuevo modelo de pago de remuneraciones sobre la plataforma SAP",
-            "Diseñé la matriz de capacitación, entrenamiento y evaluación del desempeño bajo un estricto control presupuestario fundamentado en HR Analytics"
-          ],
-          "keywords": [
-            "SAP",
             "BUK",
             "Talana",
-            "HR Analytics"
+            "SAP",
+            "n8n",
+            "Gemini",
+            "Claude"
           ]
         },
         {
-          "frase": "Implementa automatización digital mediante Inteligencia Artificial y plataformas de integración ágil para optimizar procesos de gestión de personas.",
-          "citas": [
-            "automatización digital mediante Inteligencia Artificial",
-            "Automatización & IA: Inteligencia Artificial (Gemini/Claude) y plataformas de integración ágil (n8n)"
+          "frase": "Experto en conducción de negociaciones colectivas estratégicas, gestión de crisis y optimización de estructuras de compensaciones",
+          "lineas": [
+            5,
+            27,
+            34,
+            47,
+            53
           ],
           "keywords": [
-            "automatización con IA",
-            "Gemini",
-            "Claude",
-            "n8n"
+            "negociaciones colectivas",
+            "gestión de crisis",
+            "compensaciones"
+          ]
+        },
+        {
+          "frase": "Posee experiencia en HR Analytics, presupuestos y control de gestión, así como en desarrollo de equipos directivos bajo enfoques de eficiencia operacional",
+          "lineas": [
+            7,
+            28,
+            40,
+            45,
+            57,
+            60
+          ],
+          "keywords": [
+            "HR Analytics",
+            "gestión de presupuesto"
           ]
         }
       ]
