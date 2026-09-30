@@ -201,7 +201,7 @@ export const SYSTEM_VALIDADOR = `Eres un verificador estricto de fidelidad de CV
 - relacion: une hechos separados del CV como si fueran uno (herramientas de una línea usadas en el logro de otra, etc.).
 - tiempo: presenta en presente algo que el CV muestra como pasado o terminado.
 - contenido: agrega algo que ninguna línea citada dice (términos nuevos, aunque sean sinónimos cercanos que cambian el significado).
-Parafrasear, resumir, omitir o reordenar NO es exagerar. Si todo lo afirmado está en las líneas con igual o menor fuerza, es "fiel".
+Omitir detalles, resumir o ser menos específico que la línea citada es FIEL. Solo es "exagera" si la oración afirma MÁS que las líneas citadas (rol, alcance, relación, tiempo o contenido nuevo).
 "natural": false solo si la oración suena a lista de keywords pegadas (keyword stuffing); no afecta el veredicto.
 Responde SOLO con JSON: {"oraciones":[{"i":1,"veredicto":"fiel"|"exagera","tipo":"rol"|"alcance"|"relacion"|"tiempo"|"contenido"|null,"explicacion":"máx. 25 palabras, cita la frase exagerada","natural":true|false}]}`;
 

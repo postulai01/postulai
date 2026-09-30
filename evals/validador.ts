@@ -71,7 +71,7 @@ async function main() {
     for (let n = 1; n <= corridas; n++) {
       const archivo = path.join(RESP, `${m}-${n}.json`);
       if (client) {
-        const previo = costos[m][costos[m].length - 1] ?? PRECIOS[m][1] * TOKENS_OUT / 1e6 * 4;
+        const previo = costos[m][costos[m].length - 1] ?? (PRECIOS[m][0] * 5000 + PRECIOS[m][1] * TOKENS_OUT) / 1e6; // ~5k tokens de entrada
         if (gastado + previo > presupuesto) { console.log(`⏸  ${m} #${n}: presupuesto agotado ($${gastado.toFixed(4)})`); continue; }
         const r = await juzgarConModelo(unicas, { client, modelo: MODELOS_VALIDADOR[m as keyof typeof MODELOS_VALIDADOR] });
         const c = costo(m, r.usage);

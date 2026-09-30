@@ -5,9 +5,10 @@
  * contra la oferta (misma lógica del priorizador: tema central + raíces no genéricas). La primera oración, la que
  * presenta a la persona, queda siempre primera. No escribe texto: el multiconjunto de oraciones es idéntico. $0.
  *
- * Modo "generativo" (adaptarPerfil): DESACTIVADO HASTA PED-24. Produce afirmaciones infladas que la verificación por
- * palabras no detecta ("Apoyar la definición" → "Responsable de la definición"; hechos de distintos puestos unidos).
- * Queda en el código solo detrás de una opción explícita (modo: "generativo"). Ver evals/validador/inflados-ped32.json.
+ * Modo "generativo" (adaptarPerfil): ARCHIVADO, no activable desde la app. Archivado: con el validador, los perfiles
+ * quedan como subconjuntos más pobres del original; retomar cuando PED-5 aporte material nuevo del usuario.
+ * Sin validador producía afirmaciones infladas (evals/validador/inflados-ped32.json); con él (PED-24, app/lib/validador.ts)
+ * solo 3 de 9 perfiles se adaptan. Solo lo usan los evals (evals/perfil-adaptado.ts, evals/perfil-validado.ts).
  *
  * Generativo, en detalle: reescribe el párrafo de perfil oración por oración, con trazabilidad.
  *
@@ -307,8 +308,8 @@ export function evaluarRespuestas(input: InputPerfil, respuestas: unknown[]): Om
   };
 }
 
-// Modo generativo: desactivado hasta PED-24: produce afirmaciones infladas que la verificación por palabras no detecta.
-// Usar solo explícitamente (perfilParaOferta con modo: "generativo", o el eval evals/perfil-adaptado.ts).
+// Modo generativo: archivado: con el validador, los perfiles quedan como subconjuntos más pobres del original; retomar
+// cuando PED-5 aporte material nuevo del usuario. Solo para evals; perfilParaOferta no lo expone.
 export async function adaptarPerfil(input: InputPerfil, opts: { client?: Anthropic; maxIntentos?: 1 | 2 } = {}): Promise<ResultadoPerfil> {
   const usage = { input_tokens: 0, output_tokens: 0 };
   const det = detectarPerfil(input.cv);
@@ -373,11 +374,7 @@ export function priorizarPerfil(input: InputPerfil): ResultadoPerfilPriorizado {
   return { estado: "priorizado", original: det.texto, perfil: ordenadas.map(o => o.texto).join(" "), indiceLinea: det.indice, oraciones: ordenadas };
 }
 
-// Punto de entrada. Por defecto, priorizado. El generativo solo con modo: "generativo" (desactivado hasta PED-24).
-export async function perfilParaOferta(
-  input: InputPerfil,
-  opts: { modo?: "priorizado" | "generativo"; client?: Anthropic } = {},
-): Promise<ResultadoPerfilPriorizado | ResultadoPerfil> {
-  if (opts.modo === "generativo") return adaptarPerfil(input, { client: opts.client });
+// Punto de entrada: siempre el perfil priorizado. El generativo está archivado (ver adaptarPerfil).
+export async function perfilParaOferta(input: InputPerfil): Promise<ResultadoPerfilPriorizado> {
   return priorizarPerfil(input);
 }
