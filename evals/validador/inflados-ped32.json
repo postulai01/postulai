@@ -1,0 +1,416 @@
+{
+  "descripcion": "Afirmaciones del perfil generativo de PED-32 que pasaron la verificación por palabras. 'inflados': deben rechazarse; 'honestas': deben aceptarse. Fixture para el validador de PED-24.",
+  "fuente": "evals/perfil/<caso>.json (respuestas de Haiku, verificación por oración)",
+  "tipos": [
+    "escalada_rol",
+    "calificativo_trasladado",
+    "relacion_inventada",
+    "tiempo_verbal",
+    "palabra_nueva",
+    "leve"
+  ],
+  "inflados": [
+    {
+      "caso": "andres_asap_antofagasta",
+      "tipo": "escalada_rol",
+      "nota": "'Responsable de auditorías laborales' donde el CV dice 'Apoyo en la implementación de tecnología para los procesos de auditorías laborales'",
+      "oracion": "Responsable de auditorías laborales, control documental, gestión de dotaciones a gran escala y procesamiento de nómina, con experiencia en implementación de sistemas ERP de personas y plataformas de gestión integradas.",
+      "lineas_citadas": [
+        {
+          "linea": 18,
+          "texto": "Apoyo en la implementación de tecnología para los procesos de auditorías laborales, estrategias para las negociaciones colectivas y relaciones laborales, planes de desarrollo de personas y equipos de trabajo de alto rendimiento."
+        },
+        {
+          "linea": 19,
+          "texto": "Apoyar el diagnóstico, rediseño y optimización de procesos críticos de gestión de personas para empresas industriales, maximizando la eficiencia operativa y documental."
+        },
+        {
+          "linea": 32,
+          "texto": "Dirigí la planificación estratégica y ejecución de la operación de relaciones laborales, procesamiento de nómina y entrega de beneficios a gran escala."
+        },
+        {
+          "linea": 40,
+          "texto": "Rediseñé y controlé el plan maestro de reclutamiento masivo, administración de remuneraciones, presupuestos por proyecto y control documental estricto."
+        },
+        {
+          "linea": 52,
+          "texto": "Logro clave: Lideré la puesta en marcha e implementación integral del módulo de Recursos Humanos en el sistema ERP corporativo (integrado con finanzas, compras y producción)."
+        },
+        {
+          "linea": 61,
+          "texto": "Logro clave: Lideré la implementación del sistema de gestión ERP para los módulos de RRHH, finanzas, abastecimiento y mantenimiento."
+        }
+      ]
+    },
+    {
+      "caso": "andres_asap_antofagasta",
+      "tipo": "calificativo_trasladado",
+      "nota": "'gestión de dotaciones a gran escala': 'a gran escala' califica en el CV a la entrega de beneficios",
+      "oracion": "Responsable de auditorías laborales, control documental, gestión de dotaciones a gran escala y procesamiento de nómina, con experiencia en implementación de sistemas ERP de personas y plataformas de gestión integradas.",
+      "lineas_citadas": [
+        {
+          "linea": 18,
+          "texto": "Apoyo en la implementación de tecnología para los procesos de auditorías laborales, estrategias para las negociaciones colectivas y relaciones laborales, planes de desarrollo de personas y equipos de trabajo de alto rendimiento."
+        },
+        {
+          "linea": 19,
+          "texto": "Apoyar el diagnóstico, rediseño y optimización de procesos críticos de gestión de personas para empresas industriales, maximizando la eficiencia operativa y documental."
+        },
+        {
+          "linea": 32,
+          "texto": "Dirigí la planificación estratégica y ejecución de la operación de relaciones laborales, procesamiento de nómina y entrega de beneficios a gran escala."
+        },
+        {
+          "linea": 40,
+          "texto": "Rediseñé y controlé el plan maestro de reclutamiento masivo, administración de remuneraciones, presupuestos por proyecto y control documental estricto."
+        },
+        {
+          "linea": 52,
+          "texto": "Logro clave: Lideré la puesta en marcha e implementación integral del módulo de Recursos Humanos en el sistema ERP corporativo (integrado con finanzas, compras y producción)."
+        },
+        {
+          "linea": 61,
+          "texto": "Logro clave: Lideré la implementación del sistema de gestión ERP para los módulos de RRHH, finanzas, abastecimiento y mantenimiento."
+        }
+      ]
+    },
+    {
+      "caso": "andres_asap_antofagasta",
+      "tipo": "tiempo_verbal",
+      "nota": "'Lidera equipos en minería, servicios industriales…' en presente; hoy es consultor y la cita es solo el título BUILDTEK",
+      "oracion": "Lidera equipos en minería, servicios industriales y corporaciones complejas, conduciendo negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos bajo enfoques de eficiencia operacional.",
+      "lineas_citadas": [
+        {
+          "linea": 37,
+          "texto": "BUILDTEK (Servicios de Minería) — 2014 – 2017"
+        },
+        {
+          "linea": 27,
+          "texto": "Gestioné de forma directa las comunicaciones corporativas, las relaciones sindicales y los comités de gestión de crisis, manteniendo un clima laboral óptimo y libre de paralizaciones."
+        },
+        {
+          "linea": 34,
+          "texto": "Encabecé los procesos de negociación colectiva con múltiples sindicatos complejos, alcanzando acuerdos sustentables enfocados en la eficiencia operacional y la calidad de vida de los colaboradores."
+        },
+        {
+          "linea": 47,
+          "texto": "Conduje con éxito múltiples procesos de negociación colectiva, asegurando acuerdos alineados con las metas de eficiencia financiera de la empresa."
+        }
+      ]
+    },
+    {
+      "caso": "andres_asap_antofagasta",
+      "tipo": "palabra_nueva",
+      "nota": "'estructuras de remuneraciones' donde el CV dice 'estructuras de compensaciones' (término de la oferta)",
+      "oracion": "Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital y optimización de estructuras de remuneraciones con impacto en la línea financiera.",
+      "lineas_citadas": [
+        {
+          "linea": 5,
+          "texto": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional."
+        },
+        {
+          "linea": 25,
+          "texto": "Lideré el proceso integral de transformación cultural del grupo, digitalizando y automatizando los flujos transaccionales y de desarrollo organizacional."
+        },
+        {
+          "linea": 33,
+          "texto": "Logro clave: Transformé el modelo corporativo de administración de Compensaciones y Beneficios de la clínica, logrando un equilibrio óptimo entre la equidad interna, la competitividad de mercado y el control del presupuesto."
+        },
+        {
+          "linea": 46,
+          "texto": "Logro clave: Rediseñé estructuralmente el modelo de compensaciones y las bandas salariales para la fuerza de ventas publicitarias de todas las marcas del grupo, impulsando la competitividad del equipo comercial."
+        }
+      ]
+    },
+    {
+      "caso": "andres_asap_antofagasta",
+      "tipo": "leve",
+      "nota": "'plataformas de gestión integradas' generaliza 'ERP corporativo (integrado con finanzas, compras y producción)'",
+      "oracion": "Responsable de auditorías laborales, control documental, gestión de dotaciones a gran escala y procesamiento de nómina, con experiencia en implementación de sistemas ERP de personas y plataformas de gestión integradas.",
+      "lineas_citadas": [
+        {
+          "linea": 18,
+          "texto": "Apoyo en la implementación de tecnología para los procesos de auditorías laborales, estrategias para las negociaciones colectivas y relaciones laborales, planes de desarrollo de personas y equipos de trabajo de alto rendimiento."
+        },
+        {
+          "linea": 19,
+          "texto": "Apoyar el diagnóstico, rediseño y optimización de procesos críticos de gestión de personas para empresas industriales, maximizando la eficiencia operativa y documental."
+        },
+        {
+          "linea": 32,
+          "texto": "Dirigí la planificación estratégica y ejecución de la operación de relaciones laborales, procesamiento de nómina y entrega de beneficios a gran escala."
+        },
+        {
+          "linea": 40,
+          "texto": "Rediseñé y controlé el plan maestro de reclutamiento masivo, administración de remuneraciones, presupuestos por proyecto y control documental estricto."
+        },
+        {
+          "linea": 52,
+          "texto": "Logro clave: Lideré la puesta en marcha e implementación integral del módulo de Recursos Humanos en el sistema ERP corporativo (integrado con finanzas, compras y producción)."
+        },
+        {
+          "linea": 61,
+          "texto": "Logro clave: Lideré la implementación del sistema de gestión ERP para los módulos de RRHH, finanzas, abastecimiento y mantenimiento."
+        }
+      ]
+    },
+    {
+      "caso": "andres_senior",
+      "tipo": "relacion_inventada",
+      "nota": "une la automatización de flujos (Servimaule) con Gemini, Claude y n8n (stack), y lo pasa a presente",
+      "oracion": "Automatiza flujos transaccionales y de desarrollo organizacional mediante Inteligencia Artificial con Gemini, Claude y n8n, implementando transformación digital en procesos de RRHH.",
+      "lineas_citadas": [
+        {
+          "linea": 10,
+          "texto": "Automatización & IA: Inteligencia Artificial (Gemini/Claude) y plataformas de integración ágil (n8n)."
+        },
+        {
+          "linea": 25,
+          "texto": "Lideré el proceso integral de transformación cultural del grupo, digitalizando y automatizando los flujos transaccionales y de desarrollo organizacional."
+        }
+      ]
+    },
+    {
+      "caso": "andres_vallenar",
+      "tipo": "escalada_rol",
+      "nota": "'Responsable de la definición de todas las políticas' donde el CV dice 'Apoyar la definición…'",
+      "oracion": "Responsable de la definición de todas las políticas de la gerencia con énfasis en los procesos transaccionales, operacionales y de desarrollo, así como de la gestión de relaciones sindicales y negociaciones colectivas estratégicas.",
+      "lineas_citadas": [
+        {
+          "linea": 17,
+          "texto": "Apoyar la definición e implementación de la estrategia de gestión de personas, la definición de todas las políticas de la gerencia, con énfasis en los procesos transaccionales, operacionales y de desarrollo."
+        },
+        {
+          "linea": 27,
+          "texto": "Gestioné de forma directa las comunicaciones corporativas, las relaciones sindicales y los comités de gestión de crisis, manteniendo un clima laboral óptimo y libre de paralizaciones."
+        },
+        {
+          "linea": 34,
+          "texto": "Encabecé los procesos de negociación colectiva con múltiples sindicatos complejos, alcanzando acuerdos sustentables enfocados en la eficiencia operacional y la calidad de vida de los colaboradores."
+        }
+      ]
+    },
+    {
+      "caso": "andres_vallenar",
+      "tipo": "calificativo_trasladado",
+      "nota": "'Experto' se aplica en el CV a negociaciones colectivas; transformación cultural va con 'Especialista'",
+      "oracion": "Experto en transformación cultural, automatización digital mediante Inteligencia Artificial, optimización de estructuras de compensaciones y desarrollo de equipos directivos bajo enfoques de eficiencia operacional.",
+      "lineas_citadas": [
+        {
+          "linea": 5,
+          "texto": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional."
+        },
+        {
+          "linea": 25,
+          "texto": "Lideré el proceso integral de transformación cultural del grupo, digitalizando y automatizando los flujos transaccionales y de desarrollo organizacional."
+        },
+        {
+          "linea": 28,
+          "texto": "Diseñé e implementé la matriz de capacitación, entrenamiento y evaluación del desempeño bajo un estricto control presupuestario fundamentado en HR Analytics."
+        }
+      ]
+    },
+    {
+      "caso": "valentina_asistente_do",
+      "tipo": "palabra_nueva",
+      "nota": "'comunicaciones internas' no está en el CV (es un deseable de la oferta)",
+      "oracion": "Implementa modelos de evaluación de desempeño alineados a objetivos organizacionales y gestiona el clima organizacional mediante programas de bienestar y comunicaciones internas.",
+      "lineas_citadas": [
+        {
+          "linea": 14,
+          "texto": "Implementé el modelo de evaluación de desempeño por objetivos para el equipo de supervisores, alineando metas individuales a resultados de zona."
+        },
+        {
+          "linea": 18,
+          "texto": "Reduje la tasa de ausentismo de la zona de 8,2% a 4,1% en 18 meses mediante gestión de clima laboral y programas de bienestar."
+        },
+        {
+          "linea": 33,
+          "texto": "Blandas: liderazgo de equipos, gestión del desempeño, comunicación ejecutiva, planificación y organización de tareas"
+        }
+      ]
+    },
+    {
+      "caso": "valentina_cambio_rubro",
+      "tipo": "leve",
+      "nota": "'resultados organizacionales' donde el CV dice 'resultados de zona'",
+      "oracion": "Implementa modelos de evaluación de desempeño por objetivos, alineando metas individuales a resultados organizacionales.",
+      "lineas_citadas": [
+        {
+          "linea": 14,
+          "texto": "Implementé el modelo de evaluación de desempeño por objetivos para el equipo de supervisores, alineando metas individuales a resultados de zona."
+        }
+      ]
+    }
+  ],
+  "honestas": [
+    {
+      "caso": "andres_senior",
+      "oracion": "Ejecutivo Senior con 18 años de trayectoria liderando Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150.",
+      "lineas_citadas": [
+        {
+          "linea": 5,
+          "texto": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional."
+        }
+      ]
+    },
+    {
+      "caso": "andres_senior",
+      "oracion": "Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural y optimización de estructuras de compensaciones.",
+      "lineas_citadas": [
+        {
+          "linea": 5,
+          "texto": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional."
+        },
+        {
+          "linea": 7,
+          "texto": "Áreas de Expertise: Estrategia de Capital Humano, Relaciones Sindicales y Laborales Complejas, Transformación Digital & HR Analytics, Compensaciones y Beneficios Estratégicos, Desarrollo Organizacional Presupuestos y Control de Gestión."
+        },
+        {
+          "linea": 24,
+          "texto": "Comandé la estrategia integral de la gerencia, redefiniendo las políticas operacionales y transaccionales para alinearlas con la rentabilidad de la compañía."
+        },
+        {
+          "linea": 33,
+          "texto": "Logro clave: Transformé el modelo corporativo de administración de Compensaciones y Beneficios de la clínica, logrando un equilibrio óptimo entre la equidad interna, la competitividad de mercado y el control del presupuesto."
+        },
+        {
+          "linea": 46,
+          "texto": "Logro clave: Rediseñé estructuralmente el modelo de compensaciones y las bandas salariales para la fuerza de ventas publicitarias de todas las marcas del grupo, impulsando la competitividad del equipo comercial."
+        }
+      ]
+    },
+    {
+      "caso": "andres_senior",
+      "oracion": "Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos bajo enfoques de eficiencia operacional.",
+      "lineas_citadas": [
+        {
+          "linea": 5,
+          "texto": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional."
+        },
+        {
+          "linea": 27,
+          "texto": "Gestioné de forma directa las comunicaciones corporativas, las relaciones sindicales y los comités de gestión de crisis, manteniendo un clima laboral óptimo y libre de paralizaciones."
+        },
+        {
+          "linea": 34,
+          "texto": "Encabecé los procesos de negociación colectiva con múltiples sindicatos complejos, alcanzando acuerdos sustentables enfocados en la eficiencia operacional y la calidad de vida de los colaboradores."
+        },
+        {
+          "linea": 47,
+          "texto": "Conduje con éxito múltiples procesos de negociación colectiva, asegurando acuerdos alineados con las metas de eficiencia financiera de la empresa."
+        },
+        {
+          "linea": 53,
+          "texto": "Conduje de manera exitosa los procesos de negociación colectiva con el sindicato de la compañía."
+        }
+      ]
+    },
+    {
+      "caso": "andres_vallenar",
+      "oracion": "Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, con experiencia en faenas de la zona norte del país.",
+      "lineas_citadas": [
+        {
+          "linea": 5,
+          "texto": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional."
+        },
+        {
+          "linea": 39,
+          "texto": "Responsable de la estrategia y ejecución de relaciones laborales a nivel nacional, con foco crítico en la Región Metropolitana y faenas de la zona norte del país."
+        }
+      ]
+    },
+    {
+      "caso": "pedro_cencomalls",
+      "oracion": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
+      "lineas_citadas": [
+        {
+          "linea": 3,
+          "texto": "Estudiante de Ingeniería Comercial | Especialización en Finanzas Cuantitativas"
+        },
+        {
+          "linea": 31,
+          "texto": "Ingeniería Comercial · Mención Finanzas Cuantitativas    2023 y cursando 4to año"
+        },
+        {
+          "linea": 33,
+          "texto": "Cuarto año en curso · Santiago, Chile"
+        }
+      ]
+    },
+    {
+      "caso": "pedro_cencomalls",
+      "oracion": "Orientado a resultados con habilidades de comunicación, trabajo en equipo y pensamiento analítico.",
+      "lineas_citadas": [
+        {
+          "linea": 9,
+          "texto": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento. Orientado a resultados, con habilidades de comunicación, trabajo en equipo y manejo de herramientas digitales. Inglés avanzado."
+        },
+        {
+          "linea": 63,
+          "texto": "Trabajo en equipo y comunicación efectiva."
+        },
+        {
+          "linea": 65,
+          "texto": "Pensamiento analítico y orientación a resultados."
+        }
+      ]
+    },
+    {
+      "caso": "pedro_cencomalls",
+      "oracion": "Maneja Microsoft Excel a nivel intermedio para análisis de datos y fórmulas.",
+      "lineas_citadas": [
+        {
+          "linea": 49,
+          "texto": "Microsoft Excel (nivel intermedio): análisis de datos, tablas, fórmulas."
+        }
+      ]
+    },
+    {
+      "caso": "pedro_tricolor",
+      "oracion": "Maneja Microsoft Excel a nivel intermedio para análisis de datos y fórmulas, así como Microsoft Office (Word, PowerPoint).",
+      "lineas_citadas": [
+        {
+          "linea": 49,
+          "texto": "Microsoft Excel (nivel intermedio): análisis de datos, tablas, fórmulas."
+        },
+        {
+          "linea": 51,
+          "texto": "Microsoft Office (Word, PowerPoint)."
+        }
+      ]
+    },
+    {
+      "caso": "valentina_asistente_do",
+      "oracion": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales.",
+      "lineas_citadas": [
+        {
+          "linea": 5,
+          "texto": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales. Experiencia en formación de equipos, gestión del desempeño y construcción de culturas de alto rendimiento a escala regional."
+        },
+        {
+          "linea": 10,
+          "texto": "Dirijo las operaciones de 8 tiendas en la zona centro-sur del país, con una dotación total de 240 colaboradores."
+        },
+        {
+          "linea": 13,
+          "texto": "Administro el presupuesto operacional regional de MM$ 12 anuales, logrando un 94% de cumplimiento en 2023."
+        }
+      ]
+    },
+    {
+      "caso": "valentina_cambio_rubro",
+      "oracion": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, con formación en Gestión de Personas y Organizaciones.",
+      "lineas_citadas": [
+        {
+          "linea": 5,
+          "texto": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales. Experiencia en formación de equipos, gestión del desempeño y construcción de culturas de alto rendimiento a escala regional."
+        },
+        {
+          "linea": 29,
+          "texto": "Diplomado en Gestión de Personas y Organizaciones | ACHS — 2021"
+        }
+      ]
+    }
+  ]
+}

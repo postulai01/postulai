@@ -1,6 +1,15 @@
 /**
  * Perfil profesional adaptado a la oferta (PED-32).
- * Reescribe el párrafo de perfil para el cargo usando solo hechos del CV, oración por oración, con trazabilidad.
+ *
+ * Modo por defecto: "priorizado" (perfilParaOferta). Divide el perfil original en oraciones y las reordena por puntaje
+ * contra la oferta (misma lógica del priorizador: tema central + raíces no genéricas). La primera oración, la que
+ * presenta a la persona, queda siempre primera. No escribe texto: el multiconjunto de oraciones es idéntico. $0.
+ *
+ * Modo "generativo" (adaptarPerfil): DESACTIVADO HASTA PED-24. Produce afirmaciones infladas que la verificación por
+ * palabras no detecta ("Apoyar la definición" → "Responsable de la definición"; hechos de distintos puestos unidos).
+ * Queda en el código solo detrás de una opción explícita (modo: "generativo"). Ver evals/validador/inflados-ped32.json.
+ *
+ * Generativo, en detalle: reescribe el párrafo de perfil oración por oración, con trazabilidad.
  *
  * Flujo:
  * 1. detectarPerfil (sin API): el párrafo de perfil está en el bloque "resumen" de bloquesCV. Sin perfil → "sin_perfil"
@@ -20,6 +29,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { cifrasSinRespaldo } from "./cv-postprocess";
 import { norm, raizVerbo, VERBOS_ESCALADA } from "./cv-verificacion";
 import { RAICES_GENERICAS, type KeywordsJD, type ResultadoMapeo } from "./mapeo-semantico";
+import { puntuarTextos, type KeywordPuntaje } from "./priorizador";
 import { bloquesCV, indice, palabrasContenido, presente } from "./reescritor-contextual";
 
 export const MODELO_PERFIL = "claude-haiku-4-5-20251001";
@@ -297,6 +307,8 @@ export function evaluarRespuestas(input: InputPerfil, respuestas: unknown[]): Om
   };
 }
 
+// Modo generativo: desactivado hasta PED-24: produce afirmaciones infladas que la verificación por palabras no detecta.
+// Usar solo explícitamente (perfilParaOferta con modo: "generativo", o el eval evals/perfil-adaptado.ts).
 export async function adaptarPerfil(input: InputPerfil, opts: { client?: Anthropic; maxIntentos?: 1 | 2 } = {}): Promise<ResultadoPerfil> {
   const usage = { input_tokens: 0, output_tokens: 0 };
   const det = detectarPerfil(input.cv);
@@ -326,4 +338,46 @@ export async function adaptarPerfil(input: InputPerfil, opts: { client?: Anthrop
     problemas = [...armado.problemas, ...armado.descartadas.map(d => `oración descartada "${d.texto}": ${d.problemas.join(", ")}`)];
   }
   return { ...evaluarRespuestas(input, respuestas), usage };
+}
+
+// ─── modo priorizado (por defecto, sin API) ──────────────────────────────────
+
+export interface OracionPriorizada { texto: string; de: number; a: number; puntaje: number; keywords: KeywordPuntaje[] } // de/a: 1-based
+
+export interface ResultadoPerfilPriorizado {
+  estado: "priorizado" | "sin_perfil";
+  original: string | null;
+  perfil: string | null;
+  indiceLinea: number | null;
+  oraciones: OracionPriorizada[]; // en el orden final
+}
+
+// Oraciones del párrafo: corte después de . ! ? seguido de espacio y mayúscula ("MM$ 150. Especialista…").
+export function dividirOraciones(texto: string): string[] {
+  return colapsar(texto).split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ¿¡])/).filter(Boolean);
+}
+
+export function priorizarPerfil(input: InputPerfil): ResultadoPerfilPriorizado {
+  const det = detectarPerfil(input.cv);
+  if (!det) return { estado: "sin_perfil", original: null, perfil: null, indiceLinea: null, oraciones: [] };
+  const ors = dividirOraciones(det.texto);
+  const puntajes = puntuarTextos(ors, input.mapeo, input.keywordsJD);
+  const items = ors.map((texto, k) => ({ texto, de: k + 1, ...puntajes[k] }));
+  // La primera presenta a la persona: queda fija. El resto, por puntaje descendente; empates, orden original.
+  const resto = items.slice(1).sort((a, b) => b.puntaje - a.puntaje || a.de - b.de);
+  const ordenadas = [items[0], ...resto].map((o, k) => ({ ...o, a: k + 1 }));
+  const antes = [...ors].sort(), despues = ordenadas.map(o => o.texto).sort();
+  if (antes.length !== despues.length || antes.some((o, k) => o !== despues[k])) {
+    throw new Error("perfil priorizado: el multiconjunto de oraciones cambió");
+  }
+  return { estado: "priorizado", original: det.texto, perfil: ordenadas.map(o => o.texto).join(" "), indiceLinea: det.indice, oraciones: ordenadas };
+}
+
+// Punto de entrada. Por defecto, priorizado. El generativo solo con modo: "generativo" (desactivado hasta PED-24).
+export async function perfilParaOferta(
+  input: InputPerfil,
+  opts: { modo?: "priorizado" | "generativo"; client?: Anthropic } = {},
+): Promise<ResultadoPerfilPriorizado | ResultadoPerfil> {
+  if (opts.modo === "generativo") return adaptarPerfil(input, { client: opts.client });
+  return priorizarPerfil(input);
 }
