@@ -5,7 +5,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { fusionarCompetencias, type Competencia } from "../app/lib/competencia-extractor";
 import { consolidarJD } from "../app/lib/jd-parser";
-import type { ExtrasCV, KeywordsJD } from "../app/lib/mapeo-semantico";
+import { aplicarSemanticos, mapearCompetencias, type ExtrasCV, type KeywordsJD, type ResultadoMapeo } from "../app/lib/mapeo-semantico";
 
 export function loadEnv() {
   const envPath = path.join(process.cwd(), ".env.local");
@@ -82,4 +82,15 @@ export function casosConOferta(): string[] {
   const ofertas = fs.readdirSync(path.join(process.cwd(), "evals/ofertas")).filter(o => o !== "fijadas.json");
   return fs.readdirSync(path.join(process.cwd(), "evals/casos")).filter(f => f.endsWith(".json")).map(f => f.slice(0, -5))
     .filter(c => ofertas.some(o => o.startsWith(`${c}-`))).sort();
+}
+
+// Mapeo completo de un caso sin API: capa literal + requisitos, más las propuestas semánticas guardadas en
+// evals/semantico/ (si las hay), re-filtradas con el código actual.
+export async function mapeoDelCaso(caso: string): Promise<{ ctx: ContextoMapeo; resultado: ResultadoMapeo; semantico: boolean }> {
+  const ctx = cargarContexto(caso);
+  const literal = await mapearCompetencias(ctx.competencias, ctx.keywordsJD, ctx.extras);
+  const cache = path.join(process.cwd(), "evals/semantico", `${caso}.json`);
+  if (!fs.existsSync(cache)) return { ctx, resultado: literal, semantico: false };
+  const { propuestos } = JSON.parse(fs.readFileSync(cache, "utf-8"));
+  return { ctx, resultado: aplicarSemanticos(literal, ctx.keywordsJD, ctx.casoJson.cv_texto, propuestos).resultado, semantico: true };
 }
