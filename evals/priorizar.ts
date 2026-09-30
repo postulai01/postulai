@@ -19,6 +19,7 @@ import {
   etiquetarVinetas, filtrarEtiquetas, priorizarCV, promptEtiquetas, SYSTEM_ETIQUETAS, vinetasParaEtiquetar,
   type InputPriorizacion, type ResultadoPriorizacion,
 } from "../app/lib/priorizador";
+import type { KeywordsJD } from "../app/lib/mapeo-semantico";
 import { casosConOferta, loadEnv, mapeoDelCaso } from "./lib-casos";
 
 // Haiku 4.5: $1 / $5 por MTok
@@ -37,6 +38,24 @@ const REFERENCIA_ANDRES: [string, string][] = [
   ["COEXPAN", "negociación colectiva con el sindicato de la compañía"],
   ["CIA MINERA MANTOS DE LA LUNA", "Monitoreé el control presupuestario y financiero de la gerencia"],
 ];
+
+const RELEVANCIA_CENTRAL = 9;
+
+// Criterio de éxito: en cada puesto donde alguna viñeta evidencia una keyword requerida de relevancia ≥ 9,
+// la primera viñeta evidencia al menos una de ese nivel.
+function aceptables(r: ResultadoPriorizacion, jd: KeywordsJD): { ok: number; total: number; fallos: string[] } {
+  const centrales = new Set(jd.requeridas.filter(k => k.relevancia >= RELEVANCIA_CENTRAL).map(k => k.keyword));
+  const evidencia = (v: { keywords: { keyword: string }[] }) => v.keywords.some(k => centrales.has(k.keyword));
+  let ok = 0, total = 0;
+  const fallos: string[] = [];
+  for (const p of r.puestos) {
+    if (!p.vinetas.some(evidencia)) continue;
+    total++;
+    if (evidencia(p.vinetas[0])) ok++;
+    else fallos.push(p.puesto);
+  }
+  return { ok, total, fallos };
+}
 
 const corta = (s: string, n = 95) => (s.length > n ? s.slice(0, n - 1) + "…" : s);
 
@@ -62,7 +81,7 @@ async function main() {
 
   let estimado = 0, costo = 0;
   const invariantes: string[] = [];
-  const informes: { caso: string; reglas: ResultadoPriorizacion; etiq?: ResultadoPriorizacion; etiquetas?: Record<number, string[]> }[] = [];
+  const informes: { caso: string; jd: KeywordsJD; reglas: ResultadoPriorizacion; etiq?: ResultadoPriorizacion; etiquetas?: Record<number, string[]> }[] = [];
 
   for (const caso of casos) {
     const { ctx, resultado } = await mapeoDelCaso(caso);
@@ -94,10 +113,10 @@ async function main() {
       const reglas = priorizarCV(base);
       const etiq = etiquetas ? priorizarCV({ ...base, etiquetas }) : undefined;
       invariantes.push(`${caso}: ✅`);
-      informes.push({ caso, reglas, etiq, etiquetas });
+      informes.push({ caso, jd: ctx.keywordsJD, reglas, etiq, etiquetas });
 
       if (caso === "andres_senior") {
-        console.log(`\n═══ andres_senior vs referencia de PED-28`);
+        console.log(`\n═══ andres_senior vs referencia de PED-28 (informativo)`);
         for (const [nombre, r] of [["anterior (suma, sin raíces)", anterior], ["reglas (tema + raíces)", reglas], ["reglas + etiquetas", etiq]] as const) {
           if (!r) { console.log(`\n  ${nombre}: sin etiquetas guardadas`); continue; }
           const a = aciertosAndres(r);
@@ -134,8 +153,19 @@ async function main() {
     for (const [i, kws] of Object.entries(etiquetas)) console.log(`    ${corta(ls[Number(i)].replace(/^\s*- /, ""), 70)} → ${kws.join(", ")}`);
   }
 
+  // Modo por defecto: reglas + etiquetas (si hay etiquetas guardadas); si no, solo reglas.
+  console.log(`\n═══ Criterio de éxito: primera viñeta con keyword requerida de relevancia ≥ ${RELEVANCIA_CENTRAL} (cuando el puesto tiene una)`);
+  console.log(`  ${"caso".padEnd(26)} reglas   reglas+etiquetas  fallos (modo por defecto)`);
+  let okR = 0, okE = 0, totR = 0, totE = 0;
+  for (const x of informes) {
+    const a = aceptables(x.reglas, x.jd), e = aceptables(x.etiq ?? x.reglas, x.jd);
+    okR += a.ok; totR += a.total; okE += e.ok; totE += e.total;
+    console.log(`  ${x.caso.padEnd(26)} ${`${a.ok}/${a.total}`.padEnd(8)} ${`${e.ok}/${e.total}`.padEnd(17)} ${e.fallos.map(f => corta(f, 30)).join(" · ") || "—"}`);
+  }
+  console.log(`  ${"total".padEnd(26)} ${`${okR}/${totR}`.padEnd(8)} ${okE}/${totE}`);
+
   console.log("\n═══ Candidatas a acortar (casi duplicadas entre puestos)");
-  for (const { caso, reglas } of informes) for (const c of reglas.candidatas) console.log(`  ${caso.padEnd(24)} ${corta(c.texto, 70)} · ${c.motivo}`);
+  for (const { caso, reglas, etiq } of informes) for (const c of (etiq ?? reglas).candidatas) console.log(`  ${caso.padEnd(24)} ${corta(c.texto, 70)} · ${c.motivo}`);
   console.log("\n  Informativo, viñetas sin puntaje (reglas): " + informes.map(x => `${x.caso} ${x.reglas.sinPuntaje.length}`).join(" · "));
 
   console.log("\n═══ Invariante");

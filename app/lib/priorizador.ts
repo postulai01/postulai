@@ -8,8 +8,10 @@
  *   competencia/cita de un match directo; la mitad si contiene la competencia/cita de un match relacionado.
  * - Una palabra de la keyword está en la línea si aparece igual o comparte una raíz no genérica ("presupuestario" ↔
  *   "presupuestos"). Las palabras con raíz genérica (RAICES_GENERICAS) no se exigen ni cuentan.
- * - Etiquetas opcionales (etiquetarVinetas, una llamada a Haiku por CV): keywords que cada viñeta evidencia según el
- *   modelo. Solo suman al puntaje (afectan el ORDEN); nunca cambian el texto ni el mapeo.
+ * - Modo por defecto: tema central + raíces + etiquetas (EtiquetasOrden, de etiquetarVinetas: una llamada a Haiku
+ *   por CV, cacheada en los evals). Las etiquetas solo suman al puntaje para ORDENAR; nunca cambian el texto, el
+ *   mapeo ni el score. Sin etiquetas, ordena solo por reglas.
+ * - Viñetas casi duplicadas entre puestos: se conserva la copia que puntúa más alto; la otra queda como candidata.
  * - Empates: orden original (orden estable).
  * - Invariante: el multiconjunto de líneas es idéntico antes y después (las listas se comparan por sus palabras).
  */
@@ -40,14 +42,22 @@ export interface ResultadoPriorizacion {
   candidatas: CandidataAcortar[];   // viñetas casi duplicadas entre puestos
   sinPuntaje: CandidataAcortar[];   // informativo: viñetas que no respaldan ninguna keyword
   primeras: { puesto: string; antes: string; despues: string; puntaje: number }[]; // primera viñeta de cada puesto
+  puestos: { puesto: string; vinetas: VinetaOrdenada[] }[]; // viñetas de cada puesto en el orden final
 }
+
+// Etiquetas de Haiku: índice de línea en cv.split("\n") → keywords de la oferta que esa viñeta evidencia.
+// SOLO sirven para ORDENAR viñetas dentro de su puesto. No son evidencia para el mapeo, el score ni el reescritor,
+// y ningún otro módulo debe importarlas: el modelo solo las filtra por keyword válida y número de viñeta.
+export type EtiquetasOrden = Record<number, string[]>;
+
+export interface VinetaOrdenada { texto: string; puntaje: number; keywords: KeywordPuntaje[] }
 
 export interface InputPriorizacion {
   cv: string;
   mapeo: ResultadoMapeo;
   keywordsJD: KeywordsJD;
   frasesConocidas?: string[]; // competencias del CV y keywords: sirven para detectar separadores faltantes
-  etiquetas?: Record<number, string[]>; // índice de línea en cv.split("\n") → keywords que evidencia (etiquetarVinetas)
+  etiquetas?: EtiquetasOrden; // solo afectan el orden (ver EtiquetasOrden)
   puntaje?: "tema" | "suma";  // "suma": variante anterior (suma simple), para comparar
   raices?: boolean;           // false: sin match por raíz (variante anterior)
 }
@@ -177,7 +187,8 @@ export function priorizarCV(input: InputPriorizacion): ResultadoPriorizacion {
   const esVineta = (i: number) => /^\s*[-•]\s+/.test(lineas[i]);
 
   // Viñetas dentro de cada puesto.
-  const vinetasPorPuesto: { puesto: string; texto: string }[] = [];
+  const vinetasPorPuesto: { puesto: string; texto: string; puntaje: number }[] = [];
+  const puestos: ResultadoPriorizacion["puestos"] = [];
   for (const b of bloques.filter(b => b.tipo === "puesto")) {
     const pos = b.indices.filter(esVineta);
     if (pos.length === 0) continue;
@@ -189,7 +200,8 @@ export function priorizarCV(input: InputPriorizacion): ResultadoPriorizacion {
       if (v.puntaje === 0) sinPuntaje.push({ texto: v.texto.trim(), puesto: b.titulo, motivo: "no respalda ninguna keyword de la oferta" });
     });
     primeras.push({ puesto: b.titulo, antes: vs[0].texto.trim(), despues: ordenadas[0].texto.trim(), puntaje: ordenadas[0].puntaje });
-    for (const v of vs) vinetasPorPuesto.push({ puesto: b.titulo, texto: v.texto.replace(/^\s*[-•]\s+/, "").trim() });
+    puestos.push({ puesto: b.titulo, vinetas: ordenadas.map(v => ({ texto: v.texto.trim(), puntaje: v.puntaje, keywords: v.keywords })) });
+    for (const v of vs) vinetasPorPuesto.push({ puesto: b.titulo, texto: v.texto.replace(/^\s*[-•]\s+/, "").trim(), puntaje: v.puntaje });
   }
 
   // Viñetas casi idénticas en distintos puestos.
@@ -201,7 +213,9 @@ export function priorizarCV(input: InputPriorizacion): ResultadoPriorizacion {
       const inter = [...sx].filter(p => sy.has(p)).length;
       const jaccard = inter / (sx.size + sy.size - inter);
       if (jaccard >= SIMILITUD_REPETIDA) {
-        candidatas.push({ texto: y.texto, puesto: y.puesto, motivo: `casi idéntica (${Math.round(jaccard * 100)}%) a una viñeta de ${x.puesto}` });
+        // Se conserva la copia que puntúa más alto (empate: la del puesto más reciente, que aparece primero).
+        const [queda, sobra] = y.puntaje > x.puntaje ? [y, x] : [x, y];
+        candidatas.push({ texto: sobra.texto, puesto: sobra.puesto, motivo: `casi idéntica (${Math.round(jaccard * 100)}%) a la de ${queda.puesto}, que puntúa ${queda.puntaje} (esta: ${sobra.puntaje})` });
       }
     }
   }
@@ -231,7 +245,7 @@ export function priorizarCV(input: InputPriorizacion): ResultadoPriorizacion {
 
   const resultado = nuevas.join("\n");
   verificarInvariante(lineas, nuevas, indicesLista);
-  return { cv: resultado, movimientos, separadores, candidatas, sinPuntaje, primeras };
+  return { cv: resultado, movimientos, separadores, candidatas, sinPuntaje, primeras, puestos };
 }
 
 // Mismo multiconjunto de líneas; las listas reordenadas se comparan en su posición por sus palabras.
@@ -271,9 +285,9 @@ export function promptEtiquetas(vinetas: VinetaNumerada[], jd: KeywordsJD): stri
 }
 
 // Filtros: la keyword debe estar en la oferta y el número de viñeta debe existir. Nada más se usa del modelo.
-export function filtrarEtiquetas(respuesta: unknown, vinetas: VinetaNumerada[], jd: KeywordsJD): Record<number, string[]> {
+export function filtrarEtiquetas(respuesta: unknown, vinetas: VinetaNumerada[], jd: KeywordsJD): EtiquetasOrden {
   const validas = new Map([...jd.requeridas, ...jd.deseables].map(k => [normalizarParaComparar(k.keyword), k.keyword]));
-  const out: Record<number, string[]> = {};
+  const out: EtiquetasOrden = {};
   for (const e of Array.isArray(respuesta) ? respuesta : []) {
     const n = Number(e?.vineta);
     if (!Number.isInteger(n) || n < 1 || n > vinetas.length) continue;
@@ -288,7 +302,7 @@ export function filtrarEtiquetas(respuesta: unknown, vinetas: VinetaNumerada[], 
 
 export async function etiquetarVinetas(
   cv: string, jd: KeywordsJD, client?: Anthropic,
-): Promise<{ etiquetas: Record<number, string[]>; respuesta: unknown; usage?: Anthropic.Usage }> {
+): Promise<{ etiquetas: EtiquetasOrden; respuesta: unknown; usage?: Anthropic.Usage }> {
   const vinetas = vinetasParaEtiquetar(cv);
   if (vinetas.length === 0) return { etiquetas: {}, respuesta: [] };
   const c = client ?? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
