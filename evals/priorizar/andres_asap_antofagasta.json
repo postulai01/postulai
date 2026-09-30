@@ -1,0 +1,159 @@
+{
+  "caso": "andres_asap_antofagasta",
+  "oferta": "andres_asap_antofagasta-2026-09-29T19-00-27.json",
+  "costo": 0.005256,
+  "respuesta": [
+    {
+      "vineta": 1,
+      "keywords": [
+        "administración de personal",
+        "desarrollo de equipos"
+      ]
+    },
+    {
+      "vineta": 2,
+      "keywords": [
+        "auditorías laborales",
+        "negociación colectiva",
+        "Relaciones Laborales",
+        "desarrollo de equipos"
+      ]
+    },
+    {
+      "vineta": 3,
+      "keywords": [
+        "administración de personal",
+        "control documental"
+      ]
+    },
+    {
+      "vineta": 4,
+      "keywords": [
+        "Relaciones Laborales",
+        "negociación de conflictos laborales"
+      ]
+    },
+    {
+      "vineta": 5,
+      "keywords": [
+        "administración de personal",
+        "liderazgo de equipos"
+      ]
+    },
+    {
+      "vineta": 6,
+      "keywords": [
+        "liderazgo de equipos",
+        "desarrollo de equipos"
+      ]
+    },
+    {
+      "vineta": 7,
+      "keywords": [
+        "legislación laboral chilena"
+      ]
+    },
+    {
+      "vineta": 8,
+      "keywords": [
+        "Relaciones Laborales",
+        "negociación de conflictos laborales"
+      ]
+    },
+    {
+      "vineta": 9,
+      "keywords": [
+        "desarrollo de equipos"
+      ]
+    },
+    {
+      "vineta": 10,
+      "keywords": [
+        "Relaciones Laborales",
+        "remuneraciones"
+      ]
+    },
+    {
+      "vineta": 11,
+      "keywords": [
+        "remuneraciones"
+      ]
+    },
+    {
+      "vineta": 12,
+      "keywords": [
+        "negociación colectiva"
+      ]
+    },
+    {
+      "vineta": 13,
+      "keywords": [
+        "legislación laboral chilena"
+      ]
+    },
+    {
+      "vineta": 14,
+      "keywords": [
+        "Relaciones Laborales"
+      ]
+    },
+    {
+      "vineta": 15,
+      "keywords": [
+        "administración de personal",
+        "remuneraciones",
+        "control documental"
+      ]
+    },
+    {
+      "vineta": 16,
+      "keywords": [
+        "remuneraciones",
+        "ERP de personas"
+      ]
+    },
+    {
+      "vineta": 17,
+      "keywords": [
+        "Relaciones Laborales",
+        "remuneraciones"
+      ]
+    },
+    {
+      "vineta": 18,
+      "keywords": [
+        "remuneraciones"
+      ]
+    },
+    {
+      "vineta": 19,
+      "keywords": [
+        "negociación colectiva"
+      ]
+    },
+    {
+      "vineta": 21,
+      "keywords": [
+        "ERP de personas"
+      ]
+    },
+    {
+      "vineta": 22,
+      "keywords": [
+        "negociación colectiva"
+      ]
+    },
+    {
+      "vineta": 23,
+      "keywords": [
+        "remuneraciones"
+      ]
+    },
+    {
+      "vineta": 25,
+      "keywords": [
+        "ERP de personas"
+      ]
+    }
+  ]
+}

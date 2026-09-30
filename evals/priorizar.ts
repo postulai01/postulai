@@ -1,16 +1,31 @@
 /**
- * Eval del priorizador (app/lib/priorizador.ts). Sin API, $0: usa las ofertas fijadas y las propuestas
- * semánticas guardadas (evals/semantico/).
+ * Eval del priorizador (app/lib/priorizador.ts). Sin API por defecto: usa las ofertas fijadas, las propuestas
+ * semánticas guardadas (evals/semantico/) y las etiquetas guardadas (evals/priorizar/).
  *
  * Uso:
- *   npx tsx evals/priorizar.ts [caso ...]   # sin casos: todos los que tienen oferta parseada
+ *   npx tsx evals/priorizar.ts [caso ...]              # sin API
+ *   npx tsx evals/priorizar.ts [caso ...] --estimar    # costo estimado del etiquetado
+ *   npx tsx evals/priorizar.ts [caso ...] --etiquetar  # UNA llamada a Haiku por caso; guarda en evals/priorizar/
  *
- * andres_senior se compara con la referencia de PED-28 (primera viñeta de cada puesto). El resto se muestra
- * antes → después para revisión manual. El invariante se verifica dentro de priorizarCV (lanza error si falla).
+ * Variantes: "anterior" (suma simple, sin raíces), "reglas" (tema central + raíces no genéricas) y
+ * "reglas + etiquetas" (si hay etiquetas guardadas). andres_senior se compara con la referencia de PED-28.
+ * El invariante se verifica dentro de priorizarCV (lanza error si falla).
  */
 
-import { priorizarCV, type ResultadoPriorizacion } from "../app/lib/priorizador";
-import { casosConOferta, mapeoDelCaso } from "./lib-casos";
+import Anthropic from "@anthropic-ai/sdk";
+import * as fs from "fs";
+import * as path from "path";
+import {
+  etiquetarVinetas, filtrarEtiquetas, priorizarCV, promptEtiquetas, SYSTEM_ETIQUETAS, vinetasParaEtiquetar,
+  type InputPriorizacion, type ResultadoPriorizacion,
+} from "../app/lib/priorizador";
+import { casosConOferta, loadEnv, mapeoDelCaso } from "./lib-casos";
+
+// Haiku 4.5: $1 / $5 por MTok
+const PRECIO_IN = 1, PRECIO_OUT = 5;
+const CHARS_POR_TOKEN = 2.1;
+const TOKENS_OUT = 600;
+const DIR_ETIQUETAS = path.join(process.cwd(), "evals/priorizar");
 
 // Referencia de PED-28: fragmento de la viñeta que debería quedar primera en cada puesto de andres_senior.
 const REFERENCIA_ANDRES: [string, string][] = [
@@ -25,59 +40,107 @@ const REFERENCIA_ANDRES: [string, string][] = [
 
 const corta = (s: string, n = 95) => (s.length > n ? s.slice(0, n - 1) + "…" : s);
 
+function aciertosAndres(r: ResultadoPriorizacion): { n: number; detalle: string[] } {
+  const detalle: string[] = [];
+  let n = 0;
+  for (const [puesto, ref] of REFERENCIA_ANDRES) {
+    const p = r.primeras.find(x => x.puesto.includes(puesto));
+    const ok = !!p && p.despues.includes(ref);
+    if (ok) n++;
+    detalle.push(`${ok ? "✅" : "❌"} ${puesto.padEnd(30)} (${p?.puntaje ?? "—"}) ${corta(p?.despues.replace(/^- /, "") ?? "—", 80)}`);
+  }
+  return { n, detalle };
+}
+
 async function main() {
-  const pedidos = process.argv.slice(2).filter(a => !a.startsWith("--"));
+  const args = process.argv.slice(2);
+  const etiquetar = args.includes("--etiquetar"), estimar = args.includes("--estimar");
+  const pedidos = args.filter(a => !a.startsWith("--"));
   const casos = pedidos.length > 0 ? pedidos : casosConOferta();
-  const resultados: { caso: string; r: ResultadoPriorizacion }[] = [];
+  if (etiquetar) loadEnv();
+  const client = etiquetar ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
+
+  let estimado = 0, costo = 0;
   const invariantes: string[] = [];
+  const informes: { caso: string; reglas: ResultadoPriorizacion; etiq?: ResultadoPriorizacion; etiquetas?: Record<number, string[]> }[] = [];
 
   for (const caso of casos) {
-    const { ctx, resultado, semantico } = await mapeoDelCaso(caso);
-    const frasesConocidas = ctx.competencias.flatMap(c => [c.nombre, ...(c.variantes ?? [])]);
-    let r: ResultadoPriorizacion;
-    try {
-      r = priorizarCV({ cv: ctx.casoJson.cv_texto, mapeo: resultado, keywordsJD: ctx.keywordsJD, frasesConocidas });
-      invariantes.push(`${caso}: ✅`);
-    } catch (err) {
-      invariantes.push(`${caso}: ❌ ${(err as Error).message}`);
-      continue;
-    }
-    resultados.push({ caso, r });
-    console.log(`\n═══ ${caso}${semantico ? "" : " (sin capa semántica guardada)"} · ${r.movimientos.length} movimientos`);
+    const { ctx, resultado } = await mapeoDelCaso(caso);
+    const cv: string = ctx.casoJson.cv_texto;
+    const vinetas = vinetasParaEtiquetar(cv);
+    estimado += ((SYSTEM_ETIQUETAS.length + promptEtiquetas(vinetas, ctx.keywordsJD).length) / CHARS_POR_TOKEN * PRECIO_IN + TOKENS_OUT * PRECIO_OUT) / 1e6;
+    if (estimar) continue;
 
-    if (caso === "andres_senior") {
-      let aciertos = 0;
-      for (const [puesto, ref] of REFERENCIA_ANDRES) {
-        const p = r.primeras.find(x => x.puesto.includes(puesto));
-        const ok = !!p && p.despues.includes(ref);
-        if (ok) aciertos++;
-        console.log(`\n  ${ok ? "✅" : "❌"} ${puesto}\n     referencia: …${ref}…\n     priorizador (${p?.puntaje ?? "—"}): ${corta(p?.despues ?? "—")}`);
-        if (!ok) {
-          for (const m of r.movimientos.filter(m => m.bloque.includes(puesto) && m.tipo === "vineta").sort((a, b) => a.a - b.a)) {
-            console.log(`       pos ${m.a} (${m.puntaje}): ${corta(m.texto, 70)} · ${m.keywords.map(k => `${k.keyword} ${k.puntaje}`).join(", ") || "—"}`);
-          }
+    const cache = path.join(DIR_ETIQUETAS, `${caso}.json`);
+    let etiquetas: Record<number, string[]> | undefined;
+    if (client) {
+      const r = await etiquetarVinetas(cv, ctx.keywordsJD, client);
+      etiquetas = r.etiquetas;
+      const c = r.usage ? (r.usage.input_tokens * PRECIO_IN + r.usage.output_tokens * PRECIO_OUT) / 1e6 : 0;
+      costo += c;
+      fs.mkdirSync(DIR_ETIQUETAS, { recursive: true });
+      fs.writeFileSync(cache, JSON.stringify({ caso, oferta: path.basename(ctx.archivoOferta), costo: c, respuesta: r.respuesta }, null, 2) + "\n");
+    } else if (fs.existsSync(cache)) {
+      // Se guarda la respuesta cruda del modelo; los filtros se re-aplican con el código actual.
+      etiquetas = filtrarEtiquetas(JSON.parse(fs.readFileSync(cache, "utf-8")).respuesta, vinetas, ctx.keywordsJD);
+    }
+
+    const base: InputPriorizacion = {
+      cv, mapeo: resultado, keywordsJD: ctx.keywordsJD,
+      frasesConocidas: ctx.competencias.flatMap(c => [c.nombre, ...(c.variantes ?? [])]),
+    };
+    try {
+      const anterior = priorizarCV({ ...base, puntaje: "suma", raices: false });
+      const reglas = priorizarCV(base);
+      const etiq = etiquetas ? priorizarCV({ ...base, etiquetas }) : undefined;
+      invariantes.push(`${caso}: ✅`);
+      informes.push({ caso, reglas, etiq, etiquetas });
+
+      if (caso === "andres_senior") {
+        console.log(`\n═══ andres_senior vs referencia de PED-28`);
+        for (const [nombre, r] of [["anterior (suma, sin raíces)", anterior], ["reglas (tema + raíces)", reglas], ["reglas + etiquetas", etiq]] as const) {
+          if (!r) { console.log(`\n  ${nombre}: sin etiquetas guardadas`); continue; }
+          const a = aciertosAndres(r);
+          console.log(`\n  ${nombre}: ${a.n}/${REFERENCIA_ANDRES.length}`);
+          for (const d of a.detalle) console.log(`    ${d}`);
         }
       }
-      console.log(`\n  Aciertos: ${aciertos}/${REFERENCIA_ANDRES.length}`);
-    } else {
-      for (const p of r.primeras) {
-        const cambio = p.antes !== p.despues;
-        console.log(`  ${corta(p.puesto, 60)}\n     ${cambio ? "antes:   " + corta(p.antes) + "\n     después: " : "sin cambio: "}${corta(p.despues)} (${p.puntaje})`);
-      }
+    } catch (err) {
+      invariantes.push(`${caso}: ❌ ${(err as Error).message}`);
     }
-    const items = r.movimientos.filter(m => m.tipo === "item");
-    if (items.length > 0) {
-      const listas = [...new Set(items.map(m => m.bloque))];
-      console.log(`  Listas reordenadas: ${listas.map(l => corta(l, 40)).join(" · ")}`);
-    }
-    for (const s of r.separadores) console.log(`  Separador corregido (línea ${s.linea}): ${corta(s.antes, 80)} → ${corta(s.despues, 80)}`);
   }
 
-  console.log("\nCandidatas a acortar (solo marcadas):");
-  for (const { caso, r } of resultados) for (const c of r.candidatas) console.log(`  ${caso.padEnd(24)} [${corta(c.puesto, 28)}] ${corta(c.texto, 70)} · ${c.motivo}`);
+  if (estimar) { console.log(`\nCosto estimado de --etiquetar: ~$${estimado.toFixed(4)} (${casos.length} llamadas)\n`); return; }
 
-  console.log("\nInvariante:");
+  console.log("\n═══ Primera viñeta por puesto (otros casos): reglas | reglas + etiquetas");
+  for (const { caso, reglas, etiq } of informes.filter(x => x.caso !== "andres_senior")) {
+    console.log(`\n  ${caso}`);
+    reglas.primeras.forEach((p, k) => {
+      const e = etiq?.primeras[k];
+      console.log(`    ${corta(p.puesto, 55)}`);
+      console.log(`      original:  ${corta(p.antes.replace(/^- /, ""), 85)}`);
+      console.log(`      reglas:    ${p.despues === p.antes ? "=" : corta(p.despues.replace(/^- /, ""), 85)} (${p.puntaje})`);
+      if (e) console.log(`      etiquetas: ${e.despues === p.despues ? "= reglas" : corta(e.despues.replace(/^- /, ""), 85)} (${e.puntaje})`);
+    });
+  }
+
+  console.log("\n═══ Etiquetas de Haiku por caso (revisión manual)");
+  for (const { caso, etiquetas } of informes) {
+    if (!etiquetas) { console.log(`\n  ${caso}: sin etiquetas`); continue; }
+    const lineas = fs.readFileSync(path.join(process.cwd(), "evals/casos", `${caso}.json`), "utf-8");
+    const cv: string = JSON.parse(lineas).cv_texto;
+    const ls = cv.split("\n");
+    console.log(`\n  ${caso}: ${Object.keys(etiquetas).length} viñetas etiquetadas`);
+    for (const [i, kws] of Object.entries(etiquetas)) console.log(`    ${corta(ls[Number(i)].replace(/^\s*- /, ""), 70)} → ${kws.join(", ")}`);
+  }
+
+  console.log("\n═══ Candidatas a acortar (casi duplicadas entre puestos)");
+  for (const { caso, reglas } of informes) for (const c of reglas.candidatas) console.log(`  ${caso.padEnd(24)} ${corta(c.texto, 70)} · ${c.motivo}`);
+  console.log("\n  Informativo, viñetas sin puntaje (reglas): " + informes.map(x => `${x.caso} ${x.reglas.sinPuntaje.length}`).join(" · "));
+
+  console.log("\n═══ Invariante");
   for (const i of invariantes) console.log(`  ${i}`);
+  if (etiquetar) console.log(`\nCosto real del etiquetado: $${costo.toFixed(4)}`);
   console.log("");
 }
 

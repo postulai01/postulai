@@ -1,0 +1,35 @@
+{
+  "caso": "pedro_tricolor",
+  "oferta": "pedro_tricolor-2026-09-29T22-20-53.json",
+  "costo": 0.001216,
+  "respuesta": [
+    {
+      "vineta": 1,
+      "keywords": [
+        "Trade Marketing",
+        "distribución de material"
+      ]
+    },
+    {
+      "vineta": 2,
+      "keywords": [
+        "orientación al servicio",
+        "coordinación con equipo de ventas"
+      ]
+    },
+    {
+      "vineta": 3,
+      "keywords": [
+        "coordinación con equipo de ventas",
+        "adaptabilidad"
+      ]
+    },
+    {
+      "vineta": 5,
+      "keywords": [
+        "tareas operativas",
+        "coordinación con equipo de ventas"
+      ]
+    }
+  ]
+}

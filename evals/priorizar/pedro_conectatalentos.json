@@ -1,0 +1,21 @@
+{
+  "caso": "pedro_conectatalentos",
+  "oferta": "pedro_conectatalentos-2026-09-29T19-00-27.json",
+  "costo": 0.000877,
+  "respuesta": [
+    {
+      "vineta": 2,
+      "keywords": [
+        "venta directa B2B",
+        "comunicación con clientes"
+      ]
+    },
+    {
+      "vineta": 5,
+      "keywords": [
+        "venta directa B2B",
+        "prospección de clientes"
+      ]
+    }
+  ]
+}

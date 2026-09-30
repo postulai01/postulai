@@ -1,0 +1,80 @@
+{
+  "caso": "andres_vallenar",
+  "oferta": "andres_vallenar-2026-09-29T19-00-27.json",
+  "costo": 0.003277,
+  "respuesta": [
+    {
+      "vineta": 1,
+      "keywords": [
+        "gestión de políticas internas"
+      ]
+    },
+    {
+      "vineta": 2,
+      "keywords": [
+        "tendencias en relaciones laborales"
+      ]
+    },
+    {
+      "vineta": 4,
+      "keywords": [
+        "tendencias en relaciones laborales"
+      ]
+    },
+    {
+      "vineta": 7,
+      "keywords": [
+        "legislación laboral"
+      ]
+    },
+    {
+      "vineta": 8,
+      "keywords": [
+        "tendencias en relaciones laborales"
+      ]
+    },
+    {
+      "vineta": 10,
+      "keywords": [
+        "tendencias en relaciones laborales"
+      ]
+    },
+    {
+      "vineta": 12,
+      "keywords": [
+        "tendencias en relaciones laborales"
+      ]
+    },
+    {
+      "vineta": 13,
+      "keywords": [
+        "legislación laboral"
+      ]
+    },
+    {
+      "vineta": 14,
+      "keywords": [
+        "tendencias en relaciones laborales",
+        "experiencia en faena"
+      ]
+    },
+    {
+      "vineta": 19,
+      "keywords": [
+        "tendencias en relaciones laborales"
+      ]
+    },
+    {
+      "vineta": 22,
+      "keywords": [
+        "tendencias en relaciones laborales"
+      ]
+    },
+    {
+      "vineta": 23,
+      "keywords": [
+        "experiencia en faena"
+      ]
+    }
+  ]
+}
