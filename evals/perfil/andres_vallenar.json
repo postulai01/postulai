@@ -1,0 +1,117 @@
+{
+  "caso": "andres_vallenar",
+  "oferta": "andres_vallenar-2026-09-29T19-00-27.json",
+  "costo": 0.014818,
+  "respuestas": [
+    {
+      "perfil": "Ejecutivo Senior con 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, con profunda especialización en relaciones laborales y gestión de políticas internas. Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, con experiencia en faenas de la zona norte del país y en la operación de relaciones laborales a nivel nacional. Domina la transformación cultural, automatización digital mediante Inteligencia Artificial, optimización de estructuras de compensaciones y desarrollo de equipos directivos de alto desempeño bajo enfoques de eficiencia operacional.",
+      "afirmaciones": [
+        {
+          "frase": "Posee 18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa.",
+          "citas": [
+            "18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa"
+          ],
+          "keywords": [
+            "especialización en relaciones laborales",
+            "legislación laboral"
+          ]
+        },
+        {
+          "frase": "Especialista en la definición de todas las políticas de la gerencia, con énfasis en los procesos transaccionales, operacionales y de desarrollo.",
+          "citas": [
+            "la definición de todas las políticas de la gerencia, con énfasis en los procesos transaccionales"
+          ],
+          "keywords": [
+            "gestión de políticas internas"
+          ]
+        },
+        {
+          "frase": "Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, con experiencia en faenas de la zona norte del país.",
+          "citas": [
+            "Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas",
+            "faenas de la zona norte del país"
+          ],
+          "keywords": [
+            "especialización en relaciones laborales",
+            "experiencia en faena",
+            "tendencias en relaciones laborales"
+          ]
+        },
+        {
+          "frase": "Responsable de la estrategia y ejecución de relaciones laborales a nivel nacional, con experiencia en la operación integral de relaciones laborales, procesamiento de nómina y entrega de beneficios a gran escala.",
+          "citas": [
+            "estrategia y ejecución de relaciones laborales a nivel nacional",
+            "operación de relaciones laborales, procesamiento de nómina y entrega de beneficios a gran escala"
+          ],
+          "keywords": [
+            "legislación laboral",
+            "especialización en relaciones laborales"
+          ]
+        },
+        {
+          "frase": "Domina la transformación cultural, automatización digital mediante Inteligencia Artificial, optimización de estructuras de compensaciones y desarrollo de equipos directivos de alto desempeño bajo enfoques de eficiencia operacional.",
+          "citas": [
+            "transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones",
+            "desarrollo de equipos directivos de alto desempeño bajo enfoques de desarrollo sustentable y eficiencia operacional"
+          ],
+          "keywords": [
+            "tendencias en relaciones laborales"
+          ]
+        }
+      ]
+    },
+    {
+      "perfil": "Ejecutivo Senior con 18 años de trayectoria en Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores. Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, con experiencia en la definición de todas las políticas de la gerencia, con énfasis en los procesos transaccionales. Experto en relaciones laborales, conducción de negociaciones colectivas estratégicas y gestión de crisis. Responsable de la estrategia y ejecución de relaciones laborales a nivel nacional, con experiencia en faenas de la zona norte del país. Competente en transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera.",
+      "afirmaciones": [
+        {
+          "frase": "Ejecutivo Senior con 18 años de trayectoria en Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores.",
+          "citas": [
+            "18 años de trayectoria liderando las áreas de Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores"
+          ],
+          "keywords": [
+            "especialización en relaciones laborales",
+            "legislación laboral"
+          ]
+        },
+        {
+          "frase": "Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, con experiencia en la definición de todas las políticas de la gerencia, con énfasis en los procesos transaccionales.",
+          "citas": [
+            "la definición de todas las políticas de la gerencia, con énfasis en los procesos transaccionales"
+          ],
+          "keywords": [
+            "gestión de políticas internas"
+          ]
+        },
+        {
+          "frase": "Experto en relaciones laborales, conducción de negociaciones colectivas estratégicas y gestión de crisis.",
+          "citas": [
+            "Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de crisis"
+          ],
+          "keywords": [
+            "especialización en relaciones laborales",
+            "legislación laboral"
+          ]
+        },
+        {
+          "frase": "Responsable de la estrategia y ejecución de relaciones laborales a nivel nacional, con experiencia en faenas de la zona norte del país.",
+          "citas": [
+            "Responsable de la estrategia y ejecución de relaciones laborales a nivel nacional, con foco crítico en la Región Metropolitana y faenas de la zona norte del país"
+          ],
+          "keywords": [
+            "experiencia en faena",
+            "especialización en relaciones laborales"
+          ]
+        },
+        {
+          "frase": "Competente en transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera.",
+          "citas": [
+            "transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de alto impacto en la última línea financiera"
+          ],
+          "keywords": [
+            "tendencias en relaciones laborales"
+          ]
+        }
+      ]
+    }
+  ]
+}

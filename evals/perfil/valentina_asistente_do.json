@@ -1,0 +1,142 @@
+{
+  "caso": "valentina_asistente_do",
+  "oferta": "valentina_asistente_do-2026-09-29T19-00-27.json",
+  "costo": 0.011824,
+  "respuestas": [
+    {
+      "perfil": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail. Especializada en coordinación de operaciones y formación de equipos, con trayectoria en evaluación de desempeño, inducción de colaboradores y gestión de clima laboral. Domina Excel y ha implementado modelos de desarrollo organizacional a escala regional, demostrando capacidad en comunicación ejecutiva y construcción de culturas de alto rendimiento.",
+      "afirmaciones": [
+        {
+          "frase": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail",
+          "citas": [
+            "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail"
+          ],
+          "keywords": []
+        },
+        {
+          "frase": "Especializada en coordinación de operaciones, habiendo dirigido las operaciones de múltiples tiendas y coordinado procesos de incorporación y formación de colaboradores",
+          "citas": [
+            "Dirijo las operaciones de 8 tiendas",
+            "Gestioné el proceso de incorporación y formación de 180 nuevos colaboradores",
+            "Coordiné las operaciones de 4 tiendas"
+          ],
+          "keywords": [
+            "coordinación de capacitaciones"
+          ]
+        },
+        {
+          "frase": "Con experiencia comprobada en evaluación de desempeño, habiendo implementado modelos de evaluación por objetivos para equipos supervisores",
+          "citas": [
+            "Implementé el modelo de evaluación de desempeño por objetivos para el equipo de supervisores"
+          ],
+          "keywords": [
+            "evaluación de desempeño"
+          ]
+        },
+        {
+          "frase": "Responsable de inducción y formación de equipos, asegurando la inducción y adherencia a estándares de servicio en procesos de incorporación masiva",
+          "citas": [
+            "Formé a 5 vendedores nuevos por semestre, asegurando la inducción y adherencia a los estándares de servicio",
+            "Diseñé el programa de desarrollo de jefes de tienda"
+          ],
+          "keywords": [
+            "inducción",
+            "coordinación de capacitaciones"
+          ]
+        },
+        {
+          "frase": "Experta en gestión de clima laboral, reduciendo ausentismo mediante programas de bienestar y mejora del ambiente organizacional",
+          "citas": [
+            "Reduje la tasa de ausentismo de la zona de 8,2% a 4,1% en 18 meses mediante gestión de clima laboral y programas de bienestar"
+          ],
+          "keywords": [
+            "clima organizacional"
+          ]
+        },
+        {
+          "frase": "Domina Excel Avanzado y posee experiencia en herramientas de gestión como BUK y comunicación ejecutiva",
+          "citas": [
+            "Excel Avanzado, SAP, BUK",
+            "comunicación ejecutiva"
+          ],
+          "keywords": [
+            "Excel",
+            "BUK",
+            "comunicaciones internas"
+          ]
+        },
+        {
+          "frase": "Lideró equipos de hasta 45 personas y administró presupuestos operacionales de hasta MM$ 12 anuales, demostrando capacidad en construcción de culturas de alto rendimiento a escala regional",
+          "citas": [
+            "liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales",
+            "construcción de culturas de alto rendimiento a escala regional"
+          ],
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "perfil": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail. Lidera equipos de hasta 45 personas y administra presupuestos operacionales de hasta MM$ 12 anuales. Posee experiencia en formación de equipos, evaluación de desempeño, gestión de clima laboral y comunicación ejecutiva. Domina herramientas como Excel Avanzado y BUK para la coordinación de operaciones y procesos de inducción.",
+      "afirmaciones": [
+        {
+          "frase": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail",
+          "citas": [
+            "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail"
+          ],
+          "keywords": []
+        },
+        {
+          "frase": "Lidera equipos de hasta 45 personas y administra presupuestos operacionales de hasta MM$ 12 anuales",
+          "citas": [
+            "liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales"
+          ],
+          "keywords": []
+        },
+        {
+          "frase": "Posee experiencia en formación de equipos y evaluación de desempeño",
+          "citas": [
+            "Experiencia en formación de equipos, gestión del desempeño",
+            "Implementé el modelo de evaluación de desempeño por objetivos para el equipo de supervisores"
+          ],
+          "keywords": [
+            "formación de equipos",
+            "evaluación de desempeño"
+          ]
+        },
+        {
+          "frase": "Gestiona clima laboral y comunicación ejecutiva para construir culturas de alto rendimiento",
+          "citas": [
+            "construcción de culturas de alto rendimiento a escala regional",
+            "gestión de clima laboral y programas de bienestar",
+            "comunicación ejecutiva"
+          ],
+          "keywords": [
+            "clima organizacional",
+            "comunicaciones internas"
+          ]
+        },
+        {
+          "frase": "Coordina procesos de inducción y formación de colaboradores, reduciendo rotación mediante programas estructurados",
+          "citas": [
+            "Gestioné el proceso de incorporación y formación de 180 nuevos colaboradores",
+            "Formé a 5 vendedores nuevos por semestre, asegurando la inducción y adherencia a los estándares de servicio"
+          ],
+          "keywords": [
+            "inducción",
+            "coordinación de capacitaciones"
+          ]
+        },
+        {
+          "frase": "Domina Excel Avanzado y BUK para la gestión de operaciones",
+          "citas": [
+            "Excel Avanzado, SAP, BUK"
+          ],
+          "keywords": [
+            "Excel",
+            "BUK"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "caso": "pedro_conectatalentos",
+  "oferta": "pedro_conectatalentos-2026-09-29T19-00-27.json",
+  "costo": 0.008947,
+  "respuestas": [
+    {
+      "perfil": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas y atención al cliente, demostrando habilidades de comunicación efectiva y orientación a resultados. Ha participado en activaciones de marca y comercialización directa de productos. Competente en trabajo en equipo, pensamiento analítico y manejo de herramientas digitales. Inglés avanzado.",
+      "afirmaciones": [
+        {
+          "frase": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
+          "citas": [
+            "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez"
+          ],
+          "keywords": []
+        },
+        {
+          "frase": "Con experiencia en ventas directas y atención al cliente, demostrando habilidades de comunicación efectiva.",
+          "citas": [
+            "experiencia en ventas directas",
+            "Demostración de producto e impulso de ventas mediante atención directa al cliente",
+            "Trabajo en equipo y comunicación efectiva"
+          ],
+          "keywords": [
+            "venta directa B2B",
+            "comunicación con clientes"
+          ]
+        },
+        {
+          "frase": "Ha participado en activaciones de marca y comercialización directa de productos en puntos de venta y espacios públicos.",
+          "citas": [
+            "Ejecución de activaciones de marca en puntos de venta",
+            "ventas directas en plazas y espacios públicos"
+          ],
+          "keywords": [
+            "venta directa B2B"
+          ]
+        },
+        {
+          "frase": "Orientado a resultados con competencias en pensamiento analítico, trabajo en equipo y manejo de herramientas digitales.",
+          "citas": [
+            "Orientado a resultados",
+            "Pensamiento analítico y orientación a resultados",
+            "manejo de herramientas digitales"
+          ],
+          "keywords": []
+        },
+        {
+          "frase": "Domina inglés avanzado, con formación en educación bilingüe.",
+          "citas": [
+            "Inglés avanzado",
+            "Formación en inglés como idioma de instrucción durante toda la educación secundaria"
+          ],
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "perfil": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas y promoción de productos. Orientado a resultados, con habilidades de comunicación con clientes, trabajo en equipo y manejo de herramientas digitales. Inglés avanzado.",
+      "afirmaciones": [
+        {
+          "frase": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
+          "citas": [
+            "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez"
+          ],
+          "keywords": []
+        },
+        {
+          "frase": "Con experiencia en ventas directas y promoción de productos.",
+          "citas": [
+            "experiencia en ventas directas, promoción de productos",
+            "Demostración de producto e impulso de ventas mediante atención directa al cliente",
+            "ventas directas en plazas y espacios públicos"
+          ],
+          "keywords": [
+            "venta directa B2B",
+            "comunicación con clientes"
+          ]
+        },
+        {
+          "frase": "Orientado a resultados, con habilidades de comunicación con clientes, trabajo en equipo y manejo de herramientas digitales.",
+          "citas": [
+            "Orientado a resultados, con habilidades de comunicación",
+            "Trabajo en equipo y comunicación efectiva",
+            "manejo de herramientas digitales"
+          ],
+          "keywords": [
+            "comunicación con clientes"
+          ]
+        },
+        {
+          "frase": "Inglés avanzado.",
+          "citas": [
+            "Inglés avanzado"
+          ],
+          "keywords": []
+        }
+      ]
+    }
+  ]
+}

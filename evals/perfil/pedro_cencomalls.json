@@ -1,0 +1,114 @@
+{
+  "caso": "pedro_cencomalls",
+  "oferta": "pedro_cencomalls-2026-09-29T19-00-27.json",
+  "costo": 0.009362,
+  "respuestas": [
+    {
+      "perfil": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento, demostrando habilidades analíticas y orientación a resultados. Posee competencias en manejo de herramientas digitales, particularmente Microsoft Excel para análisis de datos, trabajo en equipo y comunicación efectiva. Domina inglés avanzado con formación en educación bilingüe.",
+      "afirmaciones": [
+        {
+          "frase": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas",
+          "citas": [
+            "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez"
+          ],
+          "keywords": [
+            "Ingeniería Comercial"
+          ]
+        },
+        {
+          "frase": "Experiencia en ventas directas, promoción de productos y emprendimiento end-to-end",
+          "citas": [
+            "experiencia en ventas directas, promoción de productos y emprendimiento",
+            "Demostración de producto e impulso de ventas mediante atención directa al cliente",
+            "Desarrollé habilidades de emprendimiento end-to-end: desde la producción hasta la comercialización del producto"
+          ],
+          "keywords": [
+            "ventas",
+            "emprendimiento"
+          ]
+        },
+        {
+          "frase": "Maneja Microsoft Excel a nivel intermedio para análisis de datos",
+          "citas": [
+            "Microsoft Excel (nivel intermedio): análisis de datos, tablas, fórmulas"
+          ],
+          "keywords": [
+            "Excel",
+            "análisis de datos"
+          ]
+        },
+        {
+          "frase": "Posee pensamiento analítico, orientación a resultados y habilidades de trabajo en equipo",
+          "citas": [
+            "Orientado a resultados, con habilidades de comunicación, trabajo en equipo",
+            "Pensamiento analítico y orientación a resultados"
+          ],
+          "keywords": [
+            "orientación a resultados",
+            "trabajo en equipo"
+          ]
+        },
+        {
+          "frase": "Domina inglés avanzado con formación en educación bilingüe",
+          "citas": [
+            "Inglés avanzado",
+            "Formación en inglés como idioma de instrucción durante toda la educación secundaria"
+          ],
+          "keywords": [
+            "Inglés avanzado"
+          ]
+        }
+      ]
+    },
+    {
+      "perfil": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento. Orientado a resultados, con habilidades de comunicación, trabajo en equipo y manejo de herramientas digitales como Microsoft Excel. Inglés avanzado.",
+      "afirmaciones": [
+        {
+          "frase": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas",
+          "citas": [
+            "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez"
+          ],
+          "keywords": []
+        },
+        {
+          "frase": "Con experiencia en ventas directas, promoción de productos y emprendimiento",
+          "citas": [
+            "experiencia en ventas directas, promoción de productos y emprendimiento",
+            "Demostración de producto e impulso de ventas mediante atención directa al cliente",
+            "Co fundé y operé un emprendimiento de snacks y alimentos para perros"
+          ],
+          "keywords": []
+        },
+        {
+          "frase": "Orientado a resultados con habilidades de comunicación y trabajo en equipo",
+          "citas": [
+            "Orientado a resultados, con habilidades de comunicación, trabajo en equipo",
+            "Pensamiento analítico y orientación a resultados",
+            "Trabajo en equipo y comunicación efectiva"
+          ],
+          "keywords": []
+        },
+        {
+          "frase": "Manejo de herramientas digitales con Microsoft Excel a nivel intermedio",
+          "citas": [
+            "manejo de herramientas digitales",
+            "Microsoft Excel (nivel intermedio): análisis de datos, tablas, fórmulas"
+          ],
+          "keywords": [
+            "Excel"
+          ]
+        },
+        {
+          "frase": "Inglés avanzado con formación en educación bilingüe",
+          "citas": [
+            "Inglés avanzado",
+            "Formación en inglés como idioma de instrucción durante toda la educación secundaria"
+          ],
+          "keywords": [
+            "Inglés"
+          ]
+        }
+      ]
+    }
+  ]
+}

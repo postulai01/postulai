@@ -1,0 +1,172 @@
+{
+  "caso": "valentina_cambio_rubro",
+  "oferta": "valentina_cambio_rubro-2026-09-29T19-00-27.json",
+  "costo": 0.013437,
+  "respuestas": [
+    {
+      "perfil": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail. Posee formación especializada en Gestión de Personas y Organizaciones y dominio de herramientas de gestión como BUK. Dirige operaciones a escala regional con responsabilidad sobre dotaciones de más de 100 personas, implementando procesos de reclutamiento masivo, onboarding y evaluación de desempeño. Demuestra capacidad para reducir indicadores de rotación, desarrollar líderes internos y construir culturas de alto rendimiento.",
+      "afirmaciones": [
+        {
+          "frase": "Posee 7 años de experiencia en gestión de operaciones comerciales en el sector retail.",
+          "citas": [
+            "7 años de experiencia en gestión de operaciones comerciales en el sector retail"
+          ],
+          "keywords": []
+        },
+        {
+          "frase": "Cuenta con formación especializada en Gestión de Personas y Organizaciones.",
+          "citas": [
+            "Diplomado en Gestión de Personas y Organizaciones"
+          ],
+          "keywords": [
+            "gestión de personas"
+          ]
+        },
+        {
+          "frase": "Dirige operaciones regionales con responsabilidad sobre dotaciones de más de 100 personas.",
+          "citas": [
+            "Dirijo las operaciones de 8 tiendas en la zona centro-sur del país, con una dotación total de 240 colaboradores"
+          ],
+          "keywords": [
+            "gestión de dotaciones de más de 100 personas"
+          ]
+        },
+        {
+          "frase": "Implementa procesos de reclutamiento masivo para períodos de alta demanda.",
+          "citas": [
+            "Gestioné los procesos de reclutamiento masivo para temporadas altas, contratando a más de 60 colaboradores estacionales por período"
+          ],
+          "keywords": [
+            "reclutamiento"
+          ]
+        },
+        {
+          "frase": "Gestiona procesos de onboarding y formación de nuevos colaboradores.",
+          "citas": [
+            "Gestioné el proceso de incorporación y formación de 180 nuevos colaboradores en los últimos 12 meses",
+            "Formé a 5 vendedores nuevos por semestre, asegurando la inducción y adherencia a los estándares de servicio"
+          ],
+          "keywords": [
+            "onboarding"
+          ]
+        },
+        {
+          "frase": "Implementa modelos de evaluación de desempeño alineados con objetivos organizacionales.",
+          "citas": [
+            "Implementé el modelo de evaluación de desempeño por objetivos para el equipo de supervisores, alineando metas individuales a resultados de zona"
+          ],
+          "keywords": [
+            "evaluación de desempeño"
+          ]
+        },
+        {
+          "frase": "Demuestra capacidad para reducir indicadores de rotación mediante gestión efectiva.",
+          "citas": [
+            "reduciendo la rotación en un 19%"
+          ],
+          "keywords": [
+            "indicadores de rotación"
+          ]
+        },
+        {
+          "frase": "Desarrolla programas de liderazgo que generan promoción interna y ascensos.",
+          "citas": [
+            "Diseñé el programa de desarrollo de jefes de tienda, formando a 12 líderes que ascendieron a roles de mayor responsabilidad",
+            "Desarrollé el plan de formación de supervisores de tienda, logrando que el 80% de las jefaturas fueran cubiertas con promoción interna"
+          ],
+          "keywords": [
+            "programa de desarrollo de liderazgo"
+          ]
+        },
+        {
+          "frase": "Domina herramientas tecnológicas de gestión de personas como BUK.",
+          "citas": [
+            "BUK"
+          ],
+          "keywords": [
+            "BUK"
+          ]
+        }
+      ]
+    },
+    {
+      "perfil": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail. Dirige operaciones de múltiples tiendas con dotación de 240 colaboradores, liderando procesos de reclutamiento masivo, onboarding y evaluación de desempeño. Especializada en gestión de personas con formación académica en la disciplina, implementa modelos de evaluación por objetivos y programas de desarrollo de liderazgo que han reducido la rotación en un 19%. Maneja herramientas de gestión como BUK y demuestra capacidad para construir culturas de alto rendimiento a escala regional.",
+      "afirmaciones": [
+        {
+          "frase": "Con 7 años de experiencia en gestión de operaciones comerciales en el sector retail",
+          "citas": [
+            "7 años de experiencia en gestión de operaciones comerciales en el sector retail"
+          ],
+          "keywords": [
+            "gestión de personas"
+          ]
+        },
+        {
+          "frase": "Dirige operaciones de 8 tiendas con una dotación total de 240 colaboradores",
+          "citas": [
+            "Dirijo las operaciones de 8 tiendas en la zona centro-sur del país, con una dotación total de 240 colaboradores"
+          ],
+          "keywords": [
+            "gestión de dotaciones de más de 100 personas"
+          ]
+        },
+        {
+          "frase": "Gestionó procesos de reclutamiento masivo, contratando más de 60 colaboradores estacionales por período",
+          "citas": [
+            "Gestionó los procesos de reclutamiento masivo para temporadas altas, contratando a más de 60 colaboradores estacionales por período"
+          ],
+          "keywords": [
+            "reclutamiento"
+          ]
+        },
+        {
+          "frase": "Formó a 5 vendedores nuevos por semestre, asegurando la inducción y adherencia a los estándares de servicio",
+          "citas": [
+            "Formé a 5 vendedores nuevos por semestre, asegurando la inducción y adherencia a los estándares de servicio"
+          ],
+          "keywords": [
+            "onboarding"
+          ]
+        },
+        {
+          "frase": "Implementó modelo de evaluación de desempeño por objetivos para alinear metas individuales a resultados de zona",
+          "citas": [
+            "Implementé el modelo de evaluación de desempeño por objetivos para el equipo de supervisores, alineando metas individuales a resultados de zona"
+          ],
+          "keywords": [
+            "evaluación de desempeño"
+          ]
+        },
+        {
+          "frase": "Redujo la rotación en un 19% mediante gestión de incorporación y formación de 180 nuevos colaboradores",
+          "citas": [
+            "Gestioné el proceso de incorporación y formación de 180 nuevos colaboradores en los últimos 12 meses, reduciendo la rotación en un 19%"
+          ],
+          "keywords": [
+            "indicadores de rotación"
+          ]
+        },
+        {
+          "frase": "Diseñó programa de desarrollo de jefes de tienda, formando a 12 líderes que ascendieron a roles de mayor responsabilidad",
+          "citas": [
+            "Diseñé el programa de desarrollo de jefes de tienda, formando a 12 líderes que ascendieron a roles de mayor responsabilidad"
+          ],
+          "keywords": [
+            "programa de desarrollo de liderazgo"
+          ]
+        },
+        {
+          "frase": "Posee Diplomado en Gestión de Personas y Organizaciones y maneja herramientas como BUK",
+          "citas": [
+            "Diplomado en Gestión de Personas y Organizaciones",
+            "BUK"
+          ],
+          "keywords": [
+            "gestión de personas",
+            "BUK"
+          ]
+        }
+      ]
+    }
+  ]
+}
