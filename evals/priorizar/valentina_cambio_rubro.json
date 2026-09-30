@@ -1,0 +1,53 @@
+{
+  "caso": "valentina_cambio_rubro",
+  "oferta": "valentina_cambio_rubro-2026-09-29T19-00-27.json",
+  "costo": 0.001993,
+  "respuesta": [
+    {
+      "vineta": 1,
+      "keywords": [
+        "gestión de personas",
+        "gestión de dotaciones de más de 100 personas"
+      ]
+    },
+    {
+      "vineta": 2,
+      "keywords": [
+        "onboarding",
+        "indicadores de rotación"
+      ]
+    },
+    {
+      "vineta": 3,
+      "keywords": [
+        "programa de desarrollo de liderazgo",
+        "desarrollo de equipos"
+      ]
+    },
+    {
+      "vineta": 5,
+      "keywords": [
+        "evaluación de desempeño"
+      ]
+    },
+    {
+      "vineta": 7,
+      "keywords": [
+        "encuestas de clima organizacional"
+      ]
+    },
+    {
+      "vineta": 8,
+      "keywords": [
+        "reclutamiento"
+      ]
+    },
+    {
+      "vineta": 9,
+      "keywords": [
+        "planes de carrera",
+        "desarrollo de equipos"
+      ]
+    }
+  ]
+}

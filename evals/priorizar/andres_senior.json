@@ -1,0 +1,145 @@
+{
+  "caso": "andres_senior",
+  "oferta": "andres_senior-2026-09-29T19-00-27.json",
+  "costo": 0.00473,
+  "respuesta": [
+    {
+      "vineta": 1,
+      "keywords": [
+        "estrategia de capital humano"
+      ]
+    },
+    {
+      "vineta": 2,
+      "keywords": [
+        "negociaciones colectivas",
+        "relaciones laborales"
+      ]
+    },
+    {
+      "vineta": 4,
+      "keywords": [
+        "relaciones laborales",
+        "gestión de crisis"
+      ]
+    },
+    {
+      "vineta": 5,
+      "keywords": [
+        "estrategia de capital humano"
+      ]
+    },
+    {
+      "vineta": 6,
+      "keywords": [
+        "transformación digital",
+        "transformación cultural",
+        "automatización de procesos RRHH"
+      ]
+    },
+    {
+      "vineta": 8,
+      "keywords": [
+        "relaciones laborales",
+        "gestión de crisis"
+      ]
+    },
+    {
+      "vineta": 9,
+      "keywords": [
+        "gestión de presupuesto",
+        "HR Analytics"
+      ]
+    },
+    {
+      "vineta": 10,
+      "keywords": [
+        "relaciones laborales",
+        "compensaciones"
+      ]
+    },
+    {
+      "vineta": 11,
+      "keywords": [
+        "compensaciones",
+        "gestión de presupuesto"
+      ]
+    },
+    {
+      "vineta": 12,
+      "keywords": [
+        "negociaciones colectivas",
+        "relaciones laborales"
+      ]
+    },
+    {
+      "vineta": 14,
+      "keywords": [
+        "relaciones laborales"
+      ]
+    },
+    {
+      "vineta": 15,
+      "keywords": [
+        "compensaciones",
+        "gestión de presupuesto"
+      ]
+    },
+    {
+      "vineta": 16,
+      "keywords": [
+        "SAP",
+        "compensaciones"
+      ]
+    },
+    {
+      "vineta": 17,
+      "keywords": [
+        "relaciones laborales",
+        "compensaciones"
+      ]
+    },
+    {
+      "vineta": 18,
+      "keywords": [
+        "compensaciones"
+      ]
+    },
+    {
+      "vineta": 19,
+      "keywords": [
+        "negociaciones colectivas"
+      ]
+    },
+    {
+      "vineta": 20,
+      "keywords": [
+        "compensaciones"
+      ]
+    },
+    {
+      "vineta": 21,
+      "keywords": [
+        "automatización de procesos RRHH"
+      ]
+    },
+    {
+      "vineta": 22,
+      "keywords": [
+        "negociaciones colectivas"
+      ]
+    },
+    {
+      "vineta": 23,
+      "keywords": [
+        "compensaciones"
+      ]
+    },
+    {
+      "vineta": 24,
+      "keywords": [
+        "gestión de presupuesto"
+      ]
+    }
+  ]
+}

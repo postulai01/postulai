@@ -1,0 +1,44 @@
+{
+  "caso": "valentina_asistente_do",
+  "oferta": "valentina_asistente_do-2026-09-29T19-00-27.json",
+  "costo": 0.001663,
+  "respuesta": [
+    {
+      "vineta": 2,
+      "keywords": [
+        "inducción",
+        "coordinación de capacitaciones"
+      ]
+    },
+    {
+      "vineta": 3,
+      "keywords": [
+        "coordinación de capacitaciones"
+      ]
+    },
+    {
+      "vineta": 5,
+      "keywords": [
+        "evaluación de desempeño"
+      ]
+    },
+    {
+      "vineta": 7,
+      "keywords": [
+        "clima organizacional"
+      ]
+    },
+    {
+      "vineta": 9,
+      "keywords": [
+        "coordinación de capacitaciones"
+      ]
+    },
+    {
+      "vineta": 12,
+      "keywords": [
+        "inducción"
+      ]
+    }
+  ]
+}

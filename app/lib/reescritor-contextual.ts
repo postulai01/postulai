@@ -15,7 +15,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { normalizarParaComparar, STOP_WORDS_MATCH } from "./cv-postprocess";
 import { esEncabezado, esLineaCargo, raizVerbo, VERBOS_ESCALADA } from "./cv-verificacion";
-import { esCarrera, RAICES_GENERICAS, type KeywordsJD, type ResultadoMapeo } from "./mapeo-semantico";
+import { esCarrera, RAICES_GENERICAS, RE_EXPERIENCIA, type KeywordsJD, type ResultadoMapeo } from "./mapeo-semantico";
 
 export const MODELO_REESCRITOR = "claude-haiku-4-5-20251001";
 export const MAX_PALABRAS_NUEVAS = 4;
@@ -104,23 +104,40 @@ function fuenteDe(termino: string, cv: string, lineaActual: string, estricto = f
 
 export interface BloqueCV {
   tipo: "resumen" | "puesto" | "otro";
-  titulo: string;   // línea de empresa/cargo en los puestos
-  lineas: string[]; // sin viñeta; en un puesto incluye su título y el cargo bajo él
+  titulo: string;    // línea de empresa/cargo en los puestos
+  lineas: string[];  // sin viñeta; en un puesto incluye su título y el cargo bajo él
+  indices: number[]; // índice de cada línea de `lineas` en cv.split("\n")
 }
 
-// Resumen: todo lo anterior al primer puesto (perfil, Áreas de Expertise, stack). Un bloque por puesto: la línea
-// "Empresa — fechas" más las líneas siguientes (cargo y viñetas) hasta el próximo puesto o encabezado de sección.
-// Lo que viene después de un encabezado que corta la experiencia (educación, habilidades) va en "otro".
+// Resumen: todo lo anterior a la sección de experiencia (perfil, Áreas de Expertise, stack). Dentro de la sección de
+// experiencia, un bloque por puesto: la línea con fechas ("Empresa — 2014 – 2017", "Cargo | Empresa    2025") más
+// las líneas siguientes (cargo y viñetas) hasta el próximo puesto o encabezado. Las demás secciones (educación,
+// habilidades) van en "otro". Si el CV no tiene encabezado de experiencia, un puesto es cualquier línea "— … año".
 export function bloquesCV(cv: string): BloqueCV[] {
-  const bloques: BloqueCV[] = [{ tipo: "resumen", titulo: "", lineas: [] }];
-  for (const cruda of cv.split("\n")) {
+  const crudas = cv.split("\n");
+  const conSeccion = crudas.some(l => esEncabezado(l) && RE_EXPERIENCIA.test(normalizarParaComparar(l)));
+  const bloques: BloqueCV[] = [{ tipo: "resumen", titulo: "", lineas: [], indices: [] }];
+  let seccion: "resumen" | "experiencia" | "otro" = "resumen";
+  crudas.forEach((cruda, i) => {
     const l = cruda.replace(/^\s*[-•]\s+/, "").trim();
-    if (!l) continue;
+    if (!l) return;
+    if (esEncabezado(cruda)) {
+      if (RE_EXPERIENCIA.test(normalizarParaComparar(l))) seccion = "experiencia";
+      else if (seccion !== "resumen" || bloques[bloques.length - 1].tipo !== "resumen") {
+        seccion = "otro";
+        bloques.push({ tipo: "otro", titulo: l, lineas: [], indices: [] });
+      }
+      return;
+    }
+    const esVineta = /^\s*[-•]\s+/.test(cruda);
+    const esPuesto = conSeccion
+      ? seccion === "experiencia" && !esVineta && (esLineaCargo(cruda) || /\b(19|20)\d{2}\b/.test(l))
+      : esLineaCargo(cruda);
+    if (esPuesto) { bloques.push({ tipo: "puesto", titulo: l, lineas: [l], indices: [i] }); return; }
     const actual = bloques[bloques.length - 1];
-    if (esLineaCargo(cruda)) bloques.push({ tipo: "puesto", titulo: l, lineas: [l] });
-    else if (esEncabezado(cruda) && actual.tipo === "puesto") bloques.push({ tipo: "otro", titulo: l, lineas: [] });
-    else if (!esEncabezado(cruda)) actual.lineas.push(l);
-  }
+    actual.lineas.push(l);
+    actual.indices.push(i);
+  });
   return bloques;
 }
 
