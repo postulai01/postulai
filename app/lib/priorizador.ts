@@ -48,6 +48,7 @@ export interface ResultadoPriorizacion {
 // Etiquetas de Haiku: índice de línea en cv.split("\n") → keywords de la oferta que esa viñeta evidencia.
 // SOLO sirven para ORDENAR viñetas dentro de su puesto. No son evidencia para el mapeo, el score ni el reescritor,
 // y ningún otro módulo debe importarlas: el modelo solo las filtra por keyword válida y número de viñeta.
+// Única excepción (PED-33): informe-fit.ts puede usarlas para dar contexto a una PREGUNTA, nunca a una afirmación.
 export type EtiquetasOrden = Record<number, string[]>;
 
 export interface VinetaOrdenada { texto: string; puntaje: number; keywords: KeywordPuntaje[] }
