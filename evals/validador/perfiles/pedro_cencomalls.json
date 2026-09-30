@@ -1,0 +1,16 @@
+{
+  "[1] ORACIÓN: Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.\nLÍNEAS CITADAS:\n- (3) Estudiante de Ingeniería Comercial | Especialización en Finanzas Cuantitativas\n- (31) Ingeniería Comercial · Mención Finanzas Cuantitativas    2023 y cursando 4to año\n- (33) Cuarto año en curso · Santiago, Chile\n\n[2] ORACIÓN: Maneja Microsoft Excel a nivel intermedio para análisis de datos y fórmulas.\nLÍNEAS CITADAS:\n- (49) Microsoft Excel (nivel intermedio): análisis de datos, tablas, fórmulas.": {
+    "raw": "```json\n{\n  \"oraciones\": [\n    {\n      \"i\": 1,\n      \"veredicto\": \"fiel\",\n      \"tipo\": null,\n      \"explicacion\": \"Parafrasea fielmente: 'cuarto año' (línea 31, 33), 'Ingeniería Comercial' (línea 3, 31) y 'mención en Finanzas Cuantitativas' (línea 3, 31).\",\n      \"natural\": true\n    },\n    {\n      \"i\": 2,\n      \"veredicto\": \"fiel\",\n      \"tipo\": null,\n      \"explicacion\": \"Resume fielmente la línea 49: 'nivel intermedio' + 'análisis de datos' + 'fórmulas' sin añadir responsabilidad ni alcance.\",\n      \"natural\": true\n    }\n  ]\n}\n```",
+    "usage": {
+      "input_tokens": 633,
+      "output_tokens": 221
+    }
+  },
+  "[1] ORACIÓN: Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.\nLÍNEAS CITADAS:\n- (3) Estudiante de Ingeniería Comercial | Especialización en Finanzas Cuantitativas\n- (31) Ingeniería Comercial · Mención Finanzas Cuantitativas    2023 y cursando 4to año\n- (33) Cuarto año en curso · Santiago, Chile\n\n[2] ORACIÓN: Orientado a resultados con habilidades de comunicación, trabajo en equipo y pensamiento analítico.\nLÍNEAS CITADAS:\n- (9) Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez. Con experiencia en ventas directas, promoción de productos y emprendimiento. Orientado a resultados, con habilidades de comunicación, trabajo en equipo y manejo de herramientas digitales. Inglés avanzado.\n- (63) Trabajo en equipo y comunicación efectiva.\n- (65) Pensamiento analítico y orientación a resultados.\n\n[3] ORACIÓN: Maneja Microsoft Excel a nivel intermedio para análisis de datos y fórmulas.\nLÍNEAS CITADAS:\n- (49) Microsoft Excel (nivel intermedio): análisis de datos, tablas, fórmulas.": {
+    "raw": "```json\n{\n  \"oraciones\": [\n    {\n      \"i\": 1,\n      \"veredicto\": \"fiel\",\n      \"tipo\": null,\n      \"explicacion\": \"Parafrasea fielmente: 'cuarto año' + 'Ingeniería Comercial' + 'mención en Finanzas Cuantitativas' + 'Universidad Adolfo Ibáñez'.\",\n      \"natural\": true\n    },\n    {\n      \"i\": 2,\n      \"veredicto\": \"fiel\",\n      \"tipo\": null,\n      \"explicacion\": \"Resume fielmente: 'orientado a resultados', 'comunicación', 'trabajo en equipo', 'pensamiento analítico' están todos en las líneas citadas.\",\n      \"natural\": true\n    },\n    {\n      \"i\": 3,\n      \"veredicto\": \"fiel\",\n      \"tipo\": null,\n      \"explicacion\": \"Parafrasea directamente la línea 49: 'Excel nivel intermedio' + 'análisis de datos' + 'fórmulas'.\",\n      \"natural\": true\n    }\n  ]\n}\n```",
+    "usage": {
+      "input_tokens": 808,
+      "output_tokens": 289
+    }
+  }
+}
