@@ -1,0 +1,80 @@
+{
+  "caso": "pedro_conectatalentos",
+  "ts": "2026-09-29T19-00-27",
+  "costo": 0.003378,
+  "texto_limpio": "Buscamos a un/a Practicante de Ingeniería Comercial (o carrera afín) motivado/a por el área de ventas directas B2B para integrarse a nuestro equipo en una empresa de servicios de ciberseguridad.\nEl/la practicante apoyará directamente en la gestión con clientes empresariales y en el desarrollo de propuestas comerciales para licitaciones con instituciones del Estado.\nNo exigimos experiencia previa, valoramos la proactividad, el interés por la tecnología y la vocación comercial.\n\nFunciones Principales\n- Apoyo en la gestión de venta directa y prospección de clientes B2B.\n- Participación en la elaboración de propuestas comerciales y técnicas para servicios de ciberseguridad.\n- Colaboración en el armado y seguimiento de licitaciones y proyectos para el sector público (Mercado Público / Estado).\n- Atención inicial a clientes y seguimiento de oportunidades comerciales.\n\nRequisitos\n- Estudiante o egresado/a de Ingeniería Comercial, Administración de Empresas o carrera afín (en búsqueda de práctica profesional).\n- Marcada orientación hacia las ventas, negociación y comunicación con clientes.\n- Interés o afinidad por el sector tecnológico y la ciberseguridad.\n- Habilidades de redacción y capacidad de síntesis para la elaboración de propuestas formales.\n- Disponibilidad para trabajar 100% de manera remota.",
+  "keywords_requeridas": [
+    {
+      "keyword": "venta directa B2B",
+      "relevancia": 9
+    },
+    {
+      "keyword": "gestión de clientes empresariales",
+      "relevancia": 8
+    },
+    {
+      "keyword": "propuestas comerciales",
+      "relevancia": 8
+    },
+    {
+      "keyword": "negociación",
+      "relevancia": 8
+    },
+    {
+      "keyword": "comunicación con clientes",
+      "relevancia": 8
+    },
+    {
+      "keyword": "licitaciones",
+      "relevancia": 7
+    },
+    {
+      "keyword": "redacción",
+      "relevancia": 7
+    },
+    {
+      "keyword": "prospección de clientes",
+      "relevancia": 7
+    }
+  ],
+  "keywords_deseables": [
+    {
+      "keyword": "ciberseguridad",
+      "relevancia": 6
+    },
+    {
+      "keyword": "sector tecnológico",
+      "relevancia": 6
+    },
+    {
+      "keyword": "Mercado Público",
+      "relevancia": 5
+    }
+  ],
+  "nivel_posicion": "practicante",
+  "industria": "ciberseguridad",
+  "experiencia": [],
+  "carreras": [
+    {
+      "carreras": [
+        "Ingeniería Comercial",
+        "Administración de Empresas"
+      ],
+      "acepta_afin": true,
+      "tipo": "requerido"
+    }
+  ],
+  "descartadas": [],
+  "usage": {
+    "input_tokens": 1288,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 418,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

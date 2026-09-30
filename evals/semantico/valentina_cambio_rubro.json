@@ -1,0 +1,52 @@
+{
+  "caso": "valentina_cambio_rubro",
+  "oferta": "valentina_cambio_rubro-2026-09-29T19-00-27.json",
+  "costo": 0.005922,
+  "reintento": {
+    "pedidas": [
+      "encuestas de clima organizacional",
+      "gestión de dotaciones de más de 100 personas"
+    ],
+    "recuperadas": [
+      "gestión de dotaciones de más de 100 personas"
+    ]
+  },
+  "propuestos": [
+    {
+      "keyword": "procesos de RRHH",
+      "cita": "Gestioné el proceso de incorporación y formación de 180 nuevos colaboradores",
+      "nivel": "relacionado",
+      "relevancia": 0.7
+    },
+    {
+      "keyword": "onboarding",
+      "cita": "Formé a 5 vendedores nuevos por semestre, asegurando la inducción y adherencia",
+      "nivel": "directo",
+      "relevancia": 0.85
+    },
+    {
+      "keyword": "desarrollo de equipos",
+      "cita": "Diseñé el programa de desarrollo de jefes de tienda, formando a 12 líderes",
+      "nivel": "directo",
+      "relevancia": 0.9
+    },
+    {
+      "keyword": "indicadores de rotación",
+      "cita": "reduciendo la rotación en un 19%",
+      "nivel": "directo",
+      "relevancia": 0.9
+    },
+    {
+      "keyword": "planes de carrera",
+      "cita": "logrando que el 80% de las jefaturas fueran cubiertas con promoción interna",
+      "nivel": "relacionado",
+      "relevancia": 0.7
+    },
+    {
+      "keyword": "gestión de dotaciones de más de 100 personas",
+      "cita": "Dirijo las operaciones de 8 tiendas en la zona centro-sur del país, con una dotación total de 240 colaboradores",
+      "nivel": "directo",
+      "relevancia": 0.95
+    }
+  ]
+}

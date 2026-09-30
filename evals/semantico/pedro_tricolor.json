@@ -1,0 +1,32 @@
+{
+  "caso": "pedro_tricolor",
+  "oferta": "pedro_tricolor-2026-09-29T22-20-53.json",
+  "costo": 0.002459,
+  "reintento": null,
+  "propuestos": [
+    {
+      "keyword": "herramientas de office",
+      "cita": "Microsoft Office (Word, PowerPoint)",
+      "nivel": "directo",
+      "relevancia": 0.95
+    },
+    {
+      "keyword": "orientación al servicio",
+      "cita": "Demostración de producto e impulso de ventas mediante atención directa al cliente",
+      "nivel": "relacionado",
+      "relevancia": 0.75
+    },
+    {
+      "keyword": "actitud de aprendizaje",
+      "cita": "Desarrollé habilidades de emprendimiento end-to-end: desde la producción hasta la comercialización",
+      "nivel": "relacionado",
+      "relevancia": 0.7
+    },
+    {
+      "keyword": "tareas operativas",
+      "cita": "Gestioné actividades de producción, ventas directas en plazas y espacios públicos",
+      "nivel": "relacionado",
+      "relevancia": 0.72
+    }
+  ]
+}

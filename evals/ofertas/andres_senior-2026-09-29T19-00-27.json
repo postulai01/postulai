@@ -1,0 +1,113 @@
+{
+  "caso": "andres_senior",
+  "ts": "2026-09-29T19-00-27",
+  "costo": 0.005028,
+  "texto_limpio": "CARGO: Gerente de Capital Humano\nEMPRESA: Grupo Industrial Cóndor S.A. — empresa de servicios industriales con operaciones en la Región Metropolitana, Antofagasta y Atacama. Dotación de 3.200 colaboradores con múltiples sindicatos activos.\n\nDESCRIPCIÓN DEL CARGO:\nBuscamos un Gerente de Capital Humano para liderar la estrategia de gestión de personas de la organización, con foco en transformación cultural, relaciones laborales complejas y eficiencia operacional del área en un contexto de operaciones industriales de alta complejidad.\n\nRESPONSABILIDADES PRINCIPALES:\n- Diseñar e implementar la estrategia de capital humano alineada a los objetivos del negocio y la rentabilidad de la compañía.\n- Liderar las negociaciones colectivas estratégicas con múltiples sindicatos en faenas industriales en regiones.\n- Gestionar presupuesto de capital humano y estructuras de compensaciones estratégicas para dotaciones de alta complejidad.\n- Implementar procesos de transformación digital mediante HR Analytics y automatización de procesos de RRHH.\n- Desarrollar equipos directivos de alto desempeño y transformación cultural organizacional.\n- Supervisar la operación de relaciones laborales a nivel nacional y gestión de crisis.\n- Reportar directamente a la Gerencia General y al Directorio.\n\nREQUISITOS:\n- Profesional de carreras de Administración Pública, Ingeniería Comercial, Psicología o afines.\n- Mínimo 12 años de experiencia en Gerencias de Capital Humano / RRHH en empresas industriales o de servicios de alta complejidad.\n- Experiencia comprobable en conducción de negociaciones colectivas complejas con sindicatos industriales.\n- Dominio de sistemas de gestión de personas (BUK, SAP, Talana o similares) y HR Analytics.\n- Manejo de presupuestos de Gerencia de Capital Humano de al menos MM$ 80.\n- Experiencia en transformación digital aplicada a procesos de gestión de personas.\n- Deseable: conocimiento en automatización con IA (Gemini, Claude, n8n o similares).\n\nOFERTA:\n- Renta ejecutiva competitiva según experiencia comprobada.\n- Beneficios: seguro complementario de salud para grupo familiar, bono de desempeño anual.\n- Modalidad presencial en Santiago, con visitas periódicas a faenas en la zona norte.",
+  "keywords_requeridas": [
+    {
+      "keyword": "estrategia de capital humano",
+      "relevancia": 10
+    },
+    {
+      "keyword": "negociaciones colectivas",
+      "relevancia": 10
+    },
+    {
+      "keyword": "relaciones laborales",
+      "relevancia": 10
+    },
+    {
+      "keyword": "gestión de presupuesto",
+      "relevancia": 9
+    },
+    {
+      "keyword": "compensaciones",
+      "relevancia": 9
+    },
+    {
+      "keyword": "BUK",
+      "relevancia": 8
+    },
+    {
+      "keyword": "SAP",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Talana",
+      "relevancia": 8
+    },
+    {
+      "keyword": "HR Analytics",
+      "relevancia": 8
+    },
+    {
+      "keyword": "transformación digital",
+      "relevancia": 8
+    },
+    {
+      "keyword": "transformación cultural",
+      "relevancia": 8
+    },
+    {
+      "keyword": "gestión de crisis",
+      "relevancia": 7
+    },
+    {
+      "keyword": "automatización de procesos RRHH",
+      "relevancia": 7
+    }
+  ],
+  "keywords_deseables": [
+    {
+      "keyword": "automatización con IA",
+      "relevancia": 6
+    },
+    {
+      "keyword": "Gemini",
+      "relevancia": 5
+    },
+    {
+      "keyword": "Claude",
+      "relevancia": 5
+    },
+    {
+      "keyword": "n8n",
+      "relevancia": 5
+    }
+  ],
+  "nivel_posicion": "jefatura",
+  "industria": "servicios industriales",
+  "experiencia": [
+    {
+      "anios_minimos": 12,
+      "area": "Gerencias de Capital Humano / RRHH en empresas industriales o de servicios",
+      "tipo": "requerido"
+    }
+  ],
+  "carreras": [
+    {
+      "carreras": [
+        "Administración Pública",
+        "Ingeniería Comercial",
+        "Psicología"
+      ],
+      "acepta_afin": true,
+      "tipo": "requerido"
+    }
+  ],
+  "descartadas": [
+    "desarrollo de equipos directivos"
+  ],
+  "usage": {
+    "input_tokens": 1538,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 698,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
