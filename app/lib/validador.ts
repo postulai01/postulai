@@ -15,12 +15,14 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { norm } from "./cv-verificacion";
-import { bloquesCV, palabrasContenido } from "./reescritor-contextual";
+import { RAICES_GENERICAS } from "./mapeo-semantico";
+import { INTENSIFICADOR, RELLENO_NEUTRO } from "./perfil-adaptado";
+import { bloquesCV, indice, palabrasContenido, presenteEstricto } from "./reescritor-contextual";
 
 export interface LineaCitada { linea: number; texto: string } // linea: 1-based, como numerarCV
 export interface OracionAValidar { oracion: string; lineas_citadas: LineaCitada[] }
 
-export type TipoCodigo = "escalada_rol" | "tiempo_verbal";
+export type TipoCodigo = "escalada_rol" | "tiempo_verbal" | "palabra_fuera_de_cita" | "calificativo_trasladado";
 export interface HallazgoCodigo { tipo: TipoCodigo; detalle: string }
 
 // ─── capa 1: código ──────────────────────────────────────────────────────────
@@ -101,6 +103,69 @@ export function tiempoVerbal(o: OracionAValidar, puestos: Map<number, "terminado
   return { tipo: "tiempo_verbal", detalle: `"${verbo}" en presente; todas las líneas citadas son de puestos terminados` };
 }
 
+// Igual (o plural), o misma raíz de 5 letras no genérica en palabras largas.
+function respaldada(p: string, ix: { set: Set<string>; raices: Set<string> }): boolean {
+  return presenteEstricto(p, ix.set) || (p.length >= 6 && !/\d/.test(p) && !RAICES_GENERICAS.has(r5(p)) && ix.raices.has(r5(p)));
+}
+
+// Palabras escritas con mayúscula que no abren la oración (nombres propios, herramientas), normalizadas.
+function nombresPropios(oracion: string): Set<string> {
+  const out = new Set<string>();
+  oracion.split(/\s+/).forEach((w, i) => {
+    if (i > 0 && /^[A-ZÁÉÍÓÚÑ]/.test(w.replace(/^[("'“]+/, ""))) palabrasContenido(w).forEach(p => out.add(p));
+  });
+  return out;
+}
+
+// Bloque (índice en bloquesCV) de cada línea 1-based.
+function bloquePorLinea(cv: string): Map<number, number> {
+  const m = new Map<number, number>();
+  bloquesCV(cv).forEach((b, k) => b.indices.forEach(i => m.set(i + 1, k)));
+  return m;
+}
+
+// Cada palabra de contenido debe estar en las LÍNEAS CITADAS. Excepción: nombres propios/herramientas que están en
+// una línea del CV del mismo bloque que alguna línea citada.
+export function palabraFueraDeCita(o: OracionAValidar, cv?: string): HallazgoCodigo | null {
+  const ix = indice(o.lineas_citadas.map(l => l.texto).join(" "));
+  const propios = nombresPropios(o.oracion);
+  const bloques = cv ? bloquePorLinea(cv) : null;
+  const lineasCV = cv ? cv.split("\n") : [];
+  const bloquesCitados = new Set(o.lineas_citadas.map(l => bloques?.get(l.linea)));
+  const enMismoBloque = (p: string) => lineasCV.some((t, i) =>
+    bloquesCitados.has(bloques!.get(i + 1)) && presenteEstricto(p, new Set(palabrasContenido(t))));
+  const fuera = [...new Set(palabrasContenido(o.oracion))].filter(p =>
+    !RELLENO_NEUTRO.test(p) && !respaldada(p, ix) && !(bloques && propios.has(p) && enMismoBloque(p)));
+  return fuera.length ? { tipo: "palabra_fuera_de_cita", detalle: `no están en las líneas citadas: ${fuera.join(", ")}` } : null;
+}
+
+const SIGUIENTES = 6;
+
+// Palabras de contenido que siguen a cada aparición del intensificador (misma raíz) en un texto.
+function trasIntensificador(texto: string, prefijo: string): string[][] {
+  const ps = palabrasContenido(texto);
+  return ps.flatMap((p, i) => (p.startsWith(prefijo) ? [ps.slice(i + 1, i + 1 + SIGUIENTES)] : []));
+}
+
+// Un intensificador debe calificar lo mismo que en el CV: lo que lo sigue comparte ≥1 palabra con lo que lo sigue allí.
+export function calificativoTrasladado(o: OracionAValidar, cv?: string): HallazgoCodigo | null {
+  const fuente = cv ?? o.lineas_citadas.map(l => l.texto).join("\n");
+  for (const p of new Set(palabrasContenido(o.oracion))) {
+    const prefijo = p.match(INTENSIFICADOR)?.[1];
+    if (!prefijo) continue;
+    const enOracion = trasIntensificador(o.oracion, prefijo);
+    const enCV = trasIntensificador(fuente, prefijo);
+    const ok = enOracion.every(obj => enCV.some(cvObj => obj.some(w => respaldada(w, indice(cvObj.join(" "))))));
+    if (!ok) {
+      return {
+        tipo: "calificativo_trasladado",
+        detalle: `"${p}" califica "${enOracion.map(x => x.join(" ")).join(" | ")}"; en el CV califica ${enCV.length ? enCV.map(x => `"${x.join(" ")}"`).join(" | ") : "nada (no aparece)"}`,
+      };
+    }
+  }
+  return null;
+}
+
 export function validarCodigo(o: OracionAValidar, cv?: string): HallazgoCodigo[] {
   const out: HallazgoCodigo[] = [];
   const e = escaladaRol(o);
@@ -109,6 +174,10 @@ export function validarCodigo(o: OracionAValidar, cv?: string): HallazgoCodigo[]
     const t = tiempoVerbal(o, estadoPuestos(cv));
     if (t) out.push(t);
   }
+  const f = palabraFueraDeCita(o, cv);
+  if (f) out.push(f);
+  const c = calificativoTrasladado(o, cv);
+  if (c) out.push(c);
   return out;
 }
 
