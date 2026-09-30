@@ -132,6 +132,13 @@ function puntuar(
   return { puntaje: Math.round(total * 10) / 10, keywords };
 }
 
+// Puntaje de textos sueltos contra la oferta, con el modo por defecto (tema central + raíces no genéricas, sin
+// etiquetas). Lo usa el perfil priorizado (perfil-adaptado.ts).
+export function puntuarTextos(textos: string[], mapeo: ResultadoMapeo, jd: KeywordsJD): { puntaje: number; keywords: KeywordPuntaje[] }[] {
+  const rs = respaldos(mapeo, jd);
+  return textos.map(t => puntuar(t, rs));
+}
+
 // Orden estable por puntaje descendente.
 function ordenar<T extends { puntaje: number; pos: number }>(xs: T[]): T[] {
   return [...xs].sort((a, b) => b.puntaje - a.puntaje || a.pos - b.pos);

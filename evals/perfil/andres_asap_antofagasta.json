@@ -1,0 +1,128 @@
+{
+  "caso": "andres_asap_antofagasta",
+  "oferta": "andres_asap_antofagasta-2026-09-29T19-00-27.json",
+  "costo": 0.011816,
+  "respuestas": [
+    {
+      "oraciones": [
+        {
+          "texto": "Ejecutivo Senior con 18 años de trayectoria en Relaciones Laborales y administración de personal en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150.",
+          "lineas": [
+            5,
+            7
+          ],
+          "keywords": [
+            "Relaciones Laborales",
+            "administración de personal"
+          ]
+        },
+        {
+          "texto": "Diseña e implementa estrategias de gestión de personas alineadas a los objetivos del negocio, con énfasis en transformación cultural, automatización digital mediante Inteligencia Artificial y optimización de estructuras de compensaciones de impacto financiero.",
+          "lineas": [
+            5,
+            17,
+            25
+          ],
+          "keywords": [
+            "remuneraciones",
+            "control documental"
+          ]
+        },
+        {
+          "texto": "Lidera equipos en contextos de minería, servicios industriales y corporaciones complejas, conduciendo negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos bajo enfoques de eficiencia operacional.",
+          "lineas": [
+            5,
+            37,
+            39,
+            34,
+            47,
+            27
+          ],
+          "keywords": [
+            "liderazgo de equipos",
+            "minería",
+            "negociación colectiva",
+            "desarrollo de equipos"
+          ]
+        },
+        {
+          "texto": "Responsable de auditorías laborales, control documental riguroso, gestión de dotaciones a gran escala y procesamiento de nómina, con experiencia en implementación de sistemas ERP de personas y plataformas de gestión integradas.",
+          "lineas": [
+            18,
+            40,
+            32,
+            52,
+            61,
+            11,
+            12
+          ],
+          "keywords": [
+            "auditorías laborales",
+            "control documental",
+            "gestión de dotaciones",
+            "ERP de personas"
+          ]
+        }
+      ]
+    },
+    {
+      "oraciones": [
+        {
+          "texto": "Ejecutivo Senior con 18 años de trayectoria en Relaciones Laborales y administración de personal en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150.",
+          "lineas": [
+            5,
+            39
+          ],
+          "keywords": [
+            "Relaciones Laborales",
+            "administración de personal"
+          ]
+        },
+        {
+          "texto": "Lidera equipos en minería, servicios industriales y corporaciones complejas, conduciendo negociaciones colectivas estratégicas, gestión de crisis y desarrollo de equipos directivos bajo enfoques de eficiencia operacional.",
+          "lineas": [
+            37,
+            27,
+            34,
+            47
+          ],
+          "keywords": [
+            "liderazgo de equipos",
+            "minería",
+            "negociación colectiva",
+            "desarrollo de equipos"
+          ]
+        },
+        {
+          "texto": "Responsable de auditorías laborales, control documental, gestión de dotaciones a gran escala y procesamiento de nómina, con experiencia en implementación de sistemas ERP de personas y plataformas de gestión integradas.",
+          "lineas": [
+            18,
+            19,
+            32,
+            40,
+            52,
+            61
+          ],
+          "keywords": [
+            "auditorías laborales",
+            "control documental",
+            "gestión de dotaciones",
+            "ERP de personas"
+          ]
+        },
+        {
+          "texto": "Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, transformación cultural, automatización digital y optimización de estructuras de remuneraciones con impacto en la línea financiera.",
+          "lineas": [
+            5,
+            25,
+            33,
+            46
+          ],
+          "keywords": [
+            "remuneraciones"
+          ]
+        }
+      ]
+    }
+  ]
+}

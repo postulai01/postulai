@@ -1,0 +1,83 @@
+{
+  "caso": "valentina_cambio_rubro",
+  "oferta": "valentina_cambio_rubro-2026-09-29T19-00-27.json",
+  "costo": 0.004848,
+  "respuestas": [
+    {
+      "oraciones": [
+        {
+          "texto": "Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, con formación en Gestión de Personas y Organizaciones.",
+          "lineas": [
+            5,
+            29
+          ],
+          "keywords": [
+            "gestión de personas"
+          ]
+        },
+        {
+          "texto": "Dirige operaciones a escala regional con una dotación total de 240 colaboradores, demostrando capacidad en gestión de dotaciones de más de 100 personas.",
+          "lineas": [
+            10
+          ],
+          "keywords": [
+            "gestión de dotaciones de más de 100 personas"
+          ]
+        },
+        {
+          "texto": "Gestiona procesos de reclutamiento masivo, habiendo incorporado y formado 180 nuevos colaboradores en los últimos 12 meses con reducción de rotación del 19%.",
+          "lineas": [
+            11,
+            19
+          ],
+          "keywords": [
+            "reclutamiento",
+            "indicadores de rotación",
+            "onboarding"
+          ]
+        },
+        {
+          "texto": "Implementa modelos de evaluación de desempeño por objetivos, alineando metas individuales a resultados organizacionales.",
+          "lineas": [
+            14
+          ],
+          "keywords": [
+            "evaluación de desempeño"
+          ]
+        },
+        {
+          "texto": "Diseña y ejecuta programas de desarrollo de líderes, formando supervisores y jefes de tienda que ascienden a roles de mayor responsabilidad.",
+          "lineas": [
+            12,
+            20
+          ],
+          "keywords": [
+            "programa de desarrollo de liderazgo",
+            "desarrollo de equipos"
+          ]
+        },
+        {
+          "texto": "Administra presupuestos operacionales de hasta MM$ 12 anuales y utiliza herramientas como BUK, SAP y Power BI para la gestión integral.",
+          "lineas": [
+            13,
+            32
+          ],
+          "keywords": [
+            "BUK"
+          ]
+        },
+        {
+          "texto": "Construye culturas de alto rendimiento mediante gestión del desempeño, programas de bienestar y estrategias de retención que reducen ausentismo y rotación.",
+          "lineas": [
+            5,
+            18
+          ],
+          "keywords": [
+            "gestión de personas",
+            "gestión del desempeño"
+          ]
+        }
+      ]
+    }
+  ]
+}

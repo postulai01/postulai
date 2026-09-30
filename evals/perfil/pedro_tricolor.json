@@ -1,0 +1,143 @@
+{
+  "caso": "pedro_tricolor",
+  "oferta": "pedro_tricolor-2026-09-29T22-20-53.json",
+  "costo": 0.008308,
+  "respuestas": [
+    {
+      "oraciones": [
+        {
+          "texto": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
+          "lineas": [
+            3,
+            31,
+            33
+          ],
+          "keywords": []
+        },
+        {
+          "texto": "Con experiencia en ventas directas, promoción de productos y emprendimiento, demostrando capacidad para ejecutar actividades operativas en puntos de venta y gestionar proyectos end-to-end.",
+          "lineas": [
+            9,
+            13,
+            15,
+            17,
+            21,
+            23,
+            25,
+            27
+          ],
+          "keywords": [
+            "tareas operativas"
+          ]
+        },
+        {
+          "texto": "Orientado a resultados con habilidades de comunicación y trabajo en equipo, respaldadas por participación en múltiples campañas promocionales con distintos equipos de trabajo.",
+          "lineas": [
+            9,
+            19,
+            63,
+            65
+          ],
+          "keywords": [
+            "orientación al servicio"
+          ]
+        },
+        {
+          "texto": "Maneja herramientas digitales incluyendo Microsoft Excel a nivel intermedio para análisis de datos y fórmulas, así como Microsoft Office (Word, PowerPoint).",
+          "lineas": [
+            9,
+            49,
+            51
+          ],
+          "keywords": [
+            "Excel",
+            "herramientas de office"
+          ]
+        },
+        {
+          "texto": "Demuestra adaptabilidad y gestión multifuncional en contextos de producción, ventas y comercialización.",
+          "lineas": [
+            25,
+            27,
+            67
+          ],
+          "keywords": [
+            "adaptabilidad"
+          ]
+        },
+        {
+          "texto": "Posee inglés avanzado, certificado por formación en colegio bilingüe y exención universitaria.",
+          "lineas": [
+            37,
+            43,
+            57
+          ],
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "oraciones": [
+        {
+          "texto": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
+          "lineas": [
+            3,
+            31,
+            33
+          ],
+          "keywords": []
+        },
+        {
+          "texto": "Con experiencia en ventas directas, promoción de productos y emprendimiento, incluyendo ejecución de activaciones de marca en puntos de venta y gestión end-to-end de proyectos.",
+          "lineas": [
+            15,
+            17,
+            25,
+            27
+          ],
+          "keywords": []
+        },
+        {
+          "texto": "Orientado a resultados con habilidades de comunicación y trabajo en equipo, desarrolladas a través de participación en múltiples campañas promocionales.",
+          "lineas": [
+            19,
+            63,
+            65
+          ],
+          "keywords": []
+        },
+        {
+          "texto": "Maneja Microsoft Excel a nivel intermedio para análisis de datos y fórmulas, así como Microsoft Office (Word, PowerPoint).",
+          "lineas": [
+            49,
+            51
+          ],
+          "keywords": [
+            "Excel",
+            "herramientas de office"
+          ]
+        },
+        {
+          "texto": "Demuestra adaptabilidad y gestión multifuncional en actividades de producción, ventas y comercialización.",
+          "lineas": [
+            25,
+            27,
+            67
+          ],
+          "keywords": [
+            "adaptabilidad"
+          ]
+        },
+        {
+          "texto": "Inglés avanzado, adquirido a través de formación en colegio bilingüe y exención universitaria por dominio del idioma.",
+          "lineas": [
+            37,
+            43,
+            57
+          ],
+          "keywords": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "caso": "pedro_conectatalentos",
+  "oferta": "pedro_conectatalentos-2026-09-29T19-00-27.json",
+  "costo": 0.007135,
+  "respuestas": [
+    {
+      "oraciones": [
+        {
+          "texto": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
+          "lineas": [
+            3,
+            31,
+            33
+          ],
+          "keywords": []
+        },
+        {
+          "texto": "Con experiencia en ventas directas, donde ha ejecutado activaciones de marca, demostración de productos e impulso de ventas mediante atención directa al cliente.",
+          "lineas": [
+            9,
+            15,
+            17
+          ],
+          "keywords": [
+            "venta directa B2B",
+            "comunicación con clientes"
+          ]
+        },
+        {
+          "texto": "Ha participado en campañas promocionales con distintos equipos de trabajo y gestionado ventas directas en espacios públicos como cofundador de un emprendimiento.",
+          "lineas": [
+            19,
+            25,
+            27
+          ],
+          "keywords": [
+            "venta directa B2B"
+          ]
+        },
+        {
+          "texto": "Posee habilidades de comunicación efectiva, trabajo en equipo y pensamiento analítico orientado a resultados.",
+          "lineas": [
+            63,
+            65
+          ],
+          "keywords": [
+            "comunicación con clientes"
+          ]
+        },
+        {
+          "texto": "Maneja herramientas digitales como Microsoft Excel a nivel intermedio, Microsoft Office y cuenta con inglés avanzado.",
+          "lineas": [
+            49,
+            51,
+            57
+          ],
+          "keywords": []
+        }
+      ]
+    },
+    {
+      "oraciones": [
+        {
+          "texto": "Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.",
+          "lineas": [
+            3,
+            31,
+            33
+          ],
+          "keywords": []
+        },
+        {
+          "texto": "Con experiencia en ventas directas mediante ejecución de activaciones de marca, demostración de productos e impulso de ventas con atención directa al cliente.",
+          "lineas": [
+            13,
+            15,
+            17,
+            25
+          ],
+          "keywords": [
+            "venta directa B2B",
+            "comunicación con clientes"
+          ]
+        },
+        {
+          "texto": "Ha participado en campañas promocionales y operado un emprendimiento de comercialización de productos en espacios públicos.",
+          "lineas": [
+            19,
+            21,
+            25
+          ],
+          "keywords": [
+            "venta directa B2B"
+          ]
+        },
+        {
+          "texto": "Orientado a resultados, con habilidades de comunicación efectiva, trabajo en equipo y manejo de herramientas digitales como Microsoft Excel y Office.",
+          "lineas": [
+            63,
+            65,
+            49,
+            51
+          ],
+          "keywords": [
+            "comunicación con clientes"
+          ]
+        },
+        {
+          "texto": "Posee inglés avanzado adquirido en formación bilingüe.",
+          "lineas": [
+            37,
+            43,
+            57
+          ],
+          "keywords": []
+        }
+      ]
+    }
+  ]
+}

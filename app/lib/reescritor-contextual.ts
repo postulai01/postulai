@@ -64,25 +64,25 @@ export interface KeywordDescartada { keyword: string; motivo: string }
 // ─── palabras ────────────────────────────────────────────────────────────────
 
 // Palabras de contenido normalizadas (sin stop words ni palabras de 1–2 letras, salvo cifras).
-function palabrasContenido(texto: string): string[] {
+export function palabrasContenido(texto: string): string[] {
   return normalizarParaComparar(texto).split(" ").filter(p => p && !STOP_WORDS_MATCH.has(p) && (p.length > 2 || /\d/.test(p)));
 }
 
 const raiz = (p: string) => p.slice(0, 5);
 
 // La palabra está en el conjunto, tolerando plural y flexión (misma raíz de 5 letras en palabras largas).
-function presente(p: string, conjunto: Set<string>, raices: Set<string>): boolean {
+export function presente(p: string, conjunto: Set<string>, raices: Set<string>): boolean {
   if (conjunto.has(p) || conjunto.has(p.replace(/s$/, "")) || conjunto.has(p + "s")) return true;
   return p.length >= 6 && !/\d/.test(p) && raices.has(raiz(p));
 }
 
-function indice(texto: string) {
+export function indice(texto: string) {
   const ps = palabrasContenido(texto);
   return { set: new Set(ps), raices: new Set(ps.filter(p => p.length >= 6).map(raiz)) };
 }
 
 // Presencia estricta: la palabra o su plural, sin tolerar flexión por raíz ("operations" no respalda en "operaciones").
-function presenteEstricto(p: string, conjunto: Set<string>): boolean {
+export function presenteEstricto(p: string, conjunto: Set<string>): boolean {
   return conjunto.has(p) || conjunto.has(p.replace(/s$/, "")) || conjunto.has(p + "s");
 }
 

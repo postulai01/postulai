@@ -1,0 +1,139 @@
+{
+  "caso": "andres_vallenar",
+  "oferta": "andres_vallenar-2026-09-29T19-00-27.json",
+  "costo": 0.011651,
+  "respuestas": [
+    {
+      "oraciones": [
+        {
+          "texto": "Ejecutivo Senior con 18 años de trayectoria en Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y experiencia en faenas de la zona norte del país.",
+          "lineas": [
+            5,
+            39
+          ],
+          "keywords": [
+            "relaciones laborales",
+            "experiencia en faena"
+          ]
+        },
+        {
+          "texto": "Especialista en relaciones laborales con trayectoria en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio y transformación cultural.",
+          "lineas": [
+            5,
+            7
+          ],
+          "keywords": [
+            "especialización en relaciones laborales"
+          ]
+        },
+        {
+          "texto": "Responsable de la definición de todas las políticas de la gerencia con énfasis en los procesos transaccionales, operacionales y de desarrollo, así como de la gestión de políticas internas en organizaciones de alta complejidad.",
+          "lineas": [
+            17,
+            24
+          ],
+          "keywords": [
+            "gestión de políticas internas"
+          ]
+        },
+        {
+          "texto": "Experto en la conducción y cierre exitoso de negociaciones colectivas estratégicas, gestión de relaciones sindicales complejas y desarrollo de equipos directivos de alto desempeño bajo enfoques de eficiencia operacional.",
+          "lineas": [
+            5,
+            27,
+            34,
+            47,
+            53
+          ],
+          "keywords": [
+            "relaciones laborales",
+            "tendencias en relaciones laborales"
+          ]
+        },
+        {
+          "texto": "Con experiencia en apoyo a la definición de programas de actualización y compliance normativo-legal para personal directivo y operaciones, así como en la implementación de tecnología para procesos de auditorías laborales y estrategias de relaciones laborales.",
+          "lineas": [
+            18,
+            26,
+            35
+          ],
+          "keywords": [
+            "legislación laboral",
+            "tendencias en relaciones laborales"
+          ]
+        },
+        {
+          "texto": "Responsable de optimización de estructuras de compensaciones, rediseño de modelos de remuneraciones y control presupuestario con impacto en la línea financiera de las organizaciones.",
+          "lineas": [
+            5,
+            33,
+            40,
+            46,
+            57
+          ],
+          "keywords": [
+            "gestión de políticas internas"
+          ]
+        }
+      ]
+    },
+    {
+      "oraciones": [
+        {
+          "texto": "Ejecutivo Senior con 18 años de trayectoria liderando Recursos Humanos y Relaciones Laborales en corporaciones de alta complejidad operativa, con dotaciones de hasta 5.000 colaboradores y facturaciones de hasta MM$ 150.",
+          "lineas": [
+            5
+          ],
+          "keywords": [
+            "relaciones laborales",
+            "legislación laboral"
+          ]
+        },
+        {
+          "texto": "Especialista en el diseño e implementación de estrategias de capital humano alineadas a los objetivos del negocio, con experiencia en faenas de la zona norte del país.",
+          "lineas": [
+            5,
+            39
+          ],
+          "keywords": [
+            "especialización en relaciones laborales",
+            "experiencia en faena"
+          ]
+        },
+        {
+          "texto": "Responsable de la definición de todas las políticas de la gerencia con énfasis en los procesos transaccionales, operacionales y de desarrollo, así como de la gestión de relaciones sindicales y negociaciones colectivas estratégicas.",
+          "lineas": [
+            17,
+            27,
+            34
+          ],
+          "keywords": [
+            "gestión de políticas internas",
+            "tendencias en relaciones laborales"
+          ]
+        },
+        {
+          "texto": "Experto en transformación cultural, automatización digital mediante Inteligencia Artificial, optimización de estructuras de compensaciones y desarrollo de equipos directivos bajo enfoques de eficiencia operacional.",
+          "lineas": [
+            5,
+            25,
+            28
+          ],
+          "keywords": []
+        },
+        {
+          "texto": "Con trayectoria en la conducción exitosa de negociaciones colectivas complejas, gestión de crisis y aseguramiento de continuidad operativa en entornos de alta complejidad laboral.",
+          "lineas": [
+            5,
+            27,
+            34,
+            47
+          ],
+          "keywords": [
+            "relaciones laborales"
+          ]
+        }
+      ]
+    }
+  ]
+}
