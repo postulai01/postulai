@@ -1,0 +1,9 @@
+{
+  "[1] ORACIÓN: Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales.\nLÍNEAS CITADAS:\n- (5) Administradora con 7 años de experiencia en gestión de operaciones comerciales en el sector retail, liderando equipos de hasta 45 personas y administrando presupuestos operacionales de hasta MM$ 12 anuales. Experiencia en formación de equipos, gestión del desempeño y construcción de culturas de alto rendimiento a escala regional.\n- (10) Dirijo las operaciones de 8 tiendas en la zona centro-sur del país, con una dotación total de 240 colaboradores.\n- (13) Administro el presupuesto operacional regional de MM$ 12 anuales, logrando un 94% de cumplimiento en 2023.": {
+    "raw": "```json\n{\n  \"oraciones\": [\n    {\n      \"i\": 1,\n      \"veredicto\": \"exagera\",\n      \"tipo\": \"alcance\",\n      \"explicacion\": \"La oración generaliza 'zona centro-sur' (línea 10) a 'sector retail' sin especificar que es regional. Amplía el alcance implícitamente.\",\n      \"natural\": true\n    }\n  ]\n}\n```",
+    "usage": {
+      "input_tokens": 685,
+      "output_tokens": 112
+    }
+  }
+}

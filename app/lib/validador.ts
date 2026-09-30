@@ -16,7 +16,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { norm } from "./cv-verificacion";
 import { RAICES_GENERICAS } from "./mapeo-semantico";
-import { INTENSIFICADOR, RELLENO_NEUTRO } from "./perfil-adaptado";
+import {
+  detectarPerfil, INTENSIFICADOR, LARGO_MAX, LARGO_MIN, parsearOraciones, RELLENO_NEUTRO, verificarOracion,
+  type InputPerfil, type Oracion,
+} from "./perfil-adaptado";
 import { bloquesCV, indice, palabrasContenido, presenteEstricto } from "./reescritor-contextual";
 
 export interface LineaCitada { linea: number; texto: string } // linea: 1-based, como numerarCV
@@ -242,4 +245,65 @@ export interface ValidacionOracion { rechazada: boolean; codigo: HallazgoCodigo[
 
 export function combinar(codigo: HallazgoCodigo[], modelo: JuicioOracion | null): ValidacionOracion {
   return { rechazada: codigo.length > 0 || modelo?.veredicto === "exagera", codigo, modelo };
+}
+
+// ─── pipeline del perfil generativo con validador (solo para evals; no activo por defecto) ──────────────────
+
+export interface DescarteCapa { texto: string; capa: "verificacion" | "codigo" | "modelo"; motivos: string[] }
+export interface PerfilValidado {
+  estado: "adaptado" | "rechazado" | "sin_perfil";
+  original: string | null;
+  perfil: string | null;          // adaptado, o el original si se rechazó
+  aceptadas: string[];
+  descartadas: DescarteCapa[];
+  problemas: string[];            // por qué se rechazó el armado
+  respuesta: number | null;       // índice de la respuesta guardada usada (0/1)
+  usage: { input_tokens: number; output_tokens: number };
+}
+
+type Juez = (oraciones: OracionAValidar[]) => Promise<ResultadoModelo>;
+
+const contar = (s: string) => s.split(/\s+/).filter(Boolean).length;
+
+// Por respuesta (máx. 2, como evaluarRespuestas): verificación PED-32 → código del validador → juez SOLO sobre las que
+// pasaron el código → armado (primera oración debe pasar, largo 70–120%). Se usa la primera respuesta aceptada.
+export async function perfilValidado(input: InputPerfil, respuestas: unknown[], juez: Juez): Promise<PerfilValidado> {
+  const usage = { input_tokens: 0, output_tokens: 0 };
+  const det = detectarPerfil(input.cv);
+  const vacio = { aceptadas: [], descartadas: [], problemas: [], respuesta: null, usage };
+  if (!det) return { estado: "sin_perfil", original: null, perfil: null, ...vacio };
+  let ultimo: Omit<PerfilValidado, "usage" | "estado" | "original" | "perfil"> | null = null;
+  for (const [k, raw] of respuestas.slice(0, 2).entries()) {
+    const oraciones = parsearOraciones(raw, input.cv);
+    if (!oraciones) continue;
+    const descartadas: DescarteCapa[] = [];
+    const tras: { o: Oracion; v: OracionAValidar }[] = [];
+    for (const o of oraciones) {
+      const p = verificarOracion(o, det.texto, input);
+      if (p.length) { descartadas.push({ texto: o.texto, capa: "verificacion", motivos: p }); continue; }
+      const v = { oracion: o.texto, lineas_citadas: (o.lineas ?? []).map((n, i) => ({ linea: n, texto: o.citas[i] })) };
+      const c = validarCodigo(v, input.cv);
+      if (c.length) { descartadas.push({ texto: o.texto, capa: "codigo", motivos: c.map(h => `${h.tipo}: ${h.detalle}`) }); continue; }
+      tras.push({ o, v });
+    }
+    const aceptadas: Oracion[] = [];
+    if (tras.length) {
+      const r = await juez(tras.map(t => t.v));
+      usage.input_tokens += r.usage.input_tokens; usage.output_tokens += r.usage.output_tokens;
+      tras.forEach((t, i) => {
+        const j = r.juicios[i];
+        if (j?.veredicto === "fiel") aceptadas.push(t.o);
+        else descartadas.push({ texto: t.o.texto, capa: "modelo", motivos: [j ? `${j.tipo}: ${j.explicacion}` : "sin juicio"] });
+      });
+    }
+    const perfil = aceptadas.map(o => o.texto).join(" ").replace(/\s+/g, " ").trim();
+    const problemas: string[] = [];
+    if (oraciones.length === 0) problemas.push("sin oraciones");
+    else if (!aceptadas.includes(oraciones[0])) problemas.push("la primera oración no pasa");
+    const n = contar(perfil), n0 = contar(det.texto);
+    if (n < LARGO_MIN * n0 || n > LARGO_MAX * n0) problemas.push(`largo ${n} palabras fuera de ${Math.round(LARGO_MIN * 100)}–${Math.round(LARGO_MAX * 100)}% de ${n0}`);
+    ultimo = { aceptadas: aceptadas.map(o => o.texto), descartadas, problemas, respuesta: k };
+    if (problemas.length === 0) return { estado: "adaptado", original: det.texto, perfil, ...ultimo, usage };
+  }
+  return { estado: "rechazado", original: det.texto, perfil: det.texto, ...(ultimo ?? { ...vacio, problemas: ["respuestas no convertibles"] }), usage };
 }

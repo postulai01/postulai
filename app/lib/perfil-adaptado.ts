@@ -88,7 +88,7 @@ const contarPalabras = (s: string) => s.split(/\s+/).filter(Boolean).length;
 const raiz5 = (p: string) => p.slice(0, 5);
 
 // Conectores neutros y palabras gramaticales sin contenido: no necesitan respaldo en el CV.
-export const RELLENO_NEUTRO = /^(posee|poseo|poseen|cuenta|cuento|cuentan|experiencia|orientad[oa]s?|como|asi|entre|sus|su|ello)$/;
+export const RELLENO_NEUTRO = /^(maneja|manejo|maneje|manejan|posee|poseo|poseen|cuenta|cuento|cuentan|experiencia|orientad[oa]s?|como|asi|entre|sus|su|ello)$/;
 // Intensificadores de nivel: solo si el CV ya los dice (la palabra o su variante de género/número).
 export const INTENSIFICADOR = /^(domin|solid|ampli|profund|expert|especialista|avanzad)/; // grupo 1: raíz
 const variantes = (p: string) => { const b = p.replace(/(as|os|a|o|es|s)$/, ""); return [p, b, b + "a", b + "o", b + "as", b + "os", b + "es", b + "s"]; };

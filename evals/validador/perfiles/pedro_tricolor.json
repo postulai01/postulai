@@ -1,0 +1,16 @@
+{
+  "[1] ORACIÓN: Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.\nLÍNEAS CITADAS:\n- (3) Estudiante de Ingeniería Comercial | Especialización en Finanzas Cuantitativas\n- (31) Ingeniería Comercial · Mención Finanzas Cuantitativas    2023 y cursando 4to año\n- (33) Cuarto año en curso · Santiago, Chile": {
+    "raw": "```json\n{\n  \"oraciones\": [\n    {\n      \"i\": 1,\n      \"veredicto\": \"fiel\",\n      \"tipo\": null,\n      \"explicacion\": \"La oración parafrasea fielmente las líneas citadas: estudiante de 4to año, carrera, mención y universidad están todos presentes.\",\n      \"natural\": true\n    }\n  ]\n}\n```",
+    "usage": {
+      "input_tokens": 572,
+      "output_tokens": 101
+    }
+  },
+  "[1] ORACIÓN: Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.\nLÍNEAS CITADAS:\n- (3) Estudiante de Ingeniería Comercial | Especialización en Finanzas Cuantitativas\n- (31) Ingeniería Comercial · Mención Finanzas Cuantitativas    2023 y cursando 4to año\n- (33) Cuarto año en curso · Santiago, Chile\n\n[2] ORACIÓN: Maneja Microsoft Excel a nivel intermedio para análisis de datos y fórmulas, así como Microsoft Office (Word, PowerPoint).\nLÍNEAS CITADAS:\n- (49) Microsoft Excel (nivel intermedio): análisis de datos, tablas, fórmulas.\n- (51) Microsoft Office (Word, PowerPoint).": {
+    "raw": "```json\n{\n  \"oraciones\": [\n    {\n      \"i\": 1,\n      \"veredicto\": \"fiel\",\n      \"tipo\": null,\n      \"explicacion\": \"Todas las características (cuarto año, Ingeniería Comercial, mención Finanzas Cuantitativas, Universidad Adolfo Ibáñez) están presentes en las líneas citadas.\",\n      \"natural\": true\n    },\n    {\n      \"i\": 2,\n      \"veredicto\": \"fiel\",\n      \"tipo\": null,\n      \"explicacion\": \"La oración parafrasea fielmente las líneas: nivel intermedio de Excel con análisis de datos y fórmulas, más Office (Word, PowerPoint).\",\n      \"natural\": true\n    }\n  ]\n}\n```",
+    "usage": {
+      "input_tokens": 656,
+      "output_tokens": 198
+    }
+  }
+}

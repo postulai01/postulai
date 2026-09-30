@@ -1,0 +1,16 @@
+{
+  "[1] ORACIÓN: Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.\nLÍNEAS CITADAS:\n- (3) Estudiante de Ingeniería Comercial | Especialización en Finanzas Cuantitativas\n- (31) Ingeniería Comercial · Mención Finanzas Cuantitativas    2023 y cursando 4to año\n- (33) Cuarto año en curso · Santiago, Chile": {
+    "raw": "```json\n{\n  \"oraciones\": [\n    {\n      \"i\": 1,\n      \"veredicto\": \"fiel\",\n      \"tipo\": null,\n      \"explicacion\": \"La oración parafrasea fielmente las líneas citadas: estudiante de 4to año, carrera, mención y universidad están todos presentes.\",\n      \"natural\": true\n    }\n  ]\n}\n```",
+    "usage": {
+      "input_tokens": 572,
+      "output_tokens": 101
+    }
+  },
+  "[1] ORACIÓN: Estudiante de cuarto año de Ingeniería Comercial con mención en Finanzas Cuantitativas en la Universidad Adolfo Ibáñez.\nLÍNEAS CITADAS:\n- (3) Estudiante de Ingeniería Comercial | Especialización en Finanzas Cuantitativas\n- (31) Ingeniería Comercial · Mención Finanzas Cuantitativas    2023 y cursando 4to año\n- (33) Cuarto año en curso · Santiago, Chile\n\n[2] ORACIÓN: Con experiencia en ventas directas mediante ejecución de activaciones de marca, demostración de productos e impulso de ventas con atención directa al cliente.\nLÍNEAS CITADAS:\n- (13) Promotor de Ventas  |  Claps (campaña Hellmann's)    2025\n- (15) Ejecución de activaciones de marca en puntos de venta para Hellmann's.\n- (17) Demostración de producto e impulso de ventas mediante atención directa al cliente.\n- (25) Gestioné actividades de producción, ventas directas en plazas y espacios públicos, y creación de anuncios publicitarios.": {
+    "raw": "```json\n{\n  \"oraciones\": [\n    {\n      \"i\": 1,\n      \"veredicto\": \"fiel\",\n      \"tipo\": null,\n      \"explicacion\": \"Todas las características (cuarto año, Ingeniería Comercial, mención Finanzas Cuantitativas, Universidad Adolfo Ibáñez) están presentes en las líneas citadas.\",\n      \"natural\": true\n    },\n    {\n      \"i\": 2,\n      \"veredicto\": \"fiel\",\n      \"tipo\": null,\n      \"explicacion\": \"La oración resume fielmente: ventas directas (línea 25), activaciones de marca (línea 15), demostración de productos e impulso de ventas con atención al cliente (línea 17).\",\n      \"natural\": true\n    }\n  ]\n}\n```",
+    "usage": {
+      "input_tokens": 745,
+      "output_tokens": 210
+    }
+  }
+}
