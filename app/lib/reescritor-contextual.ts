@@ -272,15 +272,32 @@ export function verificarAdaptacion(
 // (no basta otra viñeta del mismo puesto, por eso no se pasa el CV). Una fuente compuesta ("a | b") solo cuenta si una
 // de sus partes tiene todas las palabras de la keyword: juntar "indicadores de dotación" y "reclutamiento y selección"
 // no respalda "indicadores de selección".
-export function verificarFidelidad(original: string, adaptada: string, kws: Pick<KeywordPermitida, "palabras" | "fuente">[]): string[] {
+export function verificarFidelidad(
+  original: string, adaptada: string, kws: Pick<KeywordPermitida, "keyword" | "palabras" | "fuente">[], cvCompleto?: string,
+): string[] {
   const ix = indice(adaptada);
   const tiene = (texto: string, w: string) => { const t = indice(texto); return presente(w, t.set, t.raices); };
-  const citadas = kws
+  const usadas = kws
     .filter(k => k.palabras.length > 0 && k.palabras.every(w => tiene(adaptada, w)))
-    .flatMap(k => k.fuente.split(" | ").filter(parte => k.palabras.every(w => tiene(parte, w))));
-  const o: OracionAValidar = { oracion: adaptada, lineas_citadas: [original, ...citadas].map(texto => ({ linea: 0, texto })) };
-  return [escaladaRol(o), palabraFueraDeCita(o), calificativoTrasladado(o)].filter(h => h !== null).map(h => `${h!.tipo}: ${h!.detalle}`);
+    .map(k => ({ ...k, partes: k.fuente.split(" | ").filter(parte => k.palabras.every(w => tiene(parte, w))) }));
+  const o: OracionAValidar = { oracion: adaptada, lineas_citadas: [original, ...usadas.flatMap(k => k.partes)].map(texto => ({ linea: 0, texto })) };
+  const problemas = [escaladaRol(o), palabraFueraDeCita(o), calificativoTrasladado(o)].filter(h => h !== null).map(h => `${h!.tipo}: ${h!.detalle}`);
+
+  // Líneas de resumen (perfil, Áreas de Expertise, Habilidades: todo lo que no es viñeta de un puesto): no se agrega
+  // un ítem cuya única fuente en el CV es de apoyo ("Apoyo en … auditorías laborales" no da "Auditorías Laborales").
+  if (cvCompleto) {
+    const texto = original.replace(/^\s*[-•]\s+/, "").trim();
+    const enPuesto = bloquesCV(cvCompleto).some(b => b.tipo === "puesto" && b.lineas.includes(texto));
+    if (!enPuesto) {
+      const deApoyo = usadas.filter(k => k.partes.length > 0 && k.partes.every(parte => palabrasContenido(parte).some(w => RE_VERBO_APOYO.test(w))));
+      if (deApoyo.length > 0) problemas.push(`item_de_apoyo: ${deApoyo.map(k => k.keyword).join(", ")} solo tiene fuente con verbo de apoyo`);
+    }
+  }
+  return problemas;
 }
+
+// Formas verbales (y "apoyo"), no sustantivos: "colaboradores" o "asistente" no cuentan.
+const RE_VERBO_APOYO = /^(apoy(o|e|a|ar|ando|aba|ado)|particip(o|e|a|ar|ando|aba|ado)|colabor(o|e|a|ar|ando|aba|ado)|asist(i|o|e|a|ir|iendo|ia|ido))$/;
 
 // ─── llamada a modelo ────────────────────────────────────────────────────────
 
@@ -373,7 +390,7 @@ export async function reescribirLinea(input: InputLinea, opts: OpcionesReescrito
     const problemas = [
       ...v.problemas,
       ...(fuera.length > 0 ? [`keywords no permitidas: ${fuera.join(", ")}`] : []),
-      ...verificarFidelidad(cuerpo, r.adaptada, kws),
+      ...verificarFidelidad(cuerpo, r.adaptada, kws, cvCompleto),
     ];
 
     if (problemas.length === 0) {

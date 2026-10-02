@@ -117,7 +117,7 @@ async function main() {
       // Más la capa de código del validador (PED-35), con las fuentes de las keywords que la línea dice agregar.
       const kws = permitidas.filter(p => r.keywords_agregadas.includes(p.keyword));
       const sinVineta = (t: string) => t.replace(/^\s*[-•]\s+/, "");
-      const fidelidad = r.estado === "adaptada" ? verificarFidelidad(sinVineta(r.original), sinVineta(r.adaptada), kws) : [];
+      const fidelidad = r.estado === "adaptada" ? verificarFidelidad(sinVineta(r.original), sinVineta(r.adaptada), kws, ctx.cv) : [];
       v.problemas.push(...fidelidad);
       resultados.push({ caso, r, mentira: v.problemas });
       if (r.usage) { llamadas++; costo += (r.usage.input_tokens * PRECIO_IN + r.usage.output_tokens * PRECIO_OUT) / 1e6; }
