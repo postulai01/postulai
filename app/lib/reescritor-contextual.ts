@@ -45,6 +45,9 @@ export interface InputLinea {
   cvCompleto: string;
   mapeo: ResultadoMapeo;
   keywordsJD: KeywordsJD;
+  // Hechos declarados por la persona para ESTA línea (PED-5): si hay, son las únicas keywords permitidas y la
+  // declaración es su fuente.
+  declaraciones?: { keyword: string; fuente: string }[];
 }
 
 export interface OpcionesReescritor {
@@ -155,6 +158,15 @@ export function planificarLineaDetalle(input: InputLinea): { permitidas: Keyword
   const descartadas: KeywordDescartada[] = [];
   const pl = palabrasContenido(lineaOriginal);
   if (pl.length < MIN_PALABRAS_LINEA) return { permitidas, descartadas };
+  if (input.declaraciones?.length) {
+    const ix = indice(lineaOriginal);
+    for (const d of input.declaraciones) {
+      const palabras = palabrasContenido(d.keyword);
+      if (palabras.every(p => presente(p, ix.set, ix.raices))) { descartadas.push({ keyword: d.keyword, motivo: "ya está escrita" }); continue; }
+      permitidas.push({ keyword: d.keyword, competencia_cv: d.fuente, fuente: d.fuente, tipo_match: "directo", palabras });
+    }
+    return { permitidas, descartadas };
+  }
   const ixLinea = indice(lineaOriginal);
   const raicesLinea = new Set(pl.map(raiz));
   const cvSet = indice(cvCompleto).set;

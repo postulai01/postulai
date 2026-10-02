@@ -1,0 +1,17 @@
+{
+  "prompt": "Ayudas a redactar preguntas cortas para una persona que postula a un trabajo.\n1. RESUMENES: para cada línea de su CV, escribe un resumen de MÁXIMO 5 PALABRAS EN TOTAL, contando \"tu\"/\"tus\", que empiece con \"tu\" o \"tus\" y use SOLO palabras que aparecen en esa línea (puedes omitir palabras; no agregues, no cambies ni conjugues ninguna; sin cifras). Ejemplo: \"Ejecución de activaciones de marca en puntos de venta para Hellmann's.\" → \"tus activaciones para Hellmann's\" (4 palabras).\n2. DEFINICIONES: para cada término, una definición neutra de MÁXIMO 12 PALABRAS, en lenguaje cotidiano. No hables de la persona (nada de \"tú\", \"tu\", \"usted\").\nResponde SOLO con JSON: {\"resumenes\":[{\"id\":1,\"resumen\":\"...\"}],\"definiciones\":[{\"termino\":\"...\",\"definicion\":\"...\"}]}\n---\nLÍNEAS:\n1. Demostración de producto e impulso de ventas mediante atención directa al cliente.\n2. Gestioné actividades de producción, ventas directas en plazas y espacios públicos, y creación de anuncios publicitarios.\n\nTÉRMINOS:\n(ninguno)",
+  "respuesta": {
+    "resumenes": [
+      {
+        "id": 1,
+        "resumen": "tu demostración de producto e impulso de ventas"
+      },
+      {
+        "id": 2,
+        "resumen": "tus actividades de producción y ventas directas"
+      }
+    ],
+    "definiciones": []
+  },
+  "costo": 0.000822
+}

@@ -1,0 +1,49 @@
+{
+  "prompt": "Ayudas a redactar preguntas cortas para una persona que postula a un trabajo.\n1. RESUMENES: para cada línea de su CV, escribe un resumen de MÁXIMO 5 PALABRAS EN TOTAL, contando \"tu\"/\"tus\", que empiece con \"tu\" o \"tus\" y use SOLO palabras que aparecen en esa línea (puedes omitir palabras; no agregues, no cambies ni conjugues ninguna; sin cifras). Ejemplo: \"Ejecución de activaciones de marca en puntos de venta para Hellmann's.\" → \"tus activaciones para Hellmann's\" (4 palabras).\n2. DEFINICIONES: para cada término, una definición neutra de MÁXIMO 12 PALABRAS, en lenguaje cotidiano. No hables de la persona (nada de \"tú\", \"tu\", \"usted\").\nResponde SOLO con JSON: {\"resumenes\":[{\"id\":1,\"resumen\":\"...\"}],\"definiciones\":[{\"termino\":\"...\",\"definicion\":\"...\"}]}\n---\nLÍNEAS:\n2. Gestioné el proceso de incorporación y formación de 180 nuevos colaboradores en los últimos 12 meses, reduciendo la rotación en un 19%.\n3. Diseñé el programa de desarrollo de jefes de tienda, formando a 12 líderes que ascendieron a roles de mayor responsabilidad.\n\nTÉRMINOS:\n(ninguno)",
+  "respuesta": {
+    "resumenes": [
+      {
+        "id": 2,
+        "resumen": "tu incorporación y formación de colaboradores"
+      },
+      {
+        "id": 3,
+        "resumen": "tu programa de desarrollo de jefes"
+      }
+    ],
+    "definiciones": []
+  },
+  "costo": 0.000809,
+  "reescrituras": {
+    "- Gestioné el proceso de incorporación y formación de 180 nuevos colaboradores en los últimos 12 meses, reduciendo la rotación en un 19%.\u0000procesos de RRHH": {
+      "original": "- Gestioné el proceso de incorporación y formación de 180 nuevos colaboradores en los últimos 12 meses, reduciendo la rotación en un 19%.",
+      "adaptada": "- Gestioné el proceso de incorporación y formación de 180 nuevos colaboradores en los últimos 12 meses, reduciendo la rotación en un 19%.",
+      "keywords_agregadas": [],
+      "fuente_en_cv": [],
+      "palabras_nuevas": 0,
+      "reintentos": 0,
+      "estado": "sin_cambios",
+      "usage": {
+        "input_tokens": 417,
+        "output_tokens": 192
+      }
+    },
+    "- Diseñé el programa de desarrollo de jefes de tienda, formando a 12 líderes que ascendieron a roles de mayor responsabilidad.\u0000desarrollo de equipos": {
+      "original": "- Diseñé el programa de desarrollo de jefes de tienda, formando a 12 líderes que ascendieron a roles de mayor responsabilidad.",
+      "adaptada": "- Diseñé el programa de desarrollo de equipos de jefes de tienda, formando a 12 líderes que ascendieron a roles de mayor responsabilidad.",
+      "keywords_agregadas": [
+        "desarrollo de equipos"
+      ],
+      "fuente_en_cv": [
+        "Declarado por la persona sobre «Diseñé el programa de desarrollo de jefes de tienda, formando a 12 líderes que ascendieron a roles de mayor responsabilidad.»: desarrollo de equipos"
+      ],
+      "palabras_nuevas": 1,
+      "reintentos": 0,
+      "estado": "adaptada",
+      "usage": {
+        "input_tokens": 405,
+        "output_tokens": 72
+      }
+    }
+  }
+}

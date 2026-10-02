@@ -1,0 +1,18 @@
+{
+  "prompt": "Ayudas a redactar preguntas cortas para una persona que postula a un trabajo.\n1. RESUMENES: para cada línea de su CV, escribe un resumen de MÁXIMO 5 PALABRAS EN TOTAL, contando \"tu\"/\"tus\", que empiece con \"tu\" o \"tus\" y use SOLO palabras que aparecen en esa línea (puedes omitir palabras; no agregues, no cambies ni conjugues ninguna; sin cifras). Ejemplo: \"Ejecución de activaciones de marca en puntos de venta para Hellmann's.\" → \"tus activaciones para Hellmann's\" (4 palabras).\n2. DEFINICIONES: para cada término, una definición neutra de MÁXIMO 12 PALABRAS, en lenguaje cotidiano. No hables de la persona (nada de \"tú\", \"tu\", \"usted\").\nResponde SOLO con JSON: {\"resumenes\":[{\"id\":1,\"resumen\":\"...\"}],\"definiciones\":[{\"termino\":\"...\",\"definicion\":\"...\"}]}\n---\nLÍNEAS:\n3. Apoyar la definición de programas de actualización y compliance normativo-legal para el personal directivo y operaciones de los clientes corporativos.\n\nTÉRMINOS:\n- revisión de reglamentos",
+  "respuesta": {
+    "resumenes": [
+      {
+        "id": 1,
+        "resumen": "tus programas de actualización y compliance"
+      }
+    ],
+    "definiciones": [
+      {
+        "termino": "revisión de reglamentos",
+        "definicion": "Examen detallado de las normas y reglas vigentes para verificar su cumplimiento."
+      }
+    ]
+  },
+  "costo": 0.000882
+}

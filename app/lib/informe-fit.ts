@@ -43,7 +43,11 @@ type TipoPregunta = "normativa" | "herramienta" | "oficina" | "idioma" | "concep
 export interface Cumple { requisito: string; evidencia: string }
 export interface Relacionado { requisito: string; evidencia: string; texto: string }
 export interface Bloqueante { requisito: string; texto: string }
-export interface Pregunta { requisito: string; tipo: TipoPregunta; relevancia: number; texto: string }
+export interface Pregunta {
+  requisito: string; tipo: TipoPregunta; relevancia: number; texto: string;
+  contexto?: string; // línea del CV que da contexto (semántico, área del cargo) o cargo del puesto no contado (años en el área)
+  area?: string;     // años en el área: el área pedida
+}
 export interface SugerenciaLimpieza { tema: "nacimiento" | "estado_civil" | "hijos" | "anios_perfil"; linea: string; texto: string }
 
 export interface InformeFit {
@@ -56,6 +60,7 @@ export interface InformeFit {
   aprenderas_en_el_cargo: string | null;
   para_la_entrevista: string[];
   consejo_brecha: string[];
+  por_revisar: string[]; // preguntas previas respondidas "no sé" (PED-5)
   alerta: { nivel: AlertaNivel; texto: string | null };
   limpieza: SugerenciaLimpieza[];
 }
@@ -71,6 +76,7 @@ export interface InputInforme {
   cargo?: string;
   etiquetas?: EtiquetasOrden;           // solo contexto de preguntas
   rechazadas?: PropuestaRechazada[];    // solo contexto de preguntas; la cita debe existir literal en el CV
+  porRevisar?: string[];                // preguntas previas respondidas "no sé"
 }
 
 export const MAX_PREGUNTAS = 5;
@@ -231,6 +237,7 @@ export function informeFit(input: InputInforme): InformeFit {
     if (!relevancia.has(m.keyword_jd) || vistas.has(m.keyword_jd)) continue;
     vistas.add(m.keyword_jd);
     const e = m.cita ? { texto: m.cita, foco: [] } : lineaQueContiene(cv, [m.keyword_jd, m.competencia_cv]);
+    if (m.origen === "usuario") { cumples.push({ requisito: `${m.keyword_jd} — declarado por ti`, evidencia: "declarado por ti en las preguntas previas" }); continue; }
     if (!e) continue;
     if (nivel === "directo") cumples.push({ requisito: m.keyword_jd, evidencia: evidencia(e) });
     else {
@@ -263,7 +270,7 @@ export function informeFit(input: InputInforme): InformeFit {
         const otros = candidatos(q).map(p => cargoDelPuesto(p)).slice(-2).reverse();
         const area = areaDe(q);
         preguntas.push({
-          requisito: desc, tipo: "anios_area", relevancia: PESO_REQUISITO,
+          requisito: desc, tipo: "anios_area", relevancia: PESO_REQUISITO, contexto: otros[0], area,
           texto: `¿Tu trabajo como ${otros.join(" o como ")} fue de ${area}? Si lo fue, deja claro en el CV qué hiciste en esa área.`,
         });
       } else {
@@ -303,7 +310,13 @@ export function informeFit(input: InputInforme): InformeFit {
     else if (tipo === "blanda") blandas.push(keyword);
     else if (tipo === "oficina") continue; // preguntable en el score, pero no vale una pregunta
     else if (tipo === "subtarea") subtareas.push({ requisito: keyword, tipo, relevancia: relevancia.get(keyword) ?? 0, texto: redactarPregunta(keyword, tipo, cv) });
-    else preguntas.push({ requisito: keyword, tipo: tipo!, relevancia: relevancia.get(keyword) ?? 0, texto: redactarPregunta(keyword, tipo!, cv, etiquetas, citaDe(keyword)) });
+    else {
+      const contexto = tipo === "semantico" ? lineaCompleta(cv, citaDe(keyword)!) : tipo === "area_cargo" ? lineaEtiquetada(cv, keyword, etiquetas) : undefined;
+      preguntas.push({
+        requisito: keyword, tipo: tipo!, relevancia: relevancia.get(keyword) ?? 0,
+        texto: redactarPregunta(keyword, tipo!, cv, etiquetas, citaDe(keyword)), ...(contexto ? { contexto } : {}),
+      });
+    }
   }
   preguntas.sort((a, b) => b.relevancia - a.relevancia); // estable: empates en orden de la oferta
 
@@ -345,8 +358,22 @@ export function informeFit(input: InputInforme): InformeFit {
     aprenderas_en_el_cargo: funciones.length ? `Funciones que se aprenden en la práctica: ${funciones.join(", ")}.` : null,
     para_la_entrevista: blandas.map(b => `La oferta valora ${b}: muéstralo con un ejemplo en la entrevista o en tu carta.`),
     consejo_brecha: consejoBrecha(cv),
+    por_revisar: input.porRevisar ?? [],
     alerta, limpieza: limpiezaCV(cv),
   };
+}
+
+// Línea del CV (sin viñeta) que contiene un fragmento.
+function lineaCompleta(cv: string, fragmento: string): string | undefined {
+  const f = colapsar(fragmento);
+  return cv.split("\n").map(l => colapsar(l.replace(/^\s*[-•]\s*/, ""))).find(l => l.includes(f));
+}
+
+// Viñeta que el priorizador etiquetó con la keyword (solo contexto de preguntas).
+function lineaEtiquetada(cv: string, keyword: string, etiquetas?: EtiquetasOrden): string | undefined {
+  const idx = Object.entries(etiquetas ?? {}).find(([, kws]) => kws.includes(keyword))?.[0];
+  const linea = idx !== undefined ? cv.split("\n")[Number(idx)] : undefined;
+  return linea ? linea.replace(/^\s*[-•]\s*/, "").trim() : undefined;
 }
 
 function redactarPregunta(keyword: string, tipo: TipoPregunta, cv: string, etiquetas?: EtiquetasOrden, cita?: string): string {
@@ -362,10 +389,8 @@ function redactarPregunta(keyword: string, tipo: TipoPregunta, cv: string, etiqu
     case "semantico": return `¿Tu «${clausulaCompleta(cv, cita!)}» cuenta como ${keyword}? Si es así, nómbralo así en el CV.`;
     case "area_cargo": {
       // Contexto: la viñeta que el priorizador etiquetó con esta keyword (solo para preguntar).
-      const lineas = cv.split("\n");
-      const idx = Object.entries(etiquetas ?? {}).find(([, kws]) => kws.includes(keyword))?.[0];
-      const linea = idx !== undefined ? lineas[Number(idx)] : undefined;
-      if (linea) return `¿Tu experiencia en «${clausulaCompleta(cv, linea.replace(/^\s*[-•]\s*/, "").trim())}» fue trabajo de ${keyword}? Si es así, nómbralo así en el CV.`;
+      const linea = lineaEtiquetada(cv, keyword, etiquetas);
+      if (linea) return `¿Tu experiencia en «${clausulaCompleta(cv, linea)}» fue trabajo de ${keyword}? Si es así, nómbralo así en el CV.`;
       return `¿Has hecho trabajo de ${keyword}, aunque no se llamara así? ${si}`;
     }
     default: return `¿Tienes ${keyword}? ${si}`;

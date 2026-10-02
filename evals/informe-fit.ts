@@ -16,8 +16,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { informeFit, MAX_PREGUNTAS, type InformeFit } from "../app/lib/informe-fit";
 import { scoreV2 } from "../app/lib/mapeo-semantico";
-import { filtrarEtiquetas, vinetasParaEtiquetar, type EtiquetasOrden } from "../app/lib/priorizador";
-import { casosConOferta, mapeoDelCaso } from "./lib-casos";
+import { casosConOferta, informeDelCaso } from "./lib-casos";
 
 const colapsar = (s: string) => s.replace(/\s+/g, " ").trim();
 
@@ -36,17 +35,8 @@ async function main() {
   const filas: { caso: string; fit: string; antes: string; informe: InformeFit; problemas: string[] }[] = [];
 
   for (const caso of casos) {
-    const { ctx, resultado, rechazos } = await mapeoDelCaso(caso);
+    const { ctx, resultado, informe } = await informeDelCaso(caso);
     const cv: string = ctx.casoJson.cv_texto;
-    const oferta = JSON.parse(fs.readFileSync(ctx.archivoOferta, "utf-8"));
-    const cargo: string | undefined = oferta.cargo ?? ctx.casoJson.cargo_oferta;
-    let etiquetas: EtiquetasOrden | undefined;
-    const archEt = path.join(process.cwd(), "evals/priorizar", `${caso}.json`);
-    if (fs.existsSync(archEt)) {
-      const g = JSON.parse(fs.readFileSync(archEt, "utf-8"));
-      if (g.oferta === path.basename(ctx.archivoOferta)) etiquetas = filtrarEtiquetas(g.respuesta, vinetasParaEtiquetar(cv), ctx.keywordsJD);
-    }
-    const informe = informeFit({ cv, mapeo: resultado, keywordsJD: ctx.keywordsJD, nivelPosicion: ctx.nivelPosicion, cargo, etiquetas, rechazadas: rechazos });
     const todas = [...informe.preguntas, ...informe.otras_preguntas];
     const problemas = [
       ...todas.filter(p => !esPregunta(p.texto)).map(p => `pregunta redactada como afirmación: ${p.texto}`),

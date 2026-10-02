@@ -38,7 +38,7 @@ export interface KeywordsJD {
   carreras?: RequisitoCarreras[];
 }
 
-export type OrigenMatch = "literal" | "semantico";
+export type OrigenMatch = "literal" | "semantico" | "usuario"; // usuario: hecho declarado en las preguntas previas (PED-5)
 
 export interface ExtrasCV {
   herramientas?: string[];

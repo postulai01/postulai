@@ -1,0 +1,153 @@
+/**
+ * Eval de las preguntas previas (PED-5) sobre los casos del set.
+ *
+ * Uso:
+ *   npx tsx evals/preguntas-previas.ts [caso ...]              # sin API: respuestas del modelo guardadas (o solo plantillas)
+ *   npx tsx evals/preguntas-previas.ts [caso ...] --estimar    # costo estimado de --ejecutar
+ *   npx tsx evals/preguntas-previas.ts [caso ...] --ejecutar   # UNA llamada a Haiku por CV (resúmenes y definiciones) y,
+ *                                                              # en los casos simulados, el reescritor en las viñetas declaradas
+ * Guarda las respuestas en evals/preguntas/<caso>.json (por texto del system + prompt: si cambia, se vuelve a pedir).
+ *
+ * Chequeos: ≤ 15 palabras, "¿…?", sin comillas, sin "agrégalo", definiciones sin tuteo. Simulación en SIMULADOS:
+ * todo "si" (CV antes → después) y todo "no" (CV idéntico). 0 mentiras: cada palabra nueva de una línea cambiada está
+ * en el CV o en una declaración.
+ */
+import Anthropic from "@anthropic-ai/sdk";
+import * as fs from "fs";
+import * as path from "path";
+import { informeFit } from "../app/lib/informe-fit";
+import {
+  agregarConocimientos, aplicarRespuestas, armarPreguntas, llamarModelo, mapeoConDeclaraciones, palabrasSignificativas,
+  pedidoModelo, preguntaValida, promptPrevias, SYSTEM_PREVIAS, type AnalisisPrevio, type RespuestaModelo,
+} from "../app/lib/preguntas-previas";
+import { definicionValida } from "../app/lib/glosario";
+import { reescribirLinea, type ResultadoLinea } from "../app/lib/reescritor-contextual";
+import { informeDelCaso, loadEnv } from "./lib-casos";
+
+const CASOS = [
+  "andres_senior", "andres_asap_antofagasta", "andres_vallenar", "pedro_tricolor", "pedro_conectatalentos",
+  "camila_junior", "roberto_brecha", "roberto_mercadolibre", "camila_telecom", "valentina_teamwork",
+  "valentina_asistente_do", "valentina_cambio_rubro", "pedro_xepelin", "pedro_cencomalls", "roberto_bluelight",
+];
+const SIMULADOS = ["pedro_tricolor", "valentina_cambio_rubro", "andres_asap_antofagasta"];
+const DIR = path.join(process.cwd(), "evals/preguntas");
+// Haiku 4.5: $1 / $5 por MTok
+const PRECIO_IN = 1, PRECIO_OUT = 5, CHARS_POR_TOKEN = 2.1;
+const costo = (u: { input_tokens: number; output_tokens: number }) => (u.input_tokens * PRECIO_IN + u.output_tokens * PRECIO_OUT) / 1e6;
+
+interface Guardado {
+  prompt?: string; respuesta?: RespuestaModelo; costo?: number;
+  reescrituras?: Record<string, ResultadoLinea>; // clave: línea + "\u0000" + keyword
+}
+
+async function main() {
+  const args = process.argv.slice(2);
+  const ejecutar = args.includes("--ejecutar"), estimar = args.includes("--estimar");
+  const pedidos = args.filter(a => !a.startsWith("--"));
+  const casos = pedidos.length ? pedidos : CASOS;
+  if (ejecutar) loadEnv();
+  const client = ejecutar ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : undefined;
+  fs.mkdirSync(DIR, { recursive: true });
+
+  let gastado = 0, estimado = 0;
+  const problemas: string[] = [];
+  const filas: { caso: string; analisis: AnalisisPrevio }[] = [];
+
+  for (const caso of casos) {
+    const base = await informeDelCaso(caso);
+    const { ctx, informe } = base;
+    const cv: string = ctx.casoJson.cv_texto;
+    const archivo = path.join(DIR, `${caso}.json`);
+    const g: Guardado = fs.existsSync(archivo) ? JSON.parse(fs.readFileSync(archivo, "utf-8")) : {};
+
+    // 1. Resúmenes y definiciones (una llamada por CV, solo si hace falta).
+    const pedido = pedidoModelo(informe, ctx.keywordsJD);
+    // La caché se invalida si cambia el system o el prompt.
+    const prompt = pedido ? `${SYSTEM_PREVIAS}\n---\n${promptPrevias(pedido.resumenes, pedido.terminos)}` : undefined;
+    let respuesta: RespuestaModelo = g.prompt === prompt ? g.respuesta ?? {} : {};
+    if (pedido && g.prompt !== prompt) {
+      estimado += (prompt!.length / CHARS_POR_TOKEN * PRECIO_IN + 150 * PRECIO_OUT) / 1e6;
+      if (client) {
+        const r = await llamarModelo(pedido, client);
+        respuesta = r.respuesta;
+        gastado += costo(r.usage);
+        Object.assign(g, { prompt, respuesta, costo: costo(r.usage) });
+      }
+    }
+    const analisis = armarPreguntas(informe, ctx.keywordsJD, cv, respuesta);
+    filas.push({ caso, analisis });
+
+    for (const p of analisis.preguntas) {
+      if (!preguntaValida(p.texto)) problemas.push(`${caso}: pregunta inválida (${p.palabras} palabras): ${p.texto}`);
+      if (p.definicion && !definicionValida(p.definicion.texto)) problemas.push(`${caso}: definición inválida: ${p.definicion.texto}`);
+    }
+
+    // 2. Simulación de respuestas.
+    if (SIMULADOS.includes(caso)) {
+      const todo = (r: "si" | "no") => Object.fromEntries(analisis.preguntas.map(p => [p.id, r]));
+      const no = aplicarRespuestas(analisis, todo("no"));
+      if (no.hechos.length > 0 || agregarConocimientos(cv, no.hechos) !== cv) problemas.push(`${caso}: con todo "no" el CV cambia`);
+
+      const { hechos } = aplicarRespuestas(analisis, todo("si"));
+      const mapeo = mapeoConDeclaraciones(base.resultado, hechos);
+      let despues = cv;
+      const pares: { antes: string; despues: string }[] = [];
+      for (const h of hechos.filter(h => h.destino.tipo === "vineta")) {
+        const linea = (h.destino as { linea: string }).linea;
+        const clave = `${linea}\u0000${h.keyword}`;
+        let r = g.reescrituras?.[clave];
+        if (!r) {
+          estimado += 0.0015;
+          if (!client) { console.log(`  ${caso}: falta la reescritura de «${linea.trim()}» (correr con --ejecutar)`); continue; }
+          r = await reescribirLinea({ lineaOriginal: linea, cvCompleto: cv, mapeo, keywordsJD: ctx.keywordsJD, declaraciones: [{ keyword: h.keyword, fuente: h.texto }] }, { client });
+          if (r.usage) gastado += costo(r.usage);
+          g.reescrituras = { ...g.reescrituras, [clave]: r };
+        }
+        if (r.adaptada !== linea) pares.push({ antes: linea, despues: r.adaptada });
+        despues = despues.split("\n").map(l => (l === linea ? r!.adaptada : l)).join("\n");
+      }
+      const sinConocimientos = despues.split("\n");
+      despues = agregarConocimientos(despues, hechos);
+      for (const l of despues.split("\n").filter(l => !sinConocimientos.includes(l))) {
+        const etiqueta = l.split(":")[0];
+        pares.push({ antes: sinConocimientos.find(a => a.split(":")[0] === etiqueta && a.includes(":")) ?? "(línea nueva)", despues: l });
+      }
+
+      // 0 mentiras: toda palabra nueva de una línea cambiada está en el CV original o en una declaración.
+      // "Conocimientos" es la etiqueta de la línea nueva, no una afirmación.
+      const respaldo = new Set([...palabrasSignificativas(cv), ...hechos.flatMap(h => palabrasSignificativas(h.keyword)), "conocimientos"]);
+      const antes = cv.split("\n"), ahora = despues.split("\n");
+      const cambiadas = ahora.filter(l => !antes.includes(l));
+      for (const l of cambiadas) {
+        const sin = palabrasSignificativas(l).filter(p => !respaldo.has(p));
+        if (sin.length) problemas.push(`${caso}: palabras sin fuente en «${l.trim()}»: ${sin.join(", ")}`);
+      }
+      const informeSi = informeFit({
+        cv, mapeo, keywordsJD: ctx.keywordsJD, nivelPosicion: ctx.nivelPosicion, cargo: base.cargo,
+        etiquetas: base.etiquetas, rechazadas: base.rechazos,
+      });
+      console.log(`\n═══ ${caso}: simulación todo "sí" · fit ${informe.fit.clase} (${informe.fit.score}) → ${informeSi.fit.clase} (${informeSi.fit.score})`);
+      for (const h of hechos) console.log(`  hecho: ${h.texto} → ${h.destino.tipo}`);
+      for (const p of pares) console.log(`  antes:   ${p.antes.trim()}\n  después: ${p.despues.trim()}`);
+      if (cambiadas.length === 0) console.log("  (sin cambios en el CV)");
+      console.log(`  todo "no": CV idéntico ${no.hechos.length === 0 ? "✅" : "❌"}`);
+      informeSi.cumples.filter(c => /declarado por ti/.test(c.requisito)).forEach(c => console.log(`  informe: ✓ ${c.requisito}`));
+    }
+    if (client) fs.writeFileSync(archivo, JSON.stringify(g, null, 2) + "\n");
+  }
+
+  if (estimar) { console.log(`\nCosto estimado de --ejecutar: ~$${estimado.toFixed(4)}\n`); return; }
+
+  console.log(`\n${"caso".padEnd(24)} preguntas (palabras) · definición`);
+  for (const { caso, analisis } of filas) {
+    if (analisis.preguntas.length === 0) { console.log(`${caso.padEnd(24)} — (sin preguntas: el paso se salta)`); continue; }
+    analisis.preguntas.forEach((p, i) => {
+      const def = p.definicion ? ` · ${p.definicion.texto}${p.definicion.revisar ? " [revisar]" : ""}` : "";
+      console.log(`${(i === 0 ? caso : "").padEnd(24)} ${p.texto} (${p.palabras}) [${p.tipo}, ${p.impacto}, → ${p.destino.tipo}]${def}`);
+    });
+  }
+  console.log(`\nChequeos: ${problemas.length === 0 ? "✅ sin problemas" : "❌\n  " + problemas.join("\n  ")}`);
+  if (ejecutar) console.log(`Costo real: $${gastado.toFixed(4)}`);
+}
+
+main().catch(err => { console.error("Error inesperado:", err); process.exit(1); });
