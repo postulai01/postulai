@@ -31,7 +31,7 @@
 import { matcheaPalabra, normalizarParaComparar, STOP_WORDS_MATCH } from "./cv-postprocess";
 import { esEncabezado } from "./cv-verificacion";
 import {
-  alertaNivel, aniosDeExperiencia, type ResultadoRequisito, esCarrera, pareceHerramienta, puestosCV, RAICES_GENERICAS, RE_NORMATIVA, RE_SECTOR,
+  alertaNivel, aniosDeExperiencia, puestoComparteArea, type ResultadoRequisito, esCarrera, pareceHerramienta, puestosCV, RAICES_GENERICAS, RE_NORMATIVA, RE_SECTOR,
   PESO_REQUISITO, RE_SOFTWARE, scoreV2, clasificarBrecha, type AlertaNivel, type ClaseFit, type KeywordsJD, type ResultadoMapeo,
 } from "./mapeo-semantico";
 import type { EtiquetasOrden } from "./priorizador";
@@ -83,6 +83,8 @@ const RE_BLANDA = /\b(actitud|adaptabilidad|orientacion al servicio|proactiv\w*|
 const RE_IDIOMA = /\b(english|ingles|portugues|portuguese|frances|french|aleman|german|italiano|italian|mandarin|chino)\b/;
 const RE_ESTANDAR = /\b(soc ?2|iso ?\d*|gdpr|hipaa|pci( dss)?|sox)\b/;
 const RE_OFICINA = /\b(google drive|drive|gmail|zoom|teams|microsoft teams|google meet|outlook|slack)\b/;
+// Herramientas conocidas de RRHH, ERP y oficina (PED-36): no son siglas ni camelCase, pero son herramientas.
+const RE_HERRAMIENTA_CONOCIDA = /\b(buk|talana|rex|softland|payroll|sap|meta4|oracle|workday|peoplesoft|successfactors|adp|nubox|defontana|zenda|excel|power bi|tableau|google sheets)\b/;
 const RE_CONCEPTO = /(p&l|\bebitda\b|\bbalance\b|flujo de caja|\bkpis?\b|estado de resultados|\bcontabilidad\b)/i;
 
 const singular = (p: string) => p.replace(/ciones$/, "cion").replace(/([aeiou])s$/, "$1");
@@ -106,6 +108,7 @@ function tipoDeBrecha(keyword: string): TipoPregunta | null {
   if (RE_IDIOMA.test(n)) return "idioma";
   if (RE_ESTANDAR.test(n)) return "normativa";
   if (RE_OFICINA.test(n)) return "oficina";
+  if (RE_HERRAMIENTA_CONOCIDA.test(n)) return "herramienta";
   if (RE_CONCEPTO.test(keyword)) return "concepto";
   if (RE_NORMATIVA.test(n) || RE_NORMATIVA_EXTRA.test(n)) return "normativa";
   if (RE_SOFTWARE.test(n) || pareceHerramienta(keyword)) return "herramienta";
@@ -204,8 +207,13 @@ export function informeFit(input: InputInforme): InformeFit {
   const puestos = puestosCV(cv);
   const aniosTotales = aniosDeExperiencia(puestos);
   // Años en el área no cumplidos, pero los años totales alcanzan: se pregunta por los puestos no contados (PED-36).
+  // Solo si algún puesto no contado comparte una palabra propia del área; si no, sigue siendo brecha.
+  const areaDe = (q: ResultadoRequisito) => q.descripcion.replace(/^\d+(\.\d+)? años en /, "");
+  const noContados = (q: ResultadoRequisito) => { const c = new Set(q.puestos ?? []); return puestos.filter(p => !c.has(p.titulo)); };
+  const candidatos = (q: ResultadoRequisito) => noContados(q).filter(p => puestoComparteArea(p, areaDe(q)));
   const aniosPreguntable = (q: ResultadoRequisito) => q.clase === "experiencia" && q.estado === "no_cumple"
-    && /del área/.test(q.detalle) && aniosTotales >= Number(q.descripcion.match(/^\d+(\.\d+)?/)?.[0] ?? Infinity);
+    && /del área/.test(q.detalle) && aniosTotales >= Number(q.descripcion.match(/^\d+(\.\d+)?/)?.[0] ?? Infinity)
+    && candidatos(q).length > 0;
   const v2 = scoreV2(mapeo, jd, k => (clasif(k).clase === "bloqueante" ? "bloqueante" : "preguntable"), aniosPreguntable);
 
   const relevancia = new Map(jd.requeridas.map(k => [k.keyword, k.relevancia]));
@@ -252,9 +260,8 @@ export function informeFit(input: InputInforme): InformeFit {
         const rango = contados.length > 1 ? `desde ${t(contados[0])} hasta ${t(contados[contados.length - 1])}` : contados[0] ? t(contados[0]) : "";
         cumples.push({ requisito: desc, evidencia: `${q.detalle}: ${rango}` });
       } else if (aniosPreguntable(q)) {
-        const contados = new Set(q.puestos ?? []);
-        const otros = puestos.filter(p => !contados.has(p.titulo)).map(p => cargoDelPuesto(p)).slice(-2).reverse();
-        const area = q.descripcion.replace(/^\d+(\.\d+)? años en /, "");
+        const otros = candidatos(q).map(p => cargoDelPuesto(p)).slice(-2).reverse();
+        const area = areaDe(q);
         preguntas.push({
           requisito: desc, tipo: "anios_area", relevancia: PESO_REQUISITO,
           texto: `¿Tu trabajo como ${otros.join(" o como ")} fue de ${area}? Si lo fue, deja claro en el CV qué hiciste en esa área.`,

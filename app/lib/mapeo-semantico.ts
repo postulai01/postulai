@@ -325,6 +325,14 @@ function puestoEnArea(p: PuestoCV, segmentos: string[][]): boolean {
   return segmentos.some(seg => seg.every(esta));
 }
 
+// El puesto comparte al menos una palabra propia del área (sin genéricas ni RAICES_GENERICAS) en su cargo, empresa o
+// viñetas, comparando la palabra completa (o su plural): "manufactura" ↔ "Manufactura Austral" sí; "product" ↔
+// "productivo" no (PED-36).
+export function puestoComparteArea(p: PuestoCV, area: string): boolean {
+  const t = canonArea(normalizarParaComparar(p.texto));
+  return segmentosArea(area).flat().some(w => matcheaPalabra(w, t));
+}
+
 export function evaluarRequisitos(jd: KeywordsJD, cvTexto: string): ResultadoRequisito[] {
   const out: ResultadoRequisito[] = [];
   if (!cvTexto) return out;
