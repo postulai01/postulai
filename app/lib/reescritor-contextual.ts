@@ -8,7 +8,9 @@
  *    que tocan su contenido y que aún no están escritas en ella). Sin ninguna → "sin_cambios", sin llamar a la API.
  * 2. Haiku propone la línea adaptada en JSON.
  * 3. verificarAdaptacion (sin API): palabras nuevas sin respaldo, keywords de brecha, verbos de escalada,
- *    cifras nuevas y la métrica de fuerzo (palabras_nuevas > MAX_PALABRAS_NUEVAS). Si falla, un reintento
+ *    cifras nuevas y la métrica de fuerzo (palabras_nuevas > MAX_PALABRAS_NUEVAS); más la capa de código del
+ *    validador de PED-24 (verificarFidelidad, PED-35): palabra_fuera_de_cita contra la línea original y las fuentes de
+ *    las keywords efectivamente insertadas, escalada_rol y calificativo_trasladado. Si falla, un reintento
  *    con el motivo; si vuelve a fallar → "rechazada_forzada" y se conserva la original.
  * No está conectado a process-cv todavía (PED-25).
  */
@@ -16,6 +18,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { normalizarParaComparar, STOP_WORDS_MATCH } from "./cv-postprocess";
 import { esEncabezado, esLineaCargo, raizVerbo, VERBOS_ESCALADA } from "./cv-verificacion";
 import { esCarrera, RAICES_GENERICAS, RE_EXPERIENCIA, type KeywordsJD, type ResultadoMapeo } from "./mapeo-semantico";
+import { calificativoTrasladado, escaladaRol, palabraFueraDeCita, type OracionAValidar } from "./validador";
 
 export const MODELO_REESCRITOR = "claude-haiku-4-5-20251001";
 export const MAX_PALABRAS_NUEVAS = 4;
@@ -264,6 +267,21 @@ export function verificarAdaptacion(
   return { ok: problemas.length === 0, palabras_nuevas: nuevas.length, problemas };
 }
 
+// Capa de código del validador (PED-24) sobre una línea adaptada (PED-35). Las líneas citadas son la línea original y
+// las fuentes de las keywords que la adaptada de verdad contiene: cada palabra nueva debe estar en alguna de ellas
+// (no basta otra viñeta del mismo puesto, por eso no se pasa el CV). Una fuente compuesta ("a | b") solo cuenta si una
+// de sus partes tiene todas las palabras de la keyword: juntar "indicadores de dotación" y "reclutamiento y selección"
+// no respalda "indicadores de selección".
+export function verificarFidelidad(original: string, adaptada: string, kws: Pick<KeywordPermitida, "palabras" | "fuente">[]): string[] {
+  const ix = indice(adaptada);
+  const tiene = (texto: string, w: string) => { const t = indice(texto); return presente(w, t.set, t.raices); };
+  const citadas = kws
+    .filter(k => k.palabras.length > 0 && k.palabras.every(w => tiene(adaptada, w)))
+    .flatMap(k => k.fuente.split(" | ").filter(parte => k.palabras.every(w => tiene(parte, w))));
+  const o: OracionAValidar = { oracion: adaptada, lineas_citadas: [original, ...citadas].map(texto => ({ linea: 0, texto })) };
+  return [escaladaRol(o), palabraFueraDeCita(o), calificativoTrasladado(o)].filter(h => h !== null).map(h => `${h!.tipo}: ${h!.detalle}`);
+}
+
 // ─── llamada a modelo ────────────────────────────────────────────────────────
 
 export const SYSTEM_REESCRITOR = `Adaptas UNA línea de un CV en español a una oferta de trabajo, sin inventar nada.
@@ -352,7 +370,11 @@ export async function reescribirLinea(input: InputLinea, opts: OpcionesReescrito
     const fuera = r.keywords_agregadas.filter(k => !permitidas.some(p => corresponde(k, p)));
     const kws = permitidas.filter(p => r.keywords_agregadas.some(k => corresponde(k, p)));
     const v = verificarAdaptacion(cuerpo, r.adaptada, kws.flatMap(k => k.palabras), cvCompleto, mapeo, max);
-    const problemas = [...v.problemas, ...(fuera.length > 0 ? [`keywords no permitidas: ${fuera.join(", ")}`] : [])];
+    const problemas = [
+      ...v.problemas,
+      ...(fuera.length > 0 ? [`keywords no permitidas: ${fuera.join(", ")}`] : []),
+      ...verificarFidelidad(cuerpo, r.adaptada, kws),
+    ];
 
     if (problemas.length === 0) {
       if (normalizarParaComparar(r.adaptada) === normalizarParaComparar(cuerpo)) return { ...sinCambios("sin_cambios", intento), usage };

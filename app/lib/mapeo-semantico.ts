@@ -60,6 +60,7 @@ export interface ResultadoRequisito {
   tipo: TipoKeyword;
   estado: EstadoRequisito;
   detalle: string;     // "18 años en el CV" · "carrera del CV: Administración Pública"
+  puestos?: string[];  // experiencia: títulos de los puestos que se contaron
 }
 
 export interface ResultadoMapeo {
@@ -94,6 +95,26 @@ const PATRON_CARRERA = new RegExp("^(" + [
   "kinesiologia", "sociologia", "trabajo social", "tecnico (en|de)", "diseno", "pedagogia", "agronomia",
   "geologia", "bioquimica", "quimica", "nutricion", "fonoaudiologia", "terapia ocupacional", "odontologia",
 ].join("|") + ")\\b");
+
+// Profesión ↔ carrera y género (PED-35): "Psicóloga" ↔ "Psicología", "Ingeniero/a" ↔ "Ingeniería",
+// "Abogado" ↔ "Derecho", "Administradora" ↔ "Administración", "Técnica" ↔ "Técnico". Solo para comparar carreras.
+const FORMAS_CARRERA: [RegExp, string][] = [
+  [/\bpsicolog(o|a|os|as|ia)\b/g, "psicologia"],
+  [/\bingenier(o|a|os|as|ia)\b/g, "ingenieria"],
+  [/\babogad(o|a|os|as)\b/g, "derecho"],
+  [/\badministrador(a|es|as)?\b/g, "administracion"],
+  [/\btecnic(o|a|os|as)\b/g, "tecnico"],
+];
+export function canonCarrera(texto: string): string {
+  return FORMAS_CARRERA.reduce((n, [re, c]) => n.replace(re, c), normalizarParaComparar(texto));
+}
+
+// Una línea del CV menciona la carrera, comparando en forma canónica.
+function lineaConCarrera(cvTexto: string, carrera: string): boolean {
+  const k = canonCarrera(carrera).split(" ").filter(p => p && !STOP_WORDS_MATCH.has(p));
+  if (k.length === 0) return false;
+  return cvTexto.split("\n").some(l => { const n = canonCarrera(l); return k.every(p => matcheaPalabra(p, n)); });
+}
 
 export function esCarrera(keyword: string): boolean {
   return PATRON_CARRERA.test(normalizarParaComparar(keyword));
@@ -281,20 +302,26 @@ export function aniosDeExperiencia(puestos: PuestoCV[]): number {
 }
 
 // El área se divide en alternativas ("minería, construcción o servicios industriales", "Capital Humano / RRHH");
-// de cada una quedan las palabras que identifican el tema: sin stop words, sin "experiencia/profesional/general",
-// sin raíces genéricas. Sin ninguna palabra propia → experiencia total.
+// de cada una quedan las palabras propias del tema: sin stop words, sin genéricas ("experiencia", "profesional",
+// "rol", "similar", "proyectos"…), sin raíces genéricas. Sin ninguna palabra propia → experiencia total.
+// Los niveles ("gerencias", "jefaturas") tampoco son área: "Gerencias de Capital Humano" → "capital humano".
+const GENERICAS_AREA = /^(experiencia|profesional|general|area|cargo|similar|relacionad|empresa|rol|role|proyecto|project|afin|equivalente|otro|personal|gerenc|gerent|subgeren|jefatur|jefe|direcc|director)/;
+// Nombres equivalentes del área de personas: el CV dice "Recursos Humanos" y la oferta "Capital Humano / RRHH".
+const canonArea = (n: string) => n.replace(/\b(recursos humanos|capital humano|gestion de personas|personas( y)? organizacion|rr hh)\b/g, "rrhh");
+
 function segmentosArea(area: string | null): string[][] {
   if (!area) return [];
-  return area.split(/,|\/|\s+o\s+|\s+y\s+/i)
-    .map(seg => palabras(seg).filter(p => !/^(experiencia|profesional|general|area|cargo|similar|relacionad|empresa)/.test(p) && !RAICES_GENERICAS.has(raiz(p))))
+  return area.split(/,|\/|\s+o\s+|\s+y\s+|\s+or\s+/i)
+    .map(seg => palabras(canonArea(normalizarParaComparar(seg))).filter(p => !GENERICAS_AREA.test(p) && !RAICES_GENERICAS.has(raiz(p))))
     .filter(seg => seg.length > 0);
 }
 
-// El puesto es del área si alguna alternativa tiene al menos la mitad de sus palabras en el cargo o las viñetas.
+// El puesto es del área si TODAS las palabras propias de alguna alternativa están en el cargo o sus viñetas (PED-35:
+// antes bastaba la mitad, y "Product Analyst" calzaba con "productivo").
 function puestoEnArea(p: PuestoCV, segmentos: string[][]): boolean {
-  const t = normalizarParaComparar(p.texto);
+  const t = canonArea(normalizarParaComparar(p.texto));
   const esta = (w: string) => matcheaPalabra(w, t) || t.split(" ").some(x => x.length >= 6 && x.startsWith(raiz(w)));
-  return segmentos.some(seg => seg.filter(esta).length >= Math.ceil(seg.length / 2));
+  return segmentos.some(seg => seg.every(esta));
 }
 
 export function evaluarRequisitos(jd: KeywordsJD, cvTexto: string): ResultadoRequisito[] {
@@ -312,10 +339,11 @@ export function evaluarRequisitos(jd: KeywordsJD, cvTexto: string): ResultadoReq
       tipo: e.tipo,
       estado: anios >= e.anios_minimos ? "cumple" : "no_cumple",
       detalle: `${anios} años en el CV${clave.length ? ` (${enArea.length} puesto(s) del área)` : ""}`,
+      puestos: enArea.map(p => p.titulo),
     });
   }
   for (const c of jd.carreras ?? []) {
-    const calza = c.carreras.find(k => lineaConKeyword(cvTexto, k));
+    const calza = c.carreras.find(k => lineaConCarrera(cvTexto, k));
     out.push({
       clase: "carrera",
       descripcion: `${c.carreras.join(" / ")}${c.acepta_afin ? " (o afín)" : ""}`,

@@ -8,7 +8,7 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { herramientaTieneRespaldo, matcheaPalabra, normalizarParaComparar, STOP_WORDS_MATCH } from "./cv-postprocess";
-import { esCarrera } from "./mapeo-semantico";
+import { canonCarrera, esCarrera } from "./mapeo-semantico";
 
 export const MODELO_JD = "claude-haiku-4-5-20251001";
 
@@ -126,16 +126,32 @@ export function marcadaComoDeseable(keyword: string, texto: string): boolean {
 }
 
 // Palabras de rol o nivel que no describen el área del cargo: "Practicante de Trade Marketing" → "trade marketing".
-const RE_ROL = /^(practicante|pasante|trainee|analista|asistente|ayudante|auxiliar|jefe|jefa|jefe a|gerente|subgerente|encargado|encargada|encargado a|coordinador|coordinadora|coordinador a|especialista|ejecutivo|ejecutiva|ejecutivo a|supervisor|supervisora|director|directora|lider|profesional|junior|senior|semi senior|semisenior|sr|jr|de|del|en|y|para|la|el|los|las|un|una|a)$/;
+// Singular o plural, masculino o femenino (PED-35: "Reclutadores", "Analistas", "Ejecutivas").
+const RE_ROL = /^(practicantes?|pasantes?|trainees?|analistas?|asistentes?|ayudantes?|auxiliar(es)?|jefe|jefa|jefes|jefas|jefe a|gerentes?|subgerentes?|encargad[oa]s?|encargado a|coordinador(a|es|as)?|coordinador a|especialistas?|ejecutiv[oa]s?|ejecutivo a|supervisor(a|es|as)?|director(a|es|as)?|lider(es)?|profesional(es)?|reclutador(a|es|as)?|junior|senior|semi senior|semisenior|sr|jr|de|del|en|y|para|la|el|los|las|un|una|a)$/;
+// Rol que nombra el área: "Reclutador Masivo" → "reclutamiento masivo".
+const ROL_AREA: [RegExp, string][] = [[/^reclutador(a|es|as)?$/, "reclutamiento"]];
+// Jornada y modalidad al final del título: no son área.
+const RE_JORNADA = /\s+(part time|full time|media jornada|jornada completa|remoto|presencial|h[ií]brido)$/i;
+const singularAdj = (w: string) => w.replace(/(iv|ic|al|ad)(o|a)s$/, "$1o").replace(/(iv|ic|ad)a$/, "$1o");
 
 // Lo que queda del título sin rol ni nivel: el área del cargo. Siempre es keyword requerida de relevancia 10,
 // si tiene entre 1 y 4 palabras y aparece en la oferta.
 export function keywordDelCargo(cargo: string | undefined, ofertaNorm: string): string | null {
   if (!cargo) return null;
   const tokens = cargo.replace(/\(.*?\)/g, " ").split(/\s+/).filter(Boolean);
-  let i = 0;
-  while (i < tokens.length && RE_ROL.test(normalizarParaComparar(tokens[i]))) i++;
-  const resto = tokens.slice(i).join(" ").replace(/[,.;:|–—-]+$/, "").trim();
+  let i = 0, area: string | null = null;
+  while (i < tokens.length && RE_ROL.test(normalizarParaComparar(tokens[i]))) {
+    const n = normalizarParaComparar(tokens[i]);
+    area = ROL_AREA.find(([re]) => re.test(n))?.[1] ?? area;
+    i++;
+  }
+  const resto = tokens.slice(i).join(" ").replace(/[,.;:|–—-]+$/, "").trim().replace(RE_JORNADA, "").trim();
+  if (area) {
+    // El área sale del rol; lo que sigue ("Masivos") debe aparecer en la oferta (en cualquier género o número).
+    const adj = resto.split(/\s+/).filter(Boolean);
+    if (adj.length > 2 || !adj.every(w => new RegExp(`\\b${normalizarParaComparar(w).replace(/(o|a)s?$/, "")}(o|a|os|as)\\b`).test(ofertaNorm))) return null;
+    return [area, ...adj.map(w => singularAdj(normalizarParaComparar(w)))].join(" ");
+  }
   const n = resto.split(/\s+/).filter(Boolean).length;
   if (n === 0 || n > 4 || esCarrera(resto) || !herramientaTieneRespaldo(resto, ofertaNorm)) return null; // la carrera va en `carreras`
   return resto;
@@ -162,7 +178,8 @@ function limpiarCarreras(lista: unknown, texto: string, ofertaNorm: string, desc
     const carreras = (Array.isArray(item?.carreras) ? item.carreras : [])
       .filter((c: unknown): c is string => typeof c === "string" && c.trim().length > 0)
       .map((c: string) => c.trim())
-      .filter((c: string) => herramientaTieneRespaldo(c, ofertaNorm) || (descartadas.push(c), false));
+      .filter((c: string) => herramientaTieneRespaldo(c, ofertaNorm) || herramientaTieneRespaldo(canonCarrera(c), canonCarrera(texto))
+        || (descartadas.push(c), false)); // "Psicología" vale con "Psicóloga" en la oferta
     if (carreras.length === 0) return [];
     return [{ carreras, acepta_afin: item?.acepta_afin === true || afinEnTexto, tipo: tipoRequisito(item?.tipo) }];
   });
