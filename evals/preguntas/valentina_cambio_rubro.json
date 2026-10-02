@@ -1,5 +1,5 @@
 {
-  "prompt": "Ayudas a redactar preguntas cortas para una persona que postula a un trabajo.\n1. RESUMENES: para cada línea de su CV, escribe un resumen de MÁXIMO 5 PALABRAS EN TOTAL, contando \"tu\"/\"tus\", que empiece con \"tu\" o \"tus\" y use SOLO palabras que aparecen en esa línea (puedes omitir palabras; no agregues, no cambies ni conjugues ninguna; sin cifras). Ejemplo: \"Ejecución de activaciones de marca en puntos de venta para Hellmann's.\" → \"tus activaciones para Hellmann's\" (4 palabras).\n2. DEFINICIONES: para cada término, una definición neutra de MÁXIMO 12 PALABRAS, en lenguaje cotidiano. No hables de la persona (nada de \"tú\", \"tu\", \"usted\").\nResponde SOLO con JSON: {\"resumenes\":[{\"id\":1,\"resumen\":\"...\"}],\"definiciones\":[{\"termino\":\"...\",\"definicion\":\"...\"}]}\n---\nLÍNEAS:\n2. Gestioné el proceso de incorporación y formación de 180 nuevos colaboradores en los últimos 12 meses, reduciendo la rotación en un 19%.\n3. Diseñé el programa de desarrollo de jefes de tienda, formando a 12 líderes que ascendieron a roles de mayor responsabilidad.\n\nTÉRMINOS:\n(ninguno)",
+  "prompt": "Ayudas a redactar preguntas cortas para una persona que postula a un trabajo.\n1. RESUMENES: para cada línea de su CV, escribe un resumen de MÁXIMO 5 PALABRAS EN TOTAL, contando \"tu\"/\"tus\", que empiece con \"tu\" o \"tus\" y use SOLO palabras que aparecen en esa línea (puedes omitir palabras; no agregues, no cambies ni conjugues ninguna; sin cifras). Ejemplo: \"Coordinación de ferias gastronómicas regionales para pymes del sur.\" → \"tus ferias para pymes\" (4 palabras).\n2. DEFINICIONES: para cada término, una definición neutra de MÁXIMO 12 PALABRAS, en lenguaje cotidiano. No hables de la persona (nada de \"tú\", \"tu\", \"usted\").\nResponde SOLO con JSON: {\"resumenes\":[{\"id\":1,\"resumen\":\"...\"}],\"definiciones\":[{\"termino\":\"...\",\"definicion\":\"...\"}]}\n---\nLÍNEAS:\n2. Gestioné el proceso de incorporación y formación de 180 nuevos colaboradores en los últimos 12 meses, reduciendo la rotación en un 19%.\n3. Diseñé el programa de desarrollo de jefes de tienda, formando a 12 líderes que ascendieron a roles de mayor responsabilidad.\n\nTÉRMINOS:\n(ninguno)",
   "respuesta": {
     "resumenes": [
       {
@@ -13,7 +13,7 @@
     ],
     "definiciones": []
   },
-  "costo": 0.000809,
+  "costo": 0.000804,
   "reescrituras": {
     "- Gestioné el proceso de incorporación y formación de 180 nuevos colaboradores en los últimos 12 meses, reduciendo la rotación en un 19%.\u0000procesos de RRHH": {
       "original": "- Gestioné el proceso de incorporación y formación de 180 nuevos colaboradores en los últimos 12 meses, reduciendo la rotación en un 19%.",

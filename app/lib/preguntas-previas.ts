@@ -57,10 +57,17 @@ export interface AnalisisPrevio { preguntas: PreguntaPrevia[] }
 
 // ─── selección ───────────────────────────────────────────────────────────────
 
-export function seleccionarCandidatas(informe: InformeFit, jd: KeywordsJD): (Pregunta & { impacto: number })[] {
+// La keyword sin nivel ya está escrita en alguna línea del CV ("Excel" de "Excel nivel intermedio"): no se pregunta.
+function yaEnCV(keyword: string, cv: string): boolean {
+  const k = palabrasDe(sinNivel(keyword)).filter(p => !STOP_WORDS_MATCH.has(p));
+  return k.length > 0 && cv.split("\n").some(l => { const n = ` ${normalizarParaComparar(l)} `; return k.every(p => n.includes(` ${p} `)); });
+}
+
+export function seleccionarCandidatas(informe: InformeFit, jd: KeywordsJD, cv: string): (Pregunta & { impacto: number })[] {
   const deseable = new Set(jd.deseables.map(k => normalizarParaComparar(k.keyword)));
   return [...informe.preguntas, ...informe.otras_preguntas]
     .filter(p => p.tipo in PRIORIDAD && p.relevancia >= RELEVANCIA_MIN)
+    .filter(p => p.tipo === "anios_area" || !yaEnCV(p.requisito, cv))
     .map(p => ({ ...p, impacto: p.relevancia * (deseable.has(normalizarParaComparar(p.requisito)) ? 0.5 : 1) }))
     .sort((a, b) => b.impacto - a.impacto || PRIORIDAD[b.tipo] - PRIORIDAD[a.tipo])
     .slice(0, MAX_PREGUNTAS_PREVIAS);
@@ -81,13 +88,13 @@ function plantilla(p: Pregunta, resumen?: string): string {
   const k = sinNivel(p.requisito);
   if ((p.tipo === "semantico" || p.tipo === "subtarea") && !resumen && esHerramienta(k)) return `¿Has usado ${k}?`;
   switch (p.tipo) {
-    case "area_cargo": return resumen ? `¿${mayuscula(resumen)} ${plural(resumen) ? "fueron" : "fue"} trabajo de ${k}?` : `¿Has hecho trabajo de ${k}?`;
-    case "semantico": return resumen ? `¿${mayuscula(resumen)} ${plural(resumen) ? "cuentan" : "cuenta"} como ${k}?` : `¿Has hecho ${k}?`;
+    case "area_cargo": return resumen ? `¿${mayuscula(resumen)} ${plural(resumen) ? "fueron" : "fue"} trabajo de ${k}?` : `¿Tienes experiencia en ${k}?`;
+    case "semantico": return resumen ? `¿${mayuscula(resumen)} ${plural(resumen) ? "cuentan" : "cuenta"} como ${k}?` : `¿Tienes experiencia en ${k}?`;
     case "anios_area": return `¿Tu trabajo como ${p.contexto} fue de ${p.area}?`;
     case "herramienta": return `¿Has usado ${k}?`;
     case "normativa":
     case "concepto": return `¿Has trabajado con ${k}?`;
-    case "idioma": return `¿Manejas ${k} en el trabajo?`;
+    case "idioma": return `¿Manejas ${traducirKeyword(k) ?? k} en el trabajo?`; // "English" → "inglés"
     case "sector": return `¿Tienes experiencia en ${k.replace(/^experiencia en\s+/i, "")}?`;
     default: return `¿Tu experiencia incluye ${k}?`;
   }
@@ -102,11 +109,21 @@ const palabrasDe = (t: string) => normalizarParaComparar(t).split(" ").filter(Bo
 
 // El resumen usa SOLO palabras de la línea citada (más "tu"/"tus"), ≤ PALABRAS_RESUMEN, sin comillas.
 export function resumenValido(resumen: string, linea: string): boolean {
+  if (/^[^:]{2,40}:\s/.test(linea)) return false; // lista "Técnicas: Excel, SAP…": recortarla parte nombres propios
   const ps = palabrasDe(resumen);
   if (ps.length === 0 || contarPalabras(resumen) > PALABRAS_RESUMEN || /["“”«»]/.test(resumen)) return false;
   if (!/^(tu|tus)$/.test(ps[0])) return false;
   const enLinea = new Set(palabrasDe(linea));
   return ps.slice(1).every(p => enLinea.has(p));
+}
+
+// Un resumen de más de PALABRAS_RESUMEN se recorta a sus primeras palabras, sin terminar en preposición, artículo
+// ni conjunción ("tu programa de desarrollo de jefes" → "tu programa de desarrollo").
+const FINAL_DEBIL = /^(de|del|la|las|el|los|un|una|y|e|o|u|en|para|por|con|a|al|que|sus|su)$/i;
+export function recortarResumen(resumen: string): string {
+  const ps = resumen.trim().split(/\s+/).slice(0, PALABRAS_RESUMEN);
+  while (ps.length > 1 && FINAL_DEBIL.test(ps[ps.length - 1])) ps.pop();
+  return ps.join(" ");
 }
 
 // Términos técnicos fuera del glosario: siglas o herramientas, inglés, normativas.
@@ -136,7 +153,7 @@ function destinoDe(p: Pregunta, cv: string): Destino {
 // ─── modelo (una llamada por CV) ─────────────────────────────────────────────
 
 export const SYSTEM_PREVIAS = `Ayudas a redactar preguntas cortas para una persona que postula a un trabajo.
-1. RESUMENES: para cada línea de su CV, escribe un resumen de MÁXIMO 5 PALABRAS EN TOTAL, contando "tu"/"tus", que empiece con "tu" o "tus" y use SOLO palabras que aparecen en esa línea (puedes omitir palabras; no agregues, no cambies ni conjugues ninguna; sin cifras). Ejemplo: "Ejecución de activaciones de marca en puntos de venta para Hellmann's." → "tus activaciones para Hellmann's" (4 palabras).
+1. RESUMENES: para cada línea de su CV, escribe un resumen de MÁXIMO 5 PALABRAS EN TOTAL, contando "tu"/"tus", que empiece con "tu" o "tus" y use SOLO palabras que aparecen en esa línea (puedes omitir palabras; no agregues, no cambies ni conjugues ninguna; sin cifras). Ejemplo: "Coordinación de ferias gastronómicas regionales para pymes del sur." → "tus ferias para pymes" (4 palabras).
 2. DEFINICIONES: para cada término, una definición neutra de MÁXIMO 12 PALABRAS, en lenguaje cotidiano. No hables de la persona (nada de "tú", "tu", "usted").
 Responde SOLO con JSON: {"resumenes":[{"id":1,"resumen":"..."}],"definiciones":[{"termino":"...","definicion":"..."}]}`;
 
@@ -147,8 +164,8 @@ export function promptPrevias(resumenes: { id: number; linea: string }[], termin
 export interface RespuestaModelo { resumenes?: { id: number; resumen: string }[]; definiciones?: { termino: string; definicion: string }[] }
 
 // Pedido al modelo para un informe (o null si no hace falta llamar).
-export function pedidoModelo(informe: InformeFit, jd: KeywordsJD): { resumenes: { id: number; linea: string }[]; terminos: string[] } | null {
-  const cands = seleccionarCandidatas(informe, jd);
+export function pedidoModelo(informe: InformeFit, jd: KeywordsJD, cv: string): { resumenes: { id: number; linea: string }[]; terminos: string[] } | null {
+  const cands = seleccionarCandidatas(informe, jd, cv);
   const resumenes = cands.flatMap((p, i) => ((p.tipo === "area_cargo" || p.tipo === "semantico") && p.contexto ? [{ id: i + 1, linea: p.contexto }] : []));
   const terminos = cands.map(p => p.tipo === "anios_area" ? p.area ?? p.requisito : sinNivel(p.requisito))
     .filter(k => !definirDesdeGlosario(k) && esTecnico(k));
@@ -174,10 +191,11 @@ export async function llamarModelo(
 // Arma las preguntas con la respuesta del modelo (o sin ella: solo plantillas y glosario).
 export function armarPreguntas(informe: InformeFit, jd: KeywordsJD, cv: string, respuesta: RespuestaModelo = {}): AnalisisPrevio {
   const preguntas: PreguntaPrevia[] = [];
-  seleccionarCandidatas(informe, jd).forEach((p, i) => {
+  seleccionarCandidatas(informe, jd, cv).forEach((p, i) => {
     const id = i + 1;
     const propuesto = respuesta.resumenes?.find(r => Number(r.id) === id)?.resumen?.trim();
-    const resumen = propuesto && p.contexto && resumenValido(propuesto, p.contexto) ? propuesto : undefined;
+    const recortado = propuesto ? recortarResumen(propuesto) : undefined;
+    const resumen = recortado && p.contexto && resumenValido(recortado, p.contexto) ? recortado : undefined;
     // Con resumen si cabe en el objetivo de palabras; si no, la plantilla sin resumen.
     const opciones = [resumen ? plantilla(p, resumen) : null, plantilla(p)].filter((t): t is string => !!t && preguntaValida(t));
     const texto = opciones.find(t => contarPalabras(t) <= PALABRAS_OBJETIVO) ?? opciones[0];
@@ -190,7 +208,9 @@ export function armarPreguntas(informe: InformeFit, jd: KeywordsJD, cv: string, 
       id, keyword, tipo: p.tipo, impacto: p.impacto, texto, palabras: contarPalabras(texto),
       ...(p.contexto ? { contexto: p.contexto } : {}),
       ...(resumen && texto.includes(mayuscula(resumen)) ? { resumen } : {}),
-      destino: destinoDe(p, cv),
+      // Un "sí" solo va a una viñeta si la pregunta la nombró (resumen de la línea, o el puesto en años en el área);
+      // a una pregunta genérica le corresponde "Conocimientos:".
+      destino: (resumen && texto.includes(mayuscula(resumen))) || p.tipo === "anios_area" ? destinoDe(p, cv) : { tipo: "habilidades" },
       ...(definicion ? { definicion } : {}),
     });
   });
@@ -269,6 +289,24 @@ export function agregarConocimientos(cv: string, hechos: HechoDeclarado[]): stri
   if (ancla === undefined) return [...lineas, "", nueva].join("\n");
   lineas.splice(ancla + 1, 0, nueva);
   return lineas.join("\n");
+}
+
+// Inserta en código (sin modelo) cada keyword declarada para una viñeta, entre paréntesis al final:
+// "…para Hellmann's." → "…para Hellmann's (Trade Marketing).". Nada más cambia en la línea.
+export function insertarEnVinetas(cv: string, hechos: HechoDeclarado[]): string {
+  const porLinea = new Map<string, string[]>();
+  for (const h of hechos) if (h.destino.tipo === "vineta") porLinea.set(h.destino.linea, [...(porLinea.get(h.destino.linea) ?? []), h.keyword]);
+  return cv.split("\n").map(l => {
+    const kws = porLinea.get(l);
+    if (!kws) return l;
+    const m = l.match(/^(.*?)(\.?)(\s*)$/)!;
+    return `${m[1]} (${kws.join(", ")})${m[2]}${m[3]}`;
+  }).join("\n");
+}
+
+// CV con todas las respuestas aplicadas: viñetas con paréntesis y habilidades/conocimientos.
+export function cvConDeclaraciones(cv: string, hechos: HechoDeclarado[]): string {
+  return agregarConocimientos(insertarEnVinetas(cv, hechos), hechos);
 }
 
 // Palabras de contenido (para el chequeo de "0 mentiras" del eval).

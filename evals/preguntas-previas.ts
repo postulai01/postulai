@@ -4,12 +4,11 @@
  * Uso:
  *   npx tsx evals/preguntas-previas.ts [caso ...]              # sin API: respuestas del modelo guardadas (o solo plantillas)
  *   npx tsx evals/preguntas-previas.ts [caso ...] --estimar    # costo estimado de --ejecutar
- *   npx tsx evals/preguntas-previas.ts [caso ...] --ejecutar   # UNA llamada a Haiku por CV (resúmenes y definiciones) y,
- *                                                              # en los casos simulados, el reescritor en las viñetas declaradas
+ *   npx tsx evals/preguntas-previas.ts [caso ...] --ejecutar   # UNA llamada a Haiku por CV (resúmenes y definiciones)
  * Guarda las respuestas en evals/preguntas/<caso>.json (por texto del system + prompt: si cambia, se vuelve a pedir).
  *
  * Chequeos: ≤ 15 palabras, "¿…?", sin comillas, sin "agrégalo", definiciones sin tuteo. Simulación en SIMULADOS:
- * todo "si" (CV antes → después) y todo "no" (CV idéntico). 0 mentiras: cada palabra nueva de una línea cambiada está
+ * todo "si" (CV antes → después, inserción en código) y todo "no" (CV idéntico). 0 mentiras: cada palabra nueva de una línea cambiada está
  * en el CV o en una declaración.
  */
 import Anthropic from "@anthropic-ai/sdk";
@@ -17,11 +16,10 @@ import * as fs from "fs";
 import * as path from "path";
 import { informeFit } from "../app/lib/informe-fit";
 import {
-  agregarConocimientos, aplicarRespuestas, armarPreguntas, llamarModelo, mapeoConDeclaraciones, palabrasSignificativas,
+  aplicarRespuestas, armarPreguntas, cvConDeclaraciones, llamarModelo, mapeoConDeclaraciones, palabrasSignificativas,
   pedidoModelo, preguntaValida, promptPrevias, SYSTEM_PREVIAS, type AnalisisPrevio, type RespuestaModelo,
 } from "../app/lib/preguntas-previas";
 import { definicionValida } from "../app/lib/glosario";
-import { reescribirLinea, type ResultadoLinea } from "../app/lib/reescritor-contextual";
 import { informeDelCaso, loadEnv } from "./lib-casos";
 
 const CASOS = [
@@ -37,7 +35,6 @@ const costo = (u: { input_tokens: number; output_tokens: number }) => (u.input_t
 
 interface Guardado {
   prompt?: string; respuesta?: RespuestaModelo; costo?: number;
-  reescrituras?: Record<string, ResultadoLinea>; // clave: línea + "\u0000" + keyword
 }
 
 async function main() {
@@ -61,7 +58,7 @@ async function main() {
     const g: Guardado = fs.existsSync(archivo) ? JSON.parse(fs.readFileSync(archivo, "utf-8")) : {};
 
     // 1. Resúmenes y definiciones (una llamada por CV, solo si hace falta).
-    const pedido = pedidoModelo(informe, ctx.keywordsJD);
+    const pedido = pedidoModelo(informe, ctx.keywordsJD, cv);
     // La caché se invalida si cambia el system o el prompt.
     const prompt = pedido ? `${SYSTEM_PREVIAS}\n---\n${promptPrevias(pedido.resumenes, pedido.terminos)}` : undefined;
     let respuesta: RespuestaModelo = g.prompt === prompt ? g.respuesta ?? {} : {};
@@ -86,31 +83,19 @@ async function main() {
     if (SIMULADOS.includes(caso)) {
       const todo = (r: "si" | "no") => Object.fromEntries(analisis.preguntas.map(p => [p.id, r]));
       const no = aplicarRespuestas(analisis, todo("no"));
-      if (no.hechos.length > 0 || agregarConocimientos(cv, no.hechos) !== cv) problemas.push(`${caso}: con todo "no" el CV cambia`);
+      if (no.hechos.length > 0 || cvConDeclaraciones(cv, no.hechos) !== cv) problemas.push(`${caso}: con todo "no" el CV cambia`);
 
       const { hechos } = aplicarRespuestas(analisis, todo("si"));
       const mapeo = mapeoConDeclaraciones(base.resultado, hechos);
-      let despues = cv;
+      // Inserción en código, sin modelo: viñetas nombradas con la keyword entre paréntesis; el resto a habilidades.
+      const despues = cvConDeclaraciones(cv, hechos);
       const pares: { antes: string; despues: string }[] = [];
-      for (const h of hechos.filter(h => h.destino.tipo === "vineta")) {
-        const linea = (h.destino as { linea: string }).linea;
-        const clave = `${linea}\u0000${h.keyword}`;
-        let r = g.reescrituras?.[clave];
-        if (!r) {
-          estimado += 0.0015;
-          if (!client) { console.log(`  ${caso}: falta la reescritura de «${linea.trim()}» (correr con --ejecutar)`); continue; }
-          r = await reescribirLinea({ lineaOriginal: linea, cvCompleto: cv, mapeo, keywordsJD: ctx.keywordsJD, declaraciones: [{ keyword: h.keyword, fuente: h.texto }] }, { client });
-          if (r.usage) gastado += costo(r.usage);
-          g.reescrituras = { ...g.reescrituras, [clave]: r };
-        }
-        if (r.adaptada !== linea) pares.push({ antes: linea, despues: r.adaptada });
-        despues = despues.split("\n").map(l => (l === linea ? r!.adaptada : l)).join("\n");
-      }
-      const sinConocimientos = despues.split("\n");
-      despues = agregarConocimientos(despues, hechos);
-      for (const l of despues.split("\n").filter(l => !sinConocimientos.includes(l))) {
+      const lineasAntes = cv.split("\n");
+      for (const l of despues.split("\n").filter(l => !lineasAntes.includes(l))) {
         const etiqueta = l.split(":")[0];
-        pares.push({ antes: sinConocimientos.find(a => a.split(":")[0] === etiqueta && a.includes(":")) ?? "(línea nueva)", despues: l });
+        const original = lineasAntes.find(a => a.trim() && l.startsWith(a.replace(/\.?\s*$/, "")))
+          ?? lineasAntes.find(a => a.includes(":") && a.split(":")[0] === etiqueta);
+        pares.push({ antes: original ?? "(línea nueva)", despues: l });
       }
 
       // 0 mentiras: toda palabra nueva de una línea cambiada está en el CV original o en una declaración.
