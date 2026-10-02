@@ -15,7 +15,7 @@ import { fusionarCompetencias } from "../app/lib/competencia-extractor";
 import { consolidarJD } from "../app/lib/jd-parser";
 import { mapearCompetencias, type KeywordsJD, type ResultadoMapeo } from "../app/lib/mapeo-semantico";
 import {
-  MAX_PALABRAS_NUEVAS, MAX_USOS_KEYWORD, planificarLineaDetalle, reescribirCV, SYSTEM_REESCRITOR, verificarAdaptacion, type ResultadoLinea,
+  MAX_PALABRAS_NUEVAS, MAX_USOS_KEYWORD, planificarLineaDetalle, verificarFidelidad, reescribirCV, SYSTEM_REESCRITOR, verificarAdaptacion, type ResultadoLinea,
 } from "../app/lib/reescritor-contextual";
 
 // Haiku 4.5: $1 / $5 por MTok
@@ -114,6 +114,11 @@ async function main() {
       // Conteo de mentiras independiente del estado: re-verifica la salida final sin el límite de fuerzo.
       const palabras = permitidas.filter(p => r.keywords_agregadas.includes(p.keyword)).flatMap(p => p.palabras);
       const v = verificarAdaptacion(r.original, r.adaptada, palabras, ctx.cv, ctx.mapeo, Infinity);
+      // Más la capa de código del validador (PED-35), con las fuentes de las keywords que la línea dice agregar.
+      const kws = permitidas.filter(p => r.keywords_agregadas.includes(p.keyword));
+      const sinVineta = (t: string) => t.replace(/^\s*[-•]\s+/, "");
+      const fidelidad = r.estado === "adaptada" ? verificarFidelidad(sinVineta(r.original), sinVineta(r.adaptada), kws, ctx.cv) : [];
+      v.problemas.push(...fidelidad);
       resultados.push({ caso, r, mentira: v.problemas });
       if (r.usage) { llamadas++; costo += (r.usage.input_tokens * PRECIO_IN + r.usage.output_tokens * PRECIO_OUT) / 1e6; }
       if (r.estado === "adaptada" || r.estado === "rechazada_forzada") console.log(`    original: ${linea}`);

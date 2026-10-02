@@ -8,7 +8,9 @@
  *    que tocan su contenido y que aún no están escritas en ella). Sin ninguna → "sin_cambios", sin llamar a la API.
  * 2. Haiku propone la línea adaptada en JSON.
  * 3. verificarAdaptacion (sin API): palabras nuevas sin respaldo, keywords de brecha, verbos de escalada,
- *    cifras nuevas y la métrica de fuerzo (palabras_nuevas > MAX_PALABRAS_NUEVAS). Si falla, un reintento
+ *    cifras nuevas y la métrica de fuerzo (palabras_nuevas > MAX_PALABRAS_NUEVAS); más la capa de código del
+ *    validador de PED-24 (verificarFidelidad, PED-35): palabra_fuera_de_cita contra la línea original y las fuentes de
+ *    las keywords efectivamente insertadas, escalada_rol y calificativo_trasladado. Si falla, un reintento
  *    con el motivo; si vuelve a fallar → "rechazada_forzada" y se conserva la original.
  * No está conectado a process-cv todavía (PED-25).
  */
@@ -16,6 +18,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { normalizarParaComparar, STOP_WORDS_MATCH } from "./cv-postprocess";
 import { esEncabezado, esLineaCargo, raizVerbo, VERBOS_ESCALADA } from "./cv-verificacion";
 import { esCarrera, RAICES_GENERICAS, RE_EXPERIENCIA, type KeywordsJD, type ResultadoMapeo } from "./mapeo-semantico";
+import { puntuarTextos } from "./priorizador";
+import { calificativoTrasladado, escaladaRol, palabraFueraDeCita, type OracionAValidar } from "./validador";
 
 export const MODELO_REESCRITOR = "claude-haiku-4-5-20251001";
 export const MAX_PALABRAS_NUEVAS = 4;
@@ -264,6 +268,38 @@ export function verificarAdaptacion(
   return { ok: problemas.length === 0, palabras_nuevas: nuevas.length, problemas };
 }
 
+// Capa de código del validador (PED-24) sobre una línea adaptada (PED-35). Las líneas citadas son la línea original y
+// las fuentes de las keywords que la adaptada de verdad contiene: cada palabra nueva debe estar en alguna de ellas
+// (no basta otra viñeta del mismo puesto, por eso no se pasa el CV). Una fuente compuesta ("a | b") solo cuenta si una
+// de sus partes tiene todas las palabras de la keyword: juntar "indicadores de dotación" y "reclutamiento y selección"
+// no respalda "indicadores de selección".
+export function verificarFidelidad(
+  original: string, adaptada: string, kws: Pick<KeywordPermitida, "keyword" | "palabras" | "fuente">[], cvCompleto?: string,
+): string[] {
+  const ix = indice(adaptada);
+  const tiene = (texto: string, w: string) => { const t = indice(texto); return presente(w, t.set, t.raices); };
+  const usadas = kws
+    .filter(k => k.palabras.length > 0 && k.palabras.every(w => tiene(adaptada, w)))
+    .map(k => ({ ...k, partes: k.fuente.split(" | ").filter(parte => k.palabras.every(w => tiene(parte, w))) }));
+  const o: OracionAValidar = { oracion: adaptada, lineas_citadas: [original, ...usadas.flatMap(k => k.partes)].map(texto => ({ linea: 0, texto })) };
+  const problemas = [escaladaRol(o), palabraFueraDeCita(o), calificativoTrasladado(o)].filter(h => h !== null).map(h => `${h!.tipo}: ${h!.detalle}`);
+
+  // Líneas de resumen (perfil, Áreas de Expertise, Habilidades: todo lo que no es viñeta de un puesto): no se agrega
+  // un ítem cuya única fuente en el CV es de apoyo ("Apoyo en … auditorías laborales" no da "Auditorías Laborales").
+  if (cvCompleto) {
+    const texto = original.replace(/^\s*[-•]\s+/, "").trim();
+    const enPuesto = bloquesCV(cvCompleto).some(b => b.tipo === "puesto" && b.lineas.includes(texto));
+    if (!enPuesto) {
+      const deApoyo = usadas.filter(k => k.partes.length > 0 && k.partes.every(parte => palabrasContenido(parte).some(w => RE_VERBO_APOYO.test(w))));
+      if (deApoyo.length > 0) problemas.push(`item_de_apoyo: ${deApoyo.map(k => k.keyword).join(", ")} solo tiene fuente con verbo de apoyo`);
+    }
+  }
+  return problemas;
+}
+
+// Formas verbales (y "apoyo"), no sustantivos: "colaboradores" o "asistente" no cuentan.
+const RE_VERBO_APOYO = /^(apoy(o|e|a|ar|ando|aba|ado)|particip(o|e|a|ar|ando|aba|ado)|colabor(o|e|a|ar|ando|aba|ado)|asist(i|o|e|a|ir|iendo|ia|ido))$/;
+
 // ─── llamada a modelo ────────────────────────────────────────────────────────
 
 export const SYSTEM_REESCRITOR = `Adaptas UNA línea de un CV en español a una oferta de trabajo, sin inventar nada.
@@ -352,7 +388,11 @@ export async function reescribirLinea(input: InputLinea, opts: OpcionesReescrito
     const fuera = r.keywords_agregadas.filter(k => !permitidas.some(p => corresponde(k, p)));
     const kws = permitidas.filter(p => r.keywords_agregadas.some(k => corresponde(k, p)));
     const v = verificarAdaptacion(cuerpo, r.adaptada, kws.flatMap(k => k.palabras), cvCompleto, mapeo, max);
-    const problemas = [...v.problemas, ...(fuera.length > 0 ? [`keywords no permitidas: ${fuera.join(", ")}`] : [])];
+    const problemas = [
+      ...v.problemas,
+      ...(fuera.length > 0 ? [`keywords no permitidas: ${fuera.join(", ")}`] : []),
+      ...verificarFidelidad(cuerpo, r.adaptada, kws, cvCompleto),
+    ];
 
     if (problemas.length === 0) {
       if (normalizarParaComparar(r.adaptada) === normalizarParaComparar(cuerpo)) return { ...sinCambios("sin_cambios", intento), usage };
@@ -372,21 +412,51 @@ export async function reescribirLinea(input: InputLinea, opts: OpcionesReescrito
   return { ...sinCambios("rechazada_forzada", 1, motivo), usage };
 }
 
-// Las viñetas (experiencia) van primero para que usen las keywords antes que el perfil; cada keyword se agrega
-// en a lo más MAX_USOS_KEYWORD líneas. Secuencial, porque cada línea depende de los usos de las anteriores.
+// Orden de reescritura y puesto de cada línea. Las viñetas (experiencia) van primero para que usen las keywords antes
+// que el perfil; dentro de cada puesto, por puntaje del priorizador (mayor primero, empates en orden original), así
+// la línea más relevante del puesto se queda con la keyword cuando hay dos candidatas.
+export function ordenReescritura(lineas: string[], ctx: Omit<InputLinea, "lineaOriginal">): { orden: number[]; puesto: (string | null)[] } {
+  const bloques = bloquesCV(ctx.cvCompleto).filter(b => b.tipo === "puesto");
+  const puesto = lineas.map(l => {
+    const t = l.replace(/^\s*[-•]\s+/, "").trim();
+    return bloques.find(b => b.lineas.includes(t))?.titulo ?? null;
+  });
+  const puntaje = puntuarTextos(lineas, ctx.mapeo, ctx.keywordsJD).map(p => p.puntaje);
+  const esVineta = (i: number) => /^\s*[-•]\s+/.test(lineas[i]);
+  const primeraDe = (i: number) => puesto.indexOf(puesto[i]);
+  const orden = lineas.map((_, i) => i).sort((a, b) =>
+    Number(!esVineta(a)) - Number(!esVineta(b))
+    || (puesto[a] !== null && puesto[a] === puesto[b] ? puntaje[b] - puntaje[a] : primeraDe(a) - primeraDe(b))
+    || a - b);
+  return { orden, puesto };
+}
+
+// Cada keyword se agrega en a lo más MAX_USOS_KEYWORD líneas del CV y en a lo más MAX_USOS_POR_PUESTO línea de cada
+// puesto (PED-35). Secuencial, porque cada línea depende de los usos de las anteriores.
+export const MAX_USOS_POR_PUESTO = 1;
 export async function reescribirCV(
   lineas: string[],
   ctx: Omit<InputLinea, "lineaOriginal">,
   opts: OpcionesReescritor = {},
 ): Promise<ResultadoLinea[]> {
   const client = opts.client ?? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const orden = lineas.map((_, i) => i).sort((a, b) => Number(!/^\s*[-•]\s+/.test(lineas[a])) - Number(!/^\s*[-•]\s+/.test(lineas[b])));
+  const { orden, puesto } = ordenReescritura(lineas, ctx);
   const usos = new Map<string, number>();
+  const usosPuesto = new Map<string, number>(); // "puesto\u0000keyword" → usos
   const resultados: ResultadoLinea[] = new Array(lineas.length);
   for (const i of orden) {
     const agotadas = new Set([...usos].filter(([, n]) => n >= MAX_USOS_KEYWORD).map(([k]) => k));
+    if (puesto[i] !== null) {
+      for (const [clave, n] of usosPuesto) {
+        const [p, k] = clave.split("\u0000");
+        if (p === puesto[i] && n >= MAX_USOS_POR_PUESTO) agotadas.add(k);
+      }
+    }
     const r = await reescribirLinea({ ...ctx, lineaOriginal: lineas[i] }, { ...opts, client, keywordsAgotadas: agotadas });
-    for (const k of r.keywords_agregadas) usos.set(k, (usos.get(k) ?? 0) + 1);
+    for (const k of r.keywords_agregadas) {
+      usos.set(k, (usos.get(k) ?? 0) + 1);
+      if (puesto[i] !== null) usosPuesto.set(`${puesto[i]}\u0000${k}`, (usosPuesto.get(`${puesto[i]}\u0000${k}`) ?? 0) + 1);
+    }
     resultados[i] = r;
   }
   return resultados;

@@ -31,7 +31,7 @@ import {
 import type { EtiquetasOrden } from "./priorizador";
 
 export type ClaseBrechaInforme = "bloqueante" | "preguntable" | "preguntable_contexto";
-type TipoPregunta = "normativa" | "herramienta" | "concepto" | "sector" | "funcion" | "blanda" | "area_cargo" | "semantico" | "carrera_afin";
+type TipoPregunta = "normativa" | "herramienta" | "oficina" | "idioma" | "concepto" | "sector" | "funcion" | "blanda" | "area_cargo" | "semantico" | "carrera_afin";
 
 export interface Cumple { requisito: string; evidencia: string }
 export interface Relacionado { requisito: string; evidencia: string; texto: string }
@@ -71,6 +71,10 @@ export const MAX_PREGUNTAS = 5;
 
 const RE_NORMATIVA_EXTRA = /\b(ley|subcontrat\w*|fiscalizacion\w*|disciplinari\w*|jornadas? excepcional\w*)\b/;
 const RE_BLANDA = /\b(actitud|adaptabilidad|orientacion al servicio|proactiv\w*|trabajo en equipo|comunicacion|disposicion|tareas operativas|iniciativa|responsabilidad)\b/;
+// PED-35: idiomas preguntables; normas y estándares son normativa; herramientas genéricas de oficina no generan pregunta.
+const RE_IDIOMA = /\b(english|ingles|portugues|portuguese|frances|french|aleman|german|italiano|italian|mandarin|chino)\b/;
+const RE_ESTANDAR = /\b(soc ?2|iso ?\d*|gdpr|hipaa|pci( dss)?|sox)\b/;
+const RE_OFICINA = /\b(google drive|drive|gmail|zoom|teams|microsoft teams|google meet|outlook|slack)\b/;
 const RE_CONCEPTO = /(p&l|\bebitda\b|\bbalance\b|flujo de caja|\bkpis?\b|estado de resultados|\bcontabilidad\b)/i;
 
 const singular = (p: string) => p.replace(/ciones$/, "cion").replace(/([aeiou])s$/, "$1");
@@ -91,6 +95,9 @@ function esAreaDelCargo(keyword: string, cargo?: string): boolean {
 function tipoDeBrecha(keyword: string): TipoPregunta | null {
   const n = normalizarParaComparar(keyword);
   if (RE_BLANDA.test(n)) return "blanda";
+  if (RE_IDIOMA.test(n)) return "idioma";
+  if (RE_ESTANDAR.test(n)) return "normativa";
+  if (RE_OFICINA.test(n)) return "oficina";
   if (RE_CONCEPTO.test(keyword)) return "concepto";
   if (RE_NORMATIVA.test(n) || RE_NORMATIVA_EXTRA.test(n)) return "normativa";
   if (RE_SOFTWARE.test(n) || pareceHerramienta(keyword)) return "herramienta";
@@ -119,8 +126,9 @@ const lineasCV = (cv: string) => cv.split("\n").map(l => l.trim()).filter(l => l
 // Fragmento del CV que respalda alguna de las frases: la cláusula (entre comas, puntos o dos puntos) de la primera
 // línea que contiene todas sus palabras significativas; si ninguna cláusula las tiene todas, la línea completa.
 // `foco`: las palabras que respaldan, para centrar el recorte.
-function lineaQueContiene(cv: string, frases: string[]): { texto: string; foco: string[] } | undefined {
-  const lineas = lineasCV(cv);
+function lineaQueContiene(cv: string, frases: string[], preferir?: RegExp): { texto: string; foco: string[] } | undefined {
+  const todas = lineasCV(cv);
+  const lineas = preferir ? [...todas.filter(l => preferir.test(l)), ...todas.filter(l => !preferir.test(l))] : todas;
   for (const f of frases) {
     const k = normalizarParaComparar(f).split(" ").filter(p => p && !STOP_WORDS_MATCH.has(p));
     if (k.length === 0) continue;
@@ -218,15 +226,18 @@ export function informeFit(input: InputInforme): InformeFit {
     if (q.clase === "experiencia") {
       aniosCumple = (aniosCumple ?? true) && q.estado === "cumple";
       if (q.estado === "cumple") {
-        const t = (p: typeof puestos[number]) => `«${recortar(p.titulo, 80)}»`;
-        const rango = puestos.length > 1 ? `desde ${t(puestos[0])} hasta ${t(puestos[puestos.length - 1])}` : puestos[0] ? t(puestos[0]) : "";
+        // Solo los puestos que se contaron para el requisito (PED-35).
+        const contados = q.puestos ?? puestos.map(p => p.titulo);
+        const t = (titulo: string) => `«${recortar(titulo, 80)}»`;
+        const rango = contados.length > 1 ? `desde ${t(contados[0])} hasta ${t(contados[contados.length - 1])}` : contados[0] ? t(contados[0]) : "";
         cumples.push({ requisito: desc, evidencia: `${q.detalle}: ${rango}` });
       } else {
         bloqueantes.push({ requisito: desc, texto: `La oferta pide ${desc}; según las fechas de tu CV llevas ${q.detalle.replace(/ en el CV.*/, "")}${/del área/.test(q.detalle) ? " en esa área" : ""}.` });
       }
     } else {
       const carreras = q.descripcion.replace(/ \(o afín\)$/, "").split(" / ");
-      const e = lineaQueContiene(cv, carreras);
+      // La línea del título (universidad o instituto) antes que una mención en el perfil.
+      const e = lineaQueContiene(cv, carreras, /universidad|instituto/i);
       if (q.estado === "cumple" && e) {
         carreraCumple = true;
         carrerasCumplidas.push(...carreras);
@@ -255,6 +266,7 @@ export function informeFit(input: InputInforme): InformeFit {
       bloqueantes.push({ requisito: keyword, texto: esCarrera(keyword) ? `La oferta pide la carrera ${keyword} y tu CV no la menciona.` : `La oferta pide ${keyword} y tu CV no lo muestra.` });
     } else if (tipo === "funcion") funciones.push(keyword);
     else if (tipo === "blanda") blandas.push(keyword);
+    else if (tipo === "oficina") continue; // preguntable en el score, pero no vale una pregunta
     else preguntas.push({ requisito: keyword, tipo: tipo!, relevancia: relevancia.get(keyword) ?? 0, texto: redactarPregunta(keyword, tipo!, cv, etiquetas, citaDe(keyword)) });
   }
   preguntas.sort((a, b) => b.relevancia - a.relevancia); // estable: empates en orden de la oferta
@@ -306,6 +318,7 @@ function redactarPregunta(keyword: string, tipo: TipoPregunta, cv: string, etiqu
     case "normativa":
     case "concepto": return `¿Has trabajado con ${keyword}? ${si}`;
     case "herramienta": return `¿Has usado ${keyword}? ${si}`;
+    case "idioma": return `¿Manejas ${keyword} a nivel de trabajo? Si es así, agrégalo al CV con tu nivel.`;
     case "sector": return `¿Tienes experiencia en ${keyword.replace(/^experiencia en\s+/i, "")}? ${si}`;
     case "funcion": return `¿Has hecho ${keyword} en algún trabajo, práctica o proyecto? ${si}`;
     case "semantico": return `¿Tu «${clausulaCompleta(cv, cita!)}» cuenta como ${keyword}? Si es así, nómbralo así en el CV.`;
