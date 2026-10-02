@@ -18,6 +18,12 @@
  * - Una brecha con propuesta semántica rechazada cuya cita existe literal en el CV pasa a pregunta con contexto.
  * - Los matches relacionados no son "cumples": van a "relacionado", con la advertencia de no agregar lo que no se hizo.
  *
+ * PED-36 (fit justo):
+ * - Si la keyword del área del cargo calza con match DIRECTO, las brechas de función pasan a preguntables (50% en el
+ *   score) y van plegadas en otras_preguntas. No aplica a herramientas, carreras, años, normativa ni idiomas.
+ * - Años en el área no cumplidos con años totales suficientes: pregunta con contexto (el puesto no contado), 50%.
+ * - consejo_brecha: periodos de 6+ meses sin puesto (entre puestos o hasta hoy). No cambia el score.
+ *
  * Honestidad: nada de lo que no está en el CV se sugiere como afirmación; va como pregunta condicional
  * ("¿Has trabajado con X? Si es así, agrégalo al CV"). Las etiquetas del priorizador solo pueden dar contexto
  * a una pregunta ("¿Tus activaciones de marca… fueron trabajo de trade marketing?").
@@ -25,13 +31,14 @@
 import { matcheaPalabra, normalizarParaComparar, STOP_WORDS_MATCH } from "./cv-postprocess";
 import { esEncabezado } from "./cv-verificacion";
 import {
-  alertaNivel, aniosDeExperiencia, esCarrera, pareceHerramienta, puestosCV, RAICES_GENERICAS, RE_NORMATIVA, RE_SECTOR,
+  alertaNivel, aniosDeExperiencia, type ResultadoRequisito, esCarrera, pareceHerramienta, puestosCV, RAICES_GENERICAS, RE_NORMATIVA, RE_SECTOR,
   PESO_REQUISITO, RE_SOFTWARE, scoreV2, clasificarBrecha, type AlertaNivel, type ClaseFit, type KeywordsJD, type ResultadoMapeo,
 } from "./mapeo-semantico";
 import type { EtiquetasOrden } from "./priorizador";
+import { keywordDelCargo } from "./jd-parser";
 
 export type ClaseBrechaInforme = "bloqueante" | "preguntable" | "preguntable_contexto";
-type TipoPregunta = "normativa" | "herramienta" | "oficina" | "idioma" | "concepto" | "sector" | "funcion" | "blanda" | "area_cargo" | "semantico" | "carrera_afin";
+type TipoPregunta = "normativa" | "herramienta" | "oficina" | "idioma" | "concepto" | "sector" | "funcion" | "blanda" | "area_cargo" | "semantico" | "carrera_afin" | "subtarea" | "anios_area";
 
 export interface Cumple { requisito: string; evidencia: string }
 export interface Relacionado { requisito: string; evidencia: string; texto: string }
@@ -48,6 +55,7 @@ export interface InformeFit {
   otras_preguntas: Pregunta[];  // plegadas
   aprenderas_en_el_cargo: string | null;
   para_la_entrevista: string[];
+  consejo_brecha: string[];
   alerta: { nivel: AlertaNivel; texto: string | null };
   limpieza: SugerenciaLimpieza[];
 }
@@ -105,7 +113,10 @@ function tipoDeBrecha(keyword: string): TipoPregunta | null {
   return null;
 }
 
-export interface ContextoClasificacion { nivelPosicion?: string; cargo?: string; conCita?: (keyword: string) => boolean }
+export interface ContextoClasificacion {
+  nivelPosicion?: string; cargo?: string; conCita?: (keyword: string) => boolean;
+  areaCalza?: boolean; // la keyword del área del cargo tiene match directo (PED-36)
+}
 
 export function clasificarParaInforme(keyword: string, ctx: ContextoClasificacion = {}): { clase: ClaseBrechaInforme; tipo: TipoPregunta | null } {
   if (esCarrera(keyword)) return { clase: "bloqueante", tipo: null };
@@ -116,6 +127,7 @@ export function clasificarParaInforme(keyword: string, ctx: ContextoClasificacio
   if (tipo) return { clase: "preguntable", tipo };
   if (clasificarBrecha(keyword) === "preguntable") return { clase: "preguntable", tipo: "herramienta" };
   if (ctx.nivelPosicion?.toLowerCase() === "practicante") return { clase: "preguntable", tipo: "funcion" };
+  if (ctx.areaCalza) return { clase: "preguntable", tipo: "subtarea" };
   return { clase: "bloqueante", tipo: null };
 }
 
@@ -184,9 +196,17 @@ export function informeFit(input: InputInforme): InformeFit {
   const { cv, mapeo, keywordsJD: jd, nivelPosicion, cargo, etiquetas } = input;
   const cvPlano = colapsar(cv);
   const citaDe = (k: string) => (input.rechazadas ?? []).find(r => mismaKeyword(r.keyword, k) && r.cita && cvPlano.includes(colapsar(r.cita)))?.cita;
-  const ctx: ContextoClasificacion = { nivelPosicion, cargo, conCita: k => !!citaDe(k) };
+  // Área del cargo: la keyword que el parser deriva del título ("Reclutador Masivo" → "reclutamiento masivo").
+  const kwCargo = cargo ? keywordDelCargo(cargo, normalizarParaComparar(cargo)) : null;
+  const areaCalza = !!kwCargo && mapeo.matches_directos.some(m => mismaKeyword(m.keyword_jd, kwCargo));
+  const ctx: ContextoClasificacion = { nivelPosicion, cargo, conCita: k => !!citaDe(k), areaCalza };
   const clasif = (k: string) => clasificarParaInforme(k, ctx);
-  const v2 = scoreV2(mapeo, jd, k => (clasif(k).clase === "bloqueante" ? "bloqueante" : "preguntable"));
+  const puestos = puestosCV(cv);
+  const aniosTotales = aniosDeExperiencia(puestos);
+  // Años en el área no cumplidos, pero los años totales alcanzan: se pregunta por los puestos no contados (PED-36).
+  const aniosPreguntable = (q: ResultadoRequisito) => q.clase === "experiencia" && q.estado === "no_cumple"
+    && /del área/.test(q.detalle) && aniosTotales >= Number(q.descripcion.match(/^\d+(\.\d+)?/)?.[0] ?? Infinity);
+  const v2 = scoreV2(mapeo, jd, k => (clasif(k).clase === "bloqueante" ? "bloqueante" : "preguntable"), aniosPreguntable);
 
   const relevancia = new Map(jd.requeridas.map(k => [k.keyword, k.relevancia]));
   const cumples: Cumple[] = [];
@@ -195,6 +215,7 @@ export function informeFit(input: InputInforme): InformeFit {
   const preguntas: Pregunta[] = [];
   const funciones: string[] = [];
   const blandas: string[] = [];
+  const subtareas: Pregunta[] = []; // PED-36: siempre plegadas
 
   // Directos → cumples; relacionados → "relacionado". Sin evidencia en el CV no se muestran.
   const vistas = new Set<string>();
@@ -214,7 +235,6 @@ export function informeFit(input: InputInforme): InformeFit {
   }
 
   // Requisitos estructurados.
-  const puestos = puestosCV(cv);
   let carreraCumple = false, aniosCumple: boolean | null = null;
   const carrerasCumplidas: string[] = []; // carreras de requisitos ya cumplidos: sus alternativas no son brecha
   const reqs = (mapeo.requisitos ?? []).filter(q => q.tipo === "requerido");
@@ -231,6 +251,14 @@ export function informeFit(input: InputInforme): InformeFit {
         const t = (titulo: string) => `«${recortar(titulo, 80)}»`;
         const rango = contados.length > 1 ? `desde ${t(contados[0])} hasta ${t(contados[contados.length - 1])}` : contados[0] ? t(contados[0]) : "";
         cumples.push({ requisito: desc, evidencia: `${q.detalle}: ${rango}` });
+      } else if (aniosPreguntable(q)) {
+        const contados = new Set(q.puestos ?? []);
+        const otros = puestos.filter(p => !contados.has(p.titulo)).map(p => cargoDelPuesto(p)).slice(-2).reverse();
+        const area = q.descripcion.replace(/^\d+(\.\d+)? años en /, "");
+        preguntas.push({
+          requisito: desc, tipo: "anios_area", relevancia: PESO_REQUISITO,
+          texto: `¿Tu trabajo como ${otros.join(" o como ")} fue de ${area}? Si lo fue, deja claro en el CV qué hiciste en esa área.`,
+        });
       } else {
         bloqueantes.push({ requisito: desc, texto: `La oferta pide ${desc}; según las fechas de tu CV llevas ${q.detalle.replace(/ en el CV.*/, "")}${/del área/.test(q.detalle) ? " en esa área" : ""}.` });
       }
@@ -267,6 +295,7 @@ export function informeFit(input: InputInforme): InformeFit {
     } else if (tipo === "funcion") funciones.push(keyword);
     else if (tipo === "blanda") blandas.push(keyword);
     else if (tipo === "oficina") continue; // preguntable en el score, pero no vale una pregunta
+    else if (tipo === "subtarea") subtareas.push({ requisito: keyword, tipo, relevancia: relevancia.get(keyword) ?? 0, texto: redactarPregunta(keyword, tipo, cv) });
     else preguntas.push({ requisito: keyword, tipo: tipo!, relevancia: relevancia.get(keyword) ?? 0, texto: redactarPregunta(keyword, tipo!, cv, etiquetas, citaDe(keyword)) });
   }
   preguntas.sort((a, b) => b.relevancia - a.relevancia); // estable: empates en orden de la oferta
@@ -305,9 +334,10 @@ export function informeFit(input: InputInforme): InformeFit {
   return {
     fit: { clase: v2.clase, score: v2.score, frase },
     cumples, relacionado, bloqueantes,
-    preguntas: preguntas.slice(0, MAX_PREGUNTAS), otras_preguntas: preguntas.slice(MAX_PREGUNTAS),
+    preguntas: preguntas.slice(0, MAX_PREGUNTAS), otras_preguntas: [...preguntas.slice(MAX_PREGUNTAS), ...subtareas],
     aprenderas_en_el_cargo: funciones.length ? `Funciones que se aprenden en la práctica: ${funciones.join(", ")}.` : null,
     para_la_entrevista: blandas.map(b => `La oferta valora ${b}: muéstralo con un ejemplo en la entrevista o en tu carta.`),
+    consejo_brecha: consejoBrecha(cv),
     alerta, limpieza: limpiezaCV(cv),
   };
 }
@@ -320,6 +350,7 @@ function redactarPregunta(keyword: string, tipo: TipoPregunta, cv: string, etiqu
     case "herramienta": return `¿Has usado ${keyword}? ${si}`;
     case "idioma": return `¿Manejas ${keyword} a nivel de trabajo? Si es así, agrégalo al CV con tu nivel.`;
     case "sector": return `¿Tienes experiencia en ${keyword.replace(/^experiencia en\s+/i, "")}? ${si}`;
+    case "subtarea": return `¿Tu experiencia incluye ${keyword}? Si es así, agrégalo al CV.`;
     case "funcion": return `¿Has hecho ${keyword} en algún trabajo, práctica o proyecto? ${si}`;
     case "semantico": return `¿Tu «${clausulaCompleta(cv, cita!)}» cuenta como ${keyword}? Si es así, nómbralo así en el CV.`;
     case "area_cargo": {
@@ -332,6 +363,35 @@ function redactarPregunta(keyword: string, tipo: TipoPregunta, cv: string, etiqu
     }
     default: return `¿Tienes ${keyword}? ${si}`;
   }
+}
+
+// "Analista de Procesos e Ingeniería — Manufactura Austral S.A. — 02/2017 – 02/2021" → "Analista de Procesos e Ingeniería".
+const cargoDelPuesto = (p: { titulo: string }) => p.titulo.split(/\s+[—–|]\s+/)[0].trim();
+
+// ─── brechas laborales (sin API, no cambian el score) ───────────────────────
+
+export const MESES_BRECHA = 6;
+// Solo puestos con mes en ambas fechas: con "2014 – 2017" no se sabe si hubo brecha.
+const RE_MES = /\b\d{1,2}\/\d{4}\b|\b(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\b|a la fecha|presente|actualidad/g;
+const conMeses = (titulo: string) => (titulo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().match(RE_MES) ?? []).length >= 2;
+
+export function consejoBrecha(cv: string, ahora = new Date()): string[] {
+  const mesAhora = ahora.getFullYear() * 12 + ahora.getMonth() + 1;
+  const ps = puestosCV(cv, ahora).filter(p => conMeses(p.titulo)).sort((a, b) => a.inicio - b.inicio);
+  const out: string[] = [];
+  let hasta = -Infinity, anterior: typeof ps[number] | null = null;
+  for (const p of ps) {
+    const meses = p.inicio - hasta - 1;
+    if (anterior && meses >= MESES_BRECHA) {
+      out.push(`Entre tu trabajo como ${cargoDelPuesto(anterior)} y el de ${cargoDelPuesto(p)} hay ~${meses} meses sin puesto. Si te lo preguntan, basta una explicación breve (estudios, cuidado familiar, búsqueda) y lo que hiciste en ese tiempo.`);
+    }
+    if (p.fin > hasta) { hasta = p.fin; anterior = p; }
+  }
+  const desdeUltimo = mesAhora - hasta;
+  if (anterior && desdeUltimo >= MESES_BRECHA) {
+    out.push(`Llevas ~${desdeUltimo} meses desde tu último trabajo. Es más común de lo que parece: prepara una explicación breve (estudios, cuidado familiar, búsqueda) y menciona lo que hiciste en ese tiempo.`);
+  }
+  return out;
 }
 
 // ─── limpieza del CV (sin API) ───────────────────────────────────────────────

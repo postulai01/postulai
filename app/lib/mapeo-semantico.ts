@@ -26,6 +26,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { matcheaPalabra, normalizarParaComparar, STOP_WORDS_MATCH } from "./cv-postprocess";
 import { esEncabezado } from "./cv-verificacion";
 import type { Competencia } from "./competencia-extractor";
+import { traducirKeyword } from "./glosario-en-es";
 import type { RequisitoCarreras, RequisitoExperiencia } from "./jd-parser";
 
 export type TipoKeyword = "requerido" | "deseable";
@@ -367,8 +368,10 @@ Reglas:
 - Si una keyword no tiene respaldo, no la incluyas. Es mejor no proponer que proponer algo dudoso.
 Responde SOLO con JSON: {"matches":[{"keyword":"...","cita":"...","nivel":"directo","relevancia":0.9}]}`;
 
+// Las keywords en inglés van con su traducción del glosario entre paréntesis (PED-36): "process mapping (mapeo de procesos)".
 export function promptSemantico(brechas: { keyword: string }[], cvTexto: string): string {
-  return `KEYWORDS SIN MATCH:\n${brechas.map(b => `- ${b.keyword}`).join("\n")}\n\nCV:\n${cvTexto}`;
+  const linea = (k: string) => { const t = traducirKeyword(k); return t ? `- ${k} (${t})` : `- ${k}`; };
+  return `KEYWORDS SIN MATCH:\n${brechas.map(b => linea(b.keyword)).join("\n")}\n\nCV:\n${cvTexto}`;
 }
 
 export const MOTIVO_CITA = "la cita no existe literal en el CV";
@@ -390,7 +393,8 @@ export function filtrarSemanticos(
   const rechazos: Rechazo[] = [];
   const cv = colapsar(cvTexto);
   for (const m of Array.isArray(propuestos) ? propuestos : []) {
-    const keyword = typeof m?.keyword === "string" ? m.keyword.trim() : "";
+    // El modelo puede devolver la keyword con la traducción del prompt: "process mapping (mapeo de procesos)".
+    const keyword = typeof m?.keyword === "string" ? m.keyword.replace(/\s*\([^)]*\)\s*$/, "").trim() : "";
     const cita = typeof m?.cita === "string" ? colapsar(m.cita) : "";
     const relevancia = m?.relevancia == null ? NaN : Number(m.relevancia);
     const rechazar = (motivo: string) => rechazos.push({ keyword, cita, motivo, ...(Number.isFinite(relevancia) ? { relevancia } : {}) });
@@ -559,7 +563,12 @@ export function claseFit(score: number): ClaseFit {
 }
 
 // `clasificar` permite otra clasificación de brechas (PED-33, informe-fit.ts) con los mismos pesos y umbrales.
-export function scoreV2(r: ResultadoMapeo, jd: KeywordsJD, clasificar: (keyword: string) => ClaseBrecha = clasificarBrecha): ScoreV2 {
+// `requisitoPreguntable` (PED-36): un requisito no cumplido que el informe convierte en pregunta pesa 50%, como una
+// brecha preguntable.
+export function scoreV2(
+  r: ResultadoMapeo, jd: KeywordsJD, clasificar: (keyword: string) => ClaseBrecha = clasificarBrecha,
+  requisitoPreguntable: (q: ResultadoRequisito) => boolean = () => false,
+): ScoreV2 {
   const cobertura = new Map<string, number>();
   r.matches_directos.forEach(m => cobertura.set(m.keyword_jd, 1));
   r.matches_relacionados.forEach(m => { if (!cobertura.has(m.keyword_jd)) cobertura.set(m.keyword_jd, PESO_RELACIONADO_EN_SCORE); });
@@ -576,9 +585,10 @@ export function scoreV2(r: ResultadoMapeo, jd: KeywordsJD, clasificar: (keyword:
   }
   for (const q of (r.requisitos ?? []).filter(q => q.tipo === "requerido")) {
     const cob = COBERTURA_REQUISITO[q.estado];
-    total += PESO_REQUISITO;
+    const preguntable = cob === 0 && requisitoPreguntable(q);
+    total += PESO_REQUISITO * (preguntable ? PESO_BRECHA_PREGUNTABLE : 1);
     cubierto += PESO_REQUISITO * cob;
-    if (cob === 0) bloqueantes.push({ descripcion: q.descripcion, peso: PESO_REQUISITO, clase: "bloqueante" });
+    if (cob === 0) (preguntable ? preguntables : bloqueantes).push({ descripcion: q.descripcion, peso: PESO_REQUISITO, clase: preguntable ? "preguntable" : "bloqueante" });
   }
   const score = total === 0 ? 0 : Math.round((cubierto / total) * 100) / 100;
   return { score, clase: claseFit(score), bloqueantes, preguntables };
