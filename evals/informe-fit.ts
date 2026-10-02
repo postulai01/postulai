@@ -53,6 +53,7 @@ async function main() {
       ...todas.filter(p => p.tipo === "funcion" || p.tipo === "blanda").map(p => `función o habilidad blanda como pregunta: ${p.texto}`),
       ...todas.filter(p => /«…|…»/.test(p.texto)).map(p => `cita cortada dentro de una pregunta: ${p.texto}`),
       ...todas.filter(p => /demostrado/.test(p.texto)).map(p => `redacción antigua: ${p.texto}`),
+      ...informe.preguntas.filter(p => p.tipo === "subtarea").map(p => `subtarea visible (debe ir plegada): ${p.requisito}`),
       ...(informe.preguntas.length > MAX_PREGUNTAS ? [`${informe.preguntas.length} preguntas visibles (máx. ${MAX_PREGUNTAS})`] : []),
       ...informe.relacionado.filter(r => !evidenciaEnCV(r.evidencia, cv) || !/nómbralo así; si no, no lo agregues/.test(r.texto)).map(r => `relacionado sin evidencia o sin advertencia: ${r.requisito}`),
       ...informe.cumples.filter(c => /\(en parte\)/.test(c.requisito)).map(c => `"en parte" en cumples: ${c.requisito}`),
@@ -92,6 +93,8 @@ async function main() {
     console.log(`\n  Aprenderás en el cargo: ${i.aprenderas_en_el_cargo ?? "—"}`);
     console.log(`\n  Para la entrevista (${i.para_la_entrevista.length}):`);
     i.para_la_entrevista.forEach(t => console.log(`    ◦ ${t}`));
+    console.log(`\n  Consejo sobre brechas laborales (${i.consejo_brecha.length}):`);
+    i.consejo_brecha.forEach(t => console.log(`    · ${t}`));
     console.log(`\n  Alerta de nivel: ${i.alerta.texto ?? "—"}`);
     console.log(`\n  Limpieza del CV (${i.limpieza.length}):`);
     i.limpieza.forEach(l => console.log(`    - ${l.texto}\n        línea: «${l.linea}»`));
