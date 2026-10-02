@@ -1,0 +1,108 @@
+{
+  "caso": "camila_telecom",
+  "ts": "2026-09-30T19-13-49",
+  "costo": 0.004905,
+  "texto_limpio": "Reclutamiento y Selección — empresa de telecomunicaciones con presencia en Chile, Perú y Colombia\n\nFunciones:\n- Diseñar y ejecutar planes estratégicos de atracción de talento.\n- Publicar vacantes en plataformas especializadas, bolsas de empleo y redes sociales.\n- Realizar búsqueda activa de candidatos (headhunting) para posiciones de difícil cobertura.\n- Crear y gestionar convenios con universidades y asociaciones gremiales.\n- Elaborar informes mensuales con métricas e indicadores de Reclutamiento y Selección.\n- Optimizar el uso de ATS para mejorar la trazabilidad de los procesos.\n- Participar en auditorías internas y externas, asegurando el cumplimiento de procedimientos y normativa vigente.\n- Diseñar y ejecutar campañas de Employer Branding.\n- Actualizar políticas y lineamientos de Reclutamiento y Selección.\n- Asegurar estándares de calidad y una adecuada experiencia del candidato.\n- Aplicar técnicas de evaluación estructurada y entrevistas por competencias.\n- Proponer mejoras continuas para optimizar los procesos de reclutamiento.\n- Optimizar el presupuesto de publicaciones y estrategias de atracción; reducir el costo por contratación.\n- Generar alianzas estratégicas para ampliar las fuentes de reclutamiento.\n\nRequisitos:\n- Experiencia de al menos 2 años en Reclutamiento y Selección.\n- Formación profesional en Psicología, Recursos Humanos, Ingeniería en RR.HH. o carrera afín.\n- Experiencia en selección de perfiles técnicos y profesionales.\n- Manejo de plataformas de reclutamiento y búsqueda activa de candidatos.\n- Experiencia en entrevistas estructuradas y evaluación por competencias.\n- Manejo de indicadores y métricas de Reclutamiento y Selección.\n- Manejo de herramientas computacionales, especialmente Excel.\n- Capacidad de organización, análisis y orientación al cumplimiento de objetivos.\n\nDeseable (no excluyente):\n- Experiencia en telecomunicaciones, tecnología, ingeniería o servicios.\n- LinkedIn Recruiter u otras herramientas de headhunting.\n- Employer Branding.\n- Reclutamiento masivo.\n- Normativa laboral asociada a contratación.\n- Convenios con instituciones educacionales y asociaciones gremiales.",
+  "keywords_requeridas": [
+    {
+      "keyword": "Reclutamiento y Selección",
+      "relevancia": 10
+    },
+    {
+      "keyword": "selección de perfiles técnicos y profesionales",
+      "relevancia": 9
+    },
+    {
+      "keyword": "plataformas de reclutamiento",
+      "relevancia": 9
+    },
+    {
+      "keyword": "búsqueda activa de candidatos",
+      "relevancia": 9
+    },
+    {
+      "keyword": "entrevistas estructuradas",
+      "relevancia": 8
+    },
+    {
+      "keyword": "evaluación por competencias",
+      "relevancia": 8
+    },
+    {
+      "keyword": "indicadores y métricas de Reclutamiento y Selección",
+      "relevancia": 8
+    },
+    {
+      "keyword": "planes estratégicos de atracción de talento",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Excel",
+      "relevancia": 7
+    },
+    {
+      "keyword": "ATS",
+      "relevancia": 7
+    },
+    {
+      "keyword": "campañas de Employer Branding",
+      "relevancia": 7
+    }
+  ],
+  "keywords_deseables": [
+    {
+      "keyword": "LinkedIn Recruiter",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Employer Branding",
+      "relevancia": 7
+    },
+    {
+      "keyword": "Reclutamiento masivo",
+      "relevancia": 6
+    },
+    {
+      "keyword": "Normativa laboral asociada a contratación",
+      "relevancia": 6
+    },
+    {
+      "keyword": "Convenios con instituciones educacionales",
+      "relevancia": 6
+    }
+  ],
+  "nivel_posicion": "junior",
+  "industria": "telecomunicaciones",
+  "cargo": "Reclutamiento y Selección",
+  "experiencia": [
+    {
+      "anios_minimos": 2,
+      "area": "Reclutamiento y Selección",
+      "tipo": "requerido"
+    }
+  ],
+  "carreras": [
+    {
+      "carreras": [
+        "Psicología",
+        "Recursos Humanos",
+        "Ingeniería en RR.HH."
+      ],
+      "acepta_afin": true,
+      "tipo": "requerido"
+    }
+  ],
+  "descartadas": [],
+  "usage": {
+    "input_tokens": 1600,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 661,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

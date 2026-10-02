@@ -8,6 +8,7 @@
  *   Sin casos: todos los de evals/casos/. Las líneas salen del CV de cada caso (lineasDelCaso).
  */
 
+import { competenciasDelCaso, ofertaDelCaso } from "./lib-casos";
 import * as fs from "fs";
 import * as path from "path";
 import { fusionarCompetencias } from "../app/lib/competencia-extractor";
@@ -51,8 +52,10 @@ const masReciente = (dir: string, caso: string) => {
 async function contexto(caso: string): Promise<{ cv: string; mapeo: ResultadoMapeo; keywordsJD: KeywordsJD } | string> {
   const raiz = process.cwd();
   const casoJson = JSON.parse(fs.readFileSync(path.join(raiz, "evals/casos", `${caso}.json`), "utf-8"));
-  const archComp = masReciente(path.join(raiz, "evals/competencias"), caso);
-  const archOferta = masReciente(path.join(raiz, "evals/ofertas"), caso);
+  // Competencias del mismo CV y oferta fijada, como el resto de los evals (lib-casos.ts).
+  let archComp: string | null = null, archOferta: string | null = null;
+  try { archComp = competenciasDelCaso(raiz, caso, casoJson.cv_texto); } catch { /* sin competencias */ }
+  try { archOferta = ofertaDelCaso(raiz, caso); } catch { /* sin oferta */ }
   if (!archComp) return `no hay competencias guardadas (npx tsx evals/extraer-competencias.ts ${caso} --ejecutar)`;
   if (!archOferta) return `no hay oferta parseada (npx tsx evals/parsear-jd.ts ${caso} --ejecutar, ~$0.003)`;
   const comp = JSON.parse(fs.readFileSync(archComp, "utf-8"));

@@ -1,0 +1,26 @@
+{
+  "caso": "camila_telecom",
+  "oferta": "camila_telecom-2026-09-30T19-13-49.json",
+  "costo": 0.002117,
+  "reintento": null,
+  "propuestos": [
+    {
+      "keyword": "selección de perfiles técnicos y profesionales",
+      "cita": "Coordino procesos de reclutamiento y selección para cargos operativos y técnicos",
+      "nivel": "directo",
+      "relevancia": 0.85
+    },
+    {
+      "keyword": "indicadores y métricas de Reclutamiento y Selección",
+      "cita": "Gestiono indicadores de dotación y rotación del área",
+      "nivel": "relacionado",
+      "relevancia": 0.7
+    },
+    {
+      "keyword": "Normativa laboral asociada a contratación",
+      "cita": "Apoyé la gestión de relaciones laborales y resolución de consultas de colaboradores",
+      "nivel": "relacionado",
+      "relevancia": 0.6
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "caso": "camila_junior",
+  "oferta": "camila_junior-2026-09-30T19-13-49.json",
+  "costo": 0.002556,
+  "reintento": null,
+  "propuestos": [
+    {
+      "keyword": "Excel nivel intermedio",
+      "cita": "Técnicas: BUK, entrevistas por competencias, Excel, psicometría",
+      "nivel": "relacionado",
+      "relevancia": 0.4
+    }
+  ]
+}

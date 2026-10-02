@@ -1,0 +1,28 @@
+{
+  "caso": "camila_telecom",
+  "oferta": "camila_telecom-2026-09-30T19-13-49.json",
+  "costo": 0.001403,
+  "respuesta": [
+    {
+      "vineta": 1,
+      "keywords": [
+        "Reclutamiento y Selección",
+        "selección de perfiles técnicos y profesionales",
+        "búsqueda activa de candidatos"
+      ]
+    },
+    {
+      "vineta": 2,
+      "keywords": [
+        "entrevistas estructuradas",
+        "evaluación por competencias"
+      ]
+    },
+    {
+      "vineta": 4,
+      "keywords": [
+        "indicadores y métricas de Reclutamiento y Selección"
+      ]
+    }
+  ]
+}

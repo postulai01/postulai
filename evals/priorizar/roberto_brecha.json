@@ -1,0 +1,52 @@
+{
+  "caso": "roberto_brecha",
+  "oferta": "roberto_brecha-2026-09-30T19-13-49.json",
+  "costo": 0.001699,
+  "respuesta": [
+    {
+      "vineta": 1,
+      "keywords": [
+        "Mejora Continua y Procesos",
+        "Lean Manufacturing"
+      ]
+    },
+    {
+      "vineta": 3,
+      "keywords": [
+        "gestión visual",
+        "OEE",
+        "indicadores operacionales"
+      ]
+    },
+    {
+      "vineta": 4,
+      "keywords": [
+        "Kaizen"
+      ]
+    },
+    {
+      "vineta": 5,
+      "keywords": [
+        "Lean Manufacturing"
+      ]
+    },
+    {
+      "vineta": 6,
+      "keywords": [
+        "estándares de trabajo"
+      ]
+    },
+    {
+      "vineta": 7,
+      "keywords": [
+        "análisis de datos productivos"
+      ]
+    },
+    {
+      "vineta": 9,
+      "keywords": [
+        "indicadores operacionales"
+      ]
+    }
+  ]
+}

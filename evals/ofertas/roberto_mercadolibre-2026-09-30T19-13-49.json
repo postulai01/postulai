@@ -1,0 +1,99 @@
+{
+  "caso": "roberto_mercadolibre",
+  "ts": "2026-09-30T19-13-49",
+  "costo": 0.004375,
+  "texto_limpio": "Mejora Continua / OPEX — Mercado Envíos, Mercado Libre, site en Colina, Santiago\n\nResponsabilidades:\n- Implementar, dar seguimiento y liderar end to end distintos proyectos locales y regionales orientados a la mejora de KPI's de la operación, dando visibilidad clara de avances y/o stoppers, alineado con OPEX, Ingeniería, Inventario y Calidad.\n- Identificar y desarrollar oportunidades de mejora a través de análisis de tiempos, cuellos de botella y restricciones en el flujo, para los procesos físicos y sistémicos del fulfillment.\n- Realizar análisis de data de procesos (productividades, tiempos muertos, variables de gestión de personal cross turnos), identificando desperdicios y estructurando hipótesis para resolver problemas con datos.\n- Generar, mantener y actualizar paneles y herramientas de datos con data de WMS y LMS.\n- Liderar mesas de trabajo con distintas áreas y stakeholders, cobrando avances y fechas críticas.\n\nRequisitos:\n- Formación en carreras de Ingeniería o afines.\n- Experiencia en liderazgo de proyectos (diseño a ejecución) en ambientes operacionales (Logística o Manufactura), con análisis y resolución de problemas.\n- Experiencia en diseño y análisis de procesos / ingeniería de procesos, y dominio de análisis de datos.\n- Conocimiento en programas de excelencia operacional, Lean Six Sigma; metodologías Lean como análisis de causa raíz, Kaizen, Gemba y 5S.\n- Disponibilidad para trabajo presencial en Colina, Santiago.",
+  "keywords_requeridas": [
+    {
+      "keyword": "Mejora Continua / OPEX",
+      "relevancia": 10
+    },
+    {
+      "keyword": "liderazgo de proyectos",
+      "relevancia": 9
+    },
+    {
+      "keyword": "análisis de procesos",
+      "relevancia": 9
+    },
+    {
+      "keyword": "ingeniería de procesos",
+      "relevancia": 9
+    },
+    {
+      "keyword": "análisis de datos",
+      "relevancia": 9
+    },
+    {
+      "keyword": "Lean Six Sigma",
+      "relevancia": 8
+    },
+    {
+      "keyword": "Lean",
+      "relevancia": 8
+    },
+    {
+      "keyword": "resolución de problemas",
+      "relevancia": 8
+    },
+    {
+      "keyword": "logística",
+      "relevancia": 8
+    },
+    {
+      "keyword": "manufactura",
+      "relevancia": 8
+    },
+    {
+      "keyword": "análisis de causa raíz",
+      "relevancia": 7
+    },
+    {
+      "keyword": "Kaizen",
+      "relevancia": 7
+    },
+    {
+      "keyword": "Gemba",
+      "relevancia": 7
+    },
+    {
+      "keyword": "5S",
+      "relevancia": 7
+    },
+    {
+      "keyword": "WMS",
+      "relevancia": 7
+    },
+    {
+      "keyword": "LMS",
+      "relevancia": 7
+    }
+  ],
+  "keywords_deseables": [],
+  "nivel_posicion": "semi-senior",
+  "industria": "Logística, E-commerce",
+  "cargo": "Mejora Continua / OPEX",
+  "experiencia": [],
+  "carreras": [
+    {
+      "carreras": [
+        "Ingeniería"
+      ],
+      "acepta_afin": true,
+      "tipo": "requerido"
+    }
+  ],
+  "descartadas": [],
+  "usage": {
+    "input_tokens": 1375,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 600,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

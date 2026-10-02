@@ -1,0 +1,19 @@
+{
+  "caso": "roberto_bluelight",
+  "oferta": "roberto_bluelight-2026-09-30T19-13-49.json",
+  "costo": 0.000956,
+  "respuesta": [
+    {
+      "vineta": 6,
+      "keywords": [
+        "process mapping"
+      ]
+    },
+    {
+      "vineta": 8,
+      "keywords": [
+        "compliance requirements"
+      ]
+    }
+  ]
+}

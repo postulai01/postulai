@@ -1,0 +1,58 @@
+{
+  "caso": "roberto_mercadolibre",
+  "oferta": "roberto_mercadolibre-2026-09-30T19-13-49.json",
+  "costo": 0.001988,
+  "respuesta": [
+    {
+      "vineta": 1,
+      "keywords": [
+        "Mejora Continua / OPEX",
+        "liderazgo de proyectos",
+        "Lean"
+      ]
+    },
+    {
+      "vineta": 2,
+      "keywords": [
+        "liderazgo de proyectos",
+        "ingeniería de procesos"
+      ]
+    },
+    {
+      "vineta": 3,
+      "keywords": [
+        "Mejora Continua / OPEX",
+        "manufactura"
+      ]
+    },
+    {
+      "vineta": 4,
+      "keywords": [
+        "Kaizen",
+        "Mejora Continua / OPEX"
+      ]
+    },
+    {
+      "vineta": 5,
+      "keywords": [
+        "Lean",
+        "resolución de problemas",
+        "5S"
+      ]
+    },
+    {
+      "vineta": 6,
+      "keywords": [
+        "ingeniería de procesos"
+      ]
+    },
+    {
+      "vineta": 7,
+      "keywords": [
+        "análisis de datos",
+        "análisis de procesos",
+        "resolución de problemas"
+      ]
+    }
+  ]
+}

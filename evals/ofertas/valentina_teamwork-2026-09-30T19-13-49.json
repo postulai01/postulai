@@ -1,0 +1,82 @@
+{
+  "caso": "valentina_teamwork",
+  "ts": "2026-09-30T19-13-49",
+  "costo": 0.003507,
+  "texto_limpio": "Reclutadores Masivos Part Time, Proyecto Cyber — Team Work RRHH, Santiago Centro\n\nObjetivo: liderar los procesos de atracción y selección masiva de personal de apoyo para la operación durante el evento Cyber.\n\nFunciones:\n- Publicar ofertas en portales de empleo y redes sociales.\n- Realizar filtro curricular masivo y primer contacto telefónico con postulantes.\n- Gestionar y hacer seguimiento de altos volúmenes de candidatos.\n- Coordinar y ejecutar entrevistas grupales e individuales (remotas y presenciales).\n- Gestionar la recopilación de documentos para la contratación rápida.\n- Asegurar el cumplimiento de las metas diarias de cobertura de vacantes.\n\nRequisitos:\n- Formación en Psicología, Técnico/Ingeniería en Recursos Humanos, Administración o carrera afín.\n- Experiencia: 1 año.\n- Experiencia excluy",
+  "keywords_requeridas": [
+    {
+      "keyword": "filtro curricular",
+      "relevancia": 9
+    },
+    {
+      "keyword": "entrevistas grupales",
+      "relevancia": 9
+    },
+    {
+      "keyword": "entrevistas individuales",
+      "relevancia": 9
+    },
+    {
+      "keyword": "publicar ofertas en portales de empleo",
+      "relevancia": 8
+    },
+    {
+      "keyword": "redes sociales",
+      "relevancia": 8
+    },
+    {
+      "keyword": "primer contacto telefónico",
+      "relevancia": 8
+    },
+    {
+      "keyword": "seguimiento de candidatos",
+      "relevancia": 8
+    },
+    {
+      "keyword": "recopilación de documentos",
+      "relevancia": 7
+    },
+    {
+      "keyword": "contratación",
+      "relevancia": 7
+    }
+  ],
+  "keywords_deseables": [],
+  "nivel_posicion": "junior",
+  "industria": "Recursos Humanos",
+  "cargo": "Reclutador Masivo",
+  "experiencia": [
+    {
+      "anios_minimos": 1,
+      "area": null,
+      "tipo": "requerido"
+    }
+  ],
+  "carreras": [
+    {
+      "carreras": [
+        "Psicología",
+        "Técnico en Recursos Humanos",
+        "Ingeniería en Recursos Humanos",
+        "Administración"
+      ],
+      "acepta_afin": true,
+      "tipo": "requerido"
+    }
+  ],
+  "descartadas": [
+    "gestión de candidatos"
+  ],
+  "usage": {
+    "input_tokens": 1187,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 464,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
