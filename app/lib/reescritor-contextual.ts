@@ -18,6 +18,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { normalizarParaComparar, STOP_WORDS_MATCH } from "./cv-postprocess";
 import { esEncabezado, esLineaCargo, raizVerbo, VERBOS_ESCALADA } from "./cv-verificacion";
 import { esCarrera, RAICES_GENERICAS, RE_EXPERIENCIA, type KeywordsJD, type ResultadoMapeo } from "./mapeo-semantico";
+import { puntuarTextos } from "./priorizador";
 import { calificativoTrasladado, escaladaRol, palabraFueraDeCita, type OracionAValidar } from "./validador";
 
 export const MODELO_REESCRITOR = "claude-haiku-4-5-20251001";
@@ -411,21 +412,51 @@ export async function reescribirLinea(input: InputLinea, opts: OpcionesReescrito
   return { ...sinCambios("rechazada_forzada", 1, motivo), usage };
 }
 
-// Las viñetas (experiencia) van primero para que usen las keywords antes que el perfil; cada keyword se agrega
-// en a lo más MAX_USOS_KEYWORD líneas. Secuencial, porque cada línea depende de los usos de las anteriores.
+// Orden de reescritura y puesto de cada línea. Las viñetas (experiencia) van primero para que usen las keywords antes
+// que el perfil; dentro de cada puesto, por puntaje del priorizador (mayor primero, empates en orden original), así
+// la línea más relevante del puesto se queda con la keyword cuando hay dos candidatas.
+export function ordenReescritura(lineas: string[], ctx: Omit<InputLinea, "lineaOriginal">): { orden: number[]; puesto: (string | null)[] } {
+  const bloques = bloquesCV(ctx.cvCompleto).filter(b => b.tipo === "puesto");
+  const puesto = lineas.map(l => {
+    const t = l.replace(/^\s*[-•]\s+/, "").trim();
+    return bloques.find(b => b.lineas.includes(t))?.titulo ?? null;
+  });
+  const puntaje = puntuarTextos(lineas, ctx.mapeo, ctx.keywordsJD).map(p => p.puntaje);
+  const esVineta = (i: number) => /^\s*[-•]\s+/.test(lineas[i]);
+  const primeraDe = (i: number) => puesto.indexOf(puesto[i]);
+  const orden = lineas.map((_, i) => i).sort((a, b) =>
+    Number(!esVineta(a)) - Number(!esVineta(b))
+    || (puesto[a] !== null && puesto[a] === puesto[b] ? puntaje[b] - puntaje[a] : primeraDe(a) - primeraDe(b))
+    || a - b);
+  return { orden, puesto };
+}
+
+// Cada keyword se agrega en a lo más MAX_USOS_KEYWORD líneas del CV y en a lo más MAX_USOS_POR_PUESTO línea de cada
+// puesto (PED-35). Secuencial, porque cada línea depende de los usos de las anteriores.
+export const MAX_USOS_POR_PUESTO = 1;
 export async function reescribirCV(
   lineas: string[],
   ctx: Omit<InputLinea, "lineaOriginal">,
   opts: OpcionesReescritor = {},
 ): Promise<ResultadoLinea[]> {
   const client = opts.client ?? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const orden = lineas.map((_, i) => i).sort((a, b) => Number(!/^\s*[-•]\s+/.test(lineas[a])) - Number(!/^\s*[-•]\s+/.test(lineas[b])));
+  const { orden, puesto } = ordenReescritura(lineas, ctx);
   const usos = new Map<string, number>();
+  const usosPuesto = new Map<string, number>(); // "puesto\u0000keyword" → usos
   const resultados: ResultadoLinea[] = new Array(lineas.length);
   for (const i of orden) {
     const agotadas = new Set([...usos].filter(([, n]) => n >= MAX_USOS_KEYWORD).map(([k]) => k));
+    if (puesto[i] !== null) {
+      for (const [clave, n] of usosPuesto) {
+        const [p, k] = clave.split("\u0000");
+        if (p === puesto[i] && n >= MAX_USOS_POR_PUESTO) agotadas.add(k);
+      }
+    }
     const r = await reescribirLinea({ ...ctx, lineaOriginal: lineas[i] }, { ...opts, client, keywordsAgotadas: agotadas });
-    for (const k of r.keywords_agregadas) usos.set(k, (usos.get(k) ?? 0) + 1);
+    for (const k of r.keywords_agregadas) {
+      usos.set(k, (usos.get(k) ?? 0) + 1);
+      if (puesto[i] !== null) usosPuesto.set(`${puesto[i]}\u0000${k}`, (usosPuesto.get(`${puesto[i]}\u0000${k}`) ?? 0) + 1);
+    }
     resultados[i] = r;
   }
   return resultados;
