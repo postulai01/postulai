@@ -1,0 +1,33 @@
+{
+  "prompt": "Ayudas a redactar preguntas cortas para una persona que postula a un trabajo.\n1. RESUMENES: para cada línea de su CV, escribe un resumen de MÁXIMO 5 PALABRAS EN TOTAL, contando \"tu\"/\"tus\", que empiece con \"tu\" o \"tus\" y use SOLO palabras que aparecen en esa línea (puedes omitir palabras; no agregues, no cambies ni conjugues ninguna; sin cifras). Ejemplo: \"Coordinación de ferias gastronómicas regionales para pymes del sur.\" → \"tus ferias para pymes\" (4 palabras).\n2. DEFINICIONES: para cada término, una definición neutra de MÁXIMO 12 PALABRAS, en lenguaje cotidiano. No hables de la persona (nada de \"tú\", \"tu\", \"usted\").\nResponde SOLO con JSON: {\"resumenes\":[{\"id\":1,\"resumen\":\"...\"}],\"definiciones\":[{\"termino\":\"...\",\"definicion\":\"...\"}]}\n---\nLÍNEAS:\n1. Ejecución de activaciones de marca en puntos de venta para Hellmann's.\n\nTÉRMINOS:\n(ninguno)",
+  "respuesta": {
+    "resumenes": [
+      {
+        "id": 1,
+        "resumen": "tus activaciones de marca para Hellmann's",
+        "origen": "respuesta de Haiku de la primera corrida de PED-5 (2026-10-02), registrada en la sesión; no quedó en git (08e8a25 tiene la segunda: \"tus activaciones para Hellmann's\")"
+      }
+    ],
+    "definiciones": []
+  },
+  "costo": 0.000595,
+  "reescrituras": {
+    "- Ejecución de activaciones de marca en puntos de venta para Hellmann's.\u0000Trade Marketing": {
+      "original": "- Ejecución de activaciones de marca en puntos de venta para Hellmann's.",
+      "adaptada": "- Ejecución de activaciones de Trade Marketing de marca en puntos de venta para Hellmann's.",
+      "keywords_agregadas": [
+        "Trade Marketing"
+      ],
+      "fuente_en_cv": [
+        "Declarado por la persona sobre «Ejecución de activaciones de marca en puntos de venta para Hellmann's.»: Trade Marketing"
+      ],
+      "palabras_nuevas": 2,
+      "reintentos": 1,
+      "estado": "adaptada",
+      "usage": {
+        "input_tokens": 781,
+        "output_tokens": 108
+      }
+    }
+  }
+}

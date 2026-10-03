@@ -5,6 +5,8 @@ import * as fs from "fs";
 import * as path from "path";
 import { fusionarCompetencias, type Competencia } from "../app/lib/competencia-extractor";
 import { consolidarJD } from "../app/lib/jd-parser";
+import { informeFit } from "../app/lib/informe-fit";
+import { filtrarEtiquetas, vinetasParaEtiquetar, type EtiquetasOrden } from "../app/lib/priorizador";
 import { aplicarSemanticos, mapearCompetencias, type ExtrasCV, type KeywordsJD, type Rechazo, type ResultadoMapeo } from "../app/lib/mapeo-semantico";
 
 export function loadEnv() {
@@ -94,4 +96,21 @@ export async function mapeoDelCaso(caso: string): Promise<{ ctx: ContextoMapeo; 
   const { propuestos } = JSON.parse(fs.readFileSync(cache, "utf-8"));
   const { resultado, rechazos } = aplicarSemanticos(literal, ctx.keywordsJD, ctx.casoJson.cv_texto, propuestos);
   return { ctx, resultado, semantico: true, rechazos };
+}
+
+// Informe de fit de un caso sin API (PED-33): mapeo con propuestas semánticas guardadas y etiquetas del priorizador
+// guardadas en evals/priorizar/ (solo si son de la oferta fijada).
+export async function informeDelCaso(caso: string) {
+  const { ctx, resultado, rechazos } = await mapeoDelCaso(caso);
+  const cv: string = ctx.casoJson.cv_texto;
+  const oferta = JSON.parse(fs.readFileSync(ctx.archivoOferta, "utf-8"));
+  const cargo: string | undefined = oferta.cargo ?? ctx.casoJson.cargo_oferta;
+  let etiquetas: EtiquetasOrden | undefined;
+  const archEt = path.join(process.cwd(), "evals/priorizar", `${caso}.json`);
+  if (fs.existsSync(archEt)) {
+    const g = JSON.parse(fs.readFileSync(archEt, "utf-8"));
+    if (g.oferta === path.basename(ctx.archivoOferta)) etiquetas = filtrarEtiquetas(g.respuesta, vinetasParaEtiquetar(cv), ctx.keywordsJD);
+  }
+  const informe = informeFit({ cv, mapeo: resultado, keywordsJD: ctx.keywordsJD, nivelPosicion: ctx.nivelPosicion, cargo, etiquetas, rechazadas: rechazos });
+  return { ctx, resultado, rechazos, cargo, etiquetas, informe };
 }
