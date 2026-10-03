@@ -104,7 +104,8 @@ async function main() {
       const lineasAntes = cv.split("\n");
       for (const l of despues.split("\n").filter(l => !lineasAntes.includes(l))) {
         const etiqueta = l.split(":")[0];
-        const original = lineasAntes.find(a => a.trim() && l.startsWith(a.replace(/\.?\s*$/, "")))
+        const sinParentesis = l.replace(/ \([^)]*\)/, "");
+        const original = lineasAntes.find(a => a.trim() && a === sinParentesis)
           ?? lineasAntes.find(a => a.includes(":") && a.split(":")[0] === etiqueta);
         pares.push({ antes: original ?? "(línea nueva)", despues: l });
       }

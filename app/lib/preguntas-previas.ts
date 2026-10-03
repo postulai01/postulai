@@ -29,7 +29,7 @@ export const MAX_PREGUNTAS_PREVIAS = 3;
 export const RELEVANCIA_MIN = 7;
 export const PALABRAS_OBJETIVO = 12;
 export const PALABRAS_MAX = 15;
-export const PALABRAS_RESUMEN = 5;
+export const PALABRAS_RESUMEN = 7; // y la pregunta completa con resumen ≤ PALABRAS_OBJETIVO
 export const RELEVANCIA_MIN_CONTEXTO = 0.6; // una propuesta semántica más débil no se nombra en la pregunta
 export const MODELO_PREVIAS = "claude-haiku-4-5-20251001";
 
@@ -112,7 +112,7 @@ export function preguntaValida(t: string): boolean {
 
 const palabrasDe = (t: string) => normalizarParaComparar(t).split(" ").filter(Boolean);
 
-// El resumen usa SOLO palabras de la línea citada (más "tu"/"tus"), ≤ PALABRAS_RESUMEN, sin comillas.
+// El resumen usa SOLO palabras de la línea citada (más "tu"/"tus"), ≤ PALABRAS_RESUMEN, sin comillas. Sin recortes.
 export function resumenValido(resumen: string, linea: string): boolean {
   if (/^[^:]{2,40}:\s/.test(linea)) return false; // lista "Técnicas: Excel, SAP…": recortarla parte nombres propios
   const ps = palabrasDe(resumen);
@@ -193,7 +193,10 @@ export function armarPreguntas(informe: InformeFit, jd: KeywordsJD, cv: string, 
     // Sin recortes: un resumen que no es válido tal cual se descarta (plantilla genérica y destino Conocimientos).
     const resumen = propuesto && p.contexto && resumenValido(propuesto, p.contexto) ? propuesto : undefined;
     // Con resumen si cabe en el objetivo de palabras; si no, la plantilla sin resumen.
-    const opciones = [resumen ? plantilla(p, resumen) : null, plantilla(p)].filter((t): t is string => !!t && preguntaValida(t));
+    // Con resumen solo si la pregunta completa cabe en PALABRAS_OBJETIVO; si no, la plantilla genérica.
+    const conResumen = resumen ? plantilla(p, resumen) : null;
+    const opciones = [conResumen && contarPalabras(conResumen) <= PALABRAS_OBJETIVO ? conResumen : null, plantilla(p)]
+      .filter((t): t is string => !!t && preguntaValida(t));
     const texto = opciones.find(t => contarPalabras(t) <= PALABRAS_OBJETIVO) ?? opciones[0];
     if (!texto) return; // ni la plantilla cabe en el tope: la pregunta no se hace
     const keyword = p.tipo === "anios_area" ? p.area ?? p.requisito : sinNivel(p.requisito);
