@@ -47,6 +47,7 @@ export interface Pregunta {
   requisito: string; tipo: TipoPregunta; relevancia: number; texto: string;
   contexto?: string; // línea del CV que da contexto (semántico, área del cargo) o cargo del puesto no contado (años en el área)
   area?: string;     // años en el área: el área pedida
+  relevanciaCita?: number; // semántico: relevancia que el modelo dio a la propuesta rechazada
 }
 export interface SugerenciaLimpieza { tema: "nacimiento" | "estado_civil" | "hijos" | "anios_perfil"; linea: string; texto: string }
 
@@ -66,7 +67,7 @@ export interface InformeFit {
 }
 
 // Propuesta semántica que los filtros rechazaron (evals/semantico/ o mapearSemantico): solo sirve de contexto de pregunta.
-export interface PropuestaRechazada { keyword: string; cita: string }
+export interface PropuestaRechazada { keyword: string; cita: string; relevancia?: number }
 
 export interface InputInforme {
   cv: string;
@@ -204,7 +205,8 @@ const evidencia = (e: { texto: string; foco: string[] }) => `«${recortar(e.text
 export function informeFit(input: InputInforme): InformeFit {
   const { cv, mapeo, keywordsJD: jd, nivelPosicion, cargo, etiquetas } = input;
   const cvPlano = colapsar(cv);
-  const citaDe = (k: string) => (input.rechazadas ?? []).find(r => mismaKeyword(r.keyword, k) && r.cita && cvPlano.includes(colapsar(r.cita)))?.cita;
+  const rechazadaDe = (k: string) => (input.rechazadas ?? []).find(r => mismaKeyword(r.keyword, k) && r.cita && cvPlano.includes(colapsar(r.cita)));
+  const citaDe = (k: string) => rechazadaDe(k)?.cita;
   // Área del cargo: la keyword que el parser deriva del título ("Reclutador Masivo" → "reclutamiento masivo").
   const kwCargo = cargo ? keywordDelCargo(cargo, normalizarParaComparar(cargo)) : null;
   const areaCalza = !!kwCargo && mapeo.matches_directos.some(m => mismaKeyword(m.keyword_jd, kwCargo));
@@ -315,6 +317,7 @@ export function informeFit(input: InputInforme): InformeFit {
       preguntas.push({
         requisito: keyword, tipo: tipo!, relevancia: relevancia.get(keyword) ?? 0,
         texto: redactarPregunta(keyword, tipo!, cv, etiquetas, citaDe(keyword)), ...(contexto ? { contexto } : {}),
+        ...(tipo === "semantico" && rechazadaDe(keyword)?.relevancia !== undefined ? { relevanciaCita: rechazadaDe(keyword)!.relevancia } : {}),
       });
     }
   }

@@ -62,6 +62,17 @@ async function main() {
     // La caché se invalida si cambia el system o el prompt.
     const prompt = pedido ? `${SYSTEM_PREVIAS}\n---\n${promptPrevias(pedido.resumenes, pedido.terminos)}` : undefined;
     let respuesta: RespuestaModelo = g.prompt === prompt ? g.respuesta ?? {} : {};
+    // Sin --ejecutar, de una caché de otro prompt se reutiliza solo lo que sigue valiendo: definiciones por término y
+    // resúmenes cuyo par "id. línea" estaba en el prompt guardado.
+    if (pedido && g.prompt !== prompt && !client && g.respuesta && g.prompt) {
+      respuesta = {
+        definiciones: g.respuesta.definiciones?.filter(d => pedido.terminos.includes(d.termino)),
+        resumenes: g.respuesta.resumenes?.filter(r => pedido.resumenes.some(x => x.id === Number(r.id) && g.prompt!.includes(`\n${x.id}. ${x.linea}\n`))),
+      };
+      const falta = pedido.terminos.some(t => !respuesta.definiciones?.some(d => d.termino === t))
+        || pedido.resumenes.some(x => !respuesta.resumenes?.some(r => Number(r.id) === x.id));
+      if (!falta) Object.assign(g, { prompt }); // todo lo pedido estaba en la caché: queda vigente
+    }
     if (pedido && g.prompt !== prompt) {
       estimado += (prompt!.length / CHARS_POR_TOKEN * PRECIO_IN + 150 * PRECIO_OUT) / 1e6;
       if (client) {
@@ -118,7 +129,7 @@ async function main() {
       console.log(`  todo "no": CV idéntico ${no.hechos.length === 0 ? "✅" : "❌"}`);
       informeSi.cumples.filter(c => /declarado por ti/.test(c.requisito)).forEach(c => console.log(`  informe: ✓ ${c.requisito}`));
     }
-    if (client) fs.writeFileSync(archivo, JSON.stringify(g, null, 2) + "\n");
+    if (client || g.prompt === prompt) fs.writeFileSync(archivo, JSON.stringify(g, null, 2) + "\n");
   }
 
   if (estimar) { console.log(`\nCosto estimado de --ejecutar: ~$${estimado.toFixed(4)}\n`); return; }

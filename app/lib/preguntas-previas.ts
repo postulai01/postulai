@@ -30,6 +30,7 @@ export const RELEVANCIA_MIN = 7;
 export const PALABRAS_OBJETIVO = 12;
 export const PALABRAS_MAX = 15;
 export const PALABRAS_RESUMEN = 5;
+export const RELEVANCIA_MIN_CONTEXTO = 0.6; // una propuesta semántica más débil no se nombra en la pregunta
 export const MODELO_PREVIAS = "claude-haiku-4-5-20251001";
 
 const PRIORIDAD: Record<string, number> = {
@@ -63,9 +64,13 @@ function yaEnCV(keyword: string, cv: string): boolean {
   return k.length > 0 && cv.split("\n").some(l => { const n = ` ${normalizarParaComparar(l)} `; return k.every(p => n.includes(` ${p} `)); });
 }
 
+// Semántico con propuesta débil (relevancia < RELEVANCIA_MIN_CONTEXTO o sin ella): pregunta genérica, sin contexto.
+const conContextoFiable = (p: Pregunta): Pregunta =>
+  p.tipo === "semantico" && !((p.relevanciaCita ?? 0) >= RELEVANCIA_MIN_CONTEXTO) ? { ...p, contexto: undefined } : p;
+
 export function seleccionarCandidatas(informe: InformeFit, jd: KeywordsJD, cv: string): (Pregunta & { impacto: number })[] {
   const deseable = new Set(jd.deseables.map(k => normalizarParaComparar(k.keyword)));
-  return [...informe.preguntas, ...informe.otras_preguntas]
+  return [...informe.preguntas, ...informe.otras_preguntas].map(conContextoFiable)
     .filter(p => p.tipo in PRIORIDAD && p.relevancia >= RELEVANCIA_MIN)
     .filter(p => p.tipo === "anios_area" || !yaEnCV(p.requisito, cv))
     .map(p => ({ ...p, impacto: p.relevancia * (deseable.has(normalizarParaComparar(p.requisito)) ? 0.5 : 1) }))
@@ -115,15 +120,6 @@ export function resumenValido(resumen: string, linea: string): boolean {
   if (!/^(tu|tus)$/.test(ps[0])) return false;
   const enLinea = new Set(palabrasDe(linea));
   return ps.slice(1).every(p => enLinea.has(p));
-}
-
-// Un resumen de más de PALABRAS_RESUMEN se recorta a sus primeras palabras, sin terminar en preposición, artículo
-// ni conjunción ("tu programa de desarrollo de jefes" → "tu programa de desarrollo").
-const FINAL_DEBIL = /^(de|del|la|las|el|los|un|una|y|e|o|u|en|para|por|con|a|al|que|sus|su)$/i;
-export function recortarResumen(resumen: string): string {
-  const ps = resumen.trim().split(/\s+/).slice(0, PALABRAS_RESUMEN);
-  while (ps.length > 1 && FINAL_DEBIL.test(ps[ps.length - 1])) ps.pop();
-  return ps.join(" ");
 }
 
 // Términos técnicos fuera del glosario: siglas o herramientas, inglés, normativas.
@@ -194,8 +190,8 @@ export function armarPreguntas(informe: InformeFit, jd: KeywordsJD, cv: string, 
   seleccionarCandidatas(informe, jd, cv).forEach((p, i) => {
     const id = i + 1;
     const propuesto = respuesta.resumenes?.find(r => Number(r.id) === id)?.resumen?.trim();
-    const recortado = propuesto ? recortarResumen(propuesto) : undefined;
-    const resumen = recortado && p.contexto && resumenValido(recortado, p.contexto) ? recortado : undefined;
+    // Sin recortes: un resumen que no es válido tal cual se descarta (plantilla genérica y destino Conocimientos).
+    const resumen = propuesto && p.contexto && resumenValido(propuesto, p.contexto) ? propuesto : undefined;
     // Con resumen si cabe en el objetivo de palabras; si no, la plantilla sin resumen.
     const opciones = [resumen ? plantilla(p, resumen) : null, plantilla(p)].filter((t): t is string => !!t && preguntaValida(t));
     const texto = opciones.find(t => contarPalabras(t) <= PALABRAS_OBJETIVO) ?? opciones[0];
@@ -291,14 +287,17 @@ export function agregarConocimientos(cv: string, hechos: HechoDeclarado[]): stri
   return lineas.join("\n");
 }
 
-// Inserta en código (sin modelo) cada keyword declarada para una viñeta, entre paréntesis al final:
-// "…para Hellmann's." → "…para Hellmann's (Trade Marketing).". Nada más cambia en la línea.
+// Inserta en código (sin modelo) cada keyword declarada para una viñeta, entre paréntesis al final de la primera
+// cláusula (antes de la primera coma) o, sin coma, al final: "…en los últimos 12 meses (procesos de RRHH), reduciendo…";
+// "…para Hellmann's (Trade Marketing).". Nada más cambia en la línea.
 export function insertarEnVinetas(cv: string, hechos: HechoDeclarado[]): string {
   const porLinea = new Map<string, string[]>();
   for (const h of hechos) if (h.destino.tipo === "vineta") porLinea.set(h.destino.linea, [...(porLinea.get(h.destino.linea) ?? []), h.keyword]);
   return cv.split("\n").map(l => {
     const kws = porLinea.get(l);
     if (!kws) return l;
+    const coma = l.search(/,\s/);
+    if (coma >= 0) return `${l.slice(0, coma)} (${kws.join(", ")})${l.slice(coma)}`;
     const m = l.match(/^(.*?)(\.?)(\s*)$/)!;
     return `${m[1]} (${kws.join(", ")})${m[2]}${m[3]}`;
   }).join("\n");
