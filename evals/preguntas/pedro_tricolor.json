@@ -4,7 +4,8 @@
     "resumenes": [
       {
         "id": 1,
-        "resumen": "tus activaciones de marca en puntos"
+        "resumen": "tus activaciones de marca para Hellmann's",
+        "origen": "respuesta de Haiku de la primera corrida de PED-5 (2026-10-02), registrada en la sesión; no quedó en git (08e8a25 tiene la segunda: \"tus activaciones para Hellmann's\")"
       }
     ],
     "definiciones": []

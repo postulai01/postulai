@@ -112,12 +112,17 @@ export function preguntaValida(t: string): boolean {
 
 const palabrasDe = (t: string) => normalizarParaComparar(t).split(" ").filter(Boolean);
 
+const FINAL_DEBIL = /^(de|del|la|las|el|los|un|una|y|e|o|u|en|para|por|con|a|al|que|sus|su)$/;
+
 // El resumen usa SOLO palabras de la línea citada (más "tu"/"tus"), ≤ PALABRAS_RESUMEN, sin comillas. Sin recortes.
 export function resumenValido(resumen: string, linea: string): boolean {
   if (/^[^:]{2,40}:\s/.test(linea)) return false; // lista "Técnicas: Excel, SAP…": recortarla parte nombres propios
   const ps = palabrasDe(resumen);
   if (ps.length === 0 || contarPalabras(resumen) > PALABRAS_RESUMEN || /["“”«»]/.test(resumen)) return false;
   if (!/^(tu|tus)$/.test(ps[0])) return false;
+  // Termina en infinitivo o en palabra débil: queda cortado ("tus datos de producción para identificar").
+  const ultima = ps[ps.length - 1];
+  if (ps.length > 1 && (FINAL_DEBIL.test(ultima) || /(ar|er|ir)$/.test(ultima))) return false;
   const enLinea = new Set(palabrasDe(linea));
   return ps.slice(1).every(p => enLinea.has(p));
 }
